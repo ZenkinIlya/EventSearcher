@@ -1,0 +1,36 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+        <item name="android:windowTranslucentStatus">true</item>    <!--прозрачный статус-->
+    </style>
+
+    <!--fullScreen activity-->
+    <style name="FullScreen" parent="AppTheme">
+        <item name="android:windowNoTitle">true</item>              <!--без заголовка-->
+        <item name="android:windowActionBar">false</item>           <!--без actionBar-->
+        <item name="android:windowTranslucentNavigation">true</item><!--прозрачная панель навигации-->
+    </style>
+
+    <!--    Анимация-->
+    <style name="LeftRightActivity" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/activity_left_right_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/activity_left_right_exit</item>
+        <item name="android:activityCloseExitAnimation">@anim/activity_left_right_close_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/activity_left_right_close_enter</item>
+    </style>
+
+    <!--Кнопка с загругленными краями-->
+    <style name="RoundedCornerButton" parent="@style/Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/btn_rounded_corner</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">60dp</item>
+        <item name="android:textSize">16sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
+</resources>

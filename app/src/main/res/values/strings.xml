@@ -1,0 +1,26 @@
+<resources>
+    <string name="app_name">EventSearcher</string>
+    <string name="entry">Вход</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="toComeIn">Войти</string>
+    <string name="youAreNotRegisteredYet">Вы еще не зарегестрированы?</string>
+    <string name="registration"><u>Регистрация</u></string>
+    <string name="registrationWithoutUnderline">Регистрация</string>
+    <string name="lengthPassword">Введите от 4 до 10 символов</string>
+    <string name="lengthLogin">Введите не менее 3 символов</string>
+    <string name="email">email</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="areYouAlreadyRegistered">Вы уже зарегестрированны?</string>
+    <string name="notValidEmail">Неверный формат email</string>
+    <string name="passwordsNotCompare">Пароли не совпадают</string>
+    <string name="confirmPassword">Подтвердите пароль</string>
+    <string name="forget_password">Забыли пароль</string>
+    <string name="registrationSuccess">Вы успешно зарегистрированы!</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="Map">Карта</string>
+    <string name="Events">Эвенты</string>
+    <string name="Subscribers">Подписки</string>
+    <string name="Profile">Профиль</string>
+</resources>
