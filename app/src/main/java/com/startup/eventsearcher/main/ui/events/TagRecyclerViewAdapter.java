@@ -4,15 +4,15 @@ import android.graphics.drawable.ColorDrawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.model.EventContent;
 
 import java.util.List;
 
@@ -34,7 +34,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.btnTag.setText(listTags.get(position));
+        holder.tagText.setText(listTags.get(position));
     }
 
     @Override
@@ -43,21 +43,23 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
-        public final Button btnTag;
+        public final TextView tagText;
+        public final CardView tagCard;
 
         public ViewHolder(View view) {
             super(view);
-            btnTag = (Button) view.findViewById(R.id.btn_tag);
+            tagText = view.findViewById(R.id.tagCardText);
+            tagCard = view.findViewById(R.id.tagCard);
 
-            btnTag.setOnClickListener(new View.OnClickListener() {
+            tagCard.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    if (((ColorDrawable) btnTag.getBackground()).getColor() == ContextCompat.getColor(view.getContext(), R.color.primaryLightColor)){
-                        btnTag.setBackgroundColor(ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor));
+                    if (tagCard.getCardBackgroundColor().getDefaultColor() == ContextCompat.getColor(view.getContext(), R.color.primaryLightColor)){
+                        tagCard.setCardBackgroundColor(ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor));
                     }else {
-                        btnTag.setBackgroundColor(ContextCompat.getColor(view.getContext(), R.color.primaryLightColor));
+                        tagCard.setCardBackgroundColor(ContextCompat.getColor(view.getContext(), R.color.primaryLightColor));
                     }
-                    Toast.makeText(view.getContext(), "ff", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(view.getContext(), "press tag", Toast.LENGTH_SHORT).show();
                 }
             });
         }

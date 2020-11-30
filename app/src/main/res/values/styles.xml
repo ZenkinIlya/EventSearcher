@@ -33,9 +33,11 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
-    <!--Тег с загругленными краями-->
-    <style name="tag" parent="@style/Widget.AppCompat.Button.Colored">
-        <item name="android:background">@drawable/tag_rounded_corner</item>
+    <!--Карточка с загругленными краями-->
+    <style name="Card" parent="@style/Widget.MaterialComponents.CardView">
+        <item name="cardCornerRadius">20dp</item>
+        <item name="cardElevation">8dp</item>
+        <item name="cardBackgroundColor">@color/primaryLightColor</item>
     </style>
 
 </resources>
