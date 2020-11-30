@@ -23,4 +23,15 @@
     <string name="Events">Эвенты</string>
     <string name="Subscribers">Подписки</string>
     <string name="Profile">Профиль</string>
+
+    <string-array name="category">
+        <item>Футбол</item>
+        <item>Баскетбол</item>
+        <item>Волейбол</item>
+        <item>Теннис</item>
+        <item>Настольный теннис</item>
+        <item>Бокс</item>
+        <item>Workout</item>
+        <item>Бадминтон</item>
+    </string-array>
 </resources>

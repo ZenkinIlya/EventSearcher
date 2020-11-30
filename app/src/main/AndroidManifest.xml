@@ -16,7 +16,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".utils.SuccessActivity"></activity>
+        <activity android:name=".utils.SuccessActivity"/>
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -34,7 +34,7 @@
             android:theme="@style/FullScreen" />
         <activity
             android:name=".main.MainActivity"
-            android:theme="@style/AppTheme" />
+            android:theme="@style/FullScreen" />
         <activity
             android:name=".introduction.IntroductionActivity"
             android:theme="@style/FullScreen">

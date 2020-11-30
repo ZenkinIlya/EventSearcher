@@ -14,6 +14,7 @@ import com.startup.eventsearcher.main.ui.events.EventFragment;
 import com.startup.eventsearcher.main.ui.map.MapsFragment;
 import com.startup.eventsearcher.main.ui.profile.ProfileFragment;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeFragment;
+import com.startup.eventsearcher.utils.Design;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Design.setStatusBarGradient(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -58,6 +60,5 @@ public class MainActivity extends AppCompatActivity {
                 return true;
             }
         });
-
     }
 }

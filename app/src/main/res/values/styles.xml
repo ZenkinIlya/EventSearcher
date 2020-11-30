@@ -5,7 +5,6 @@
         <item name="colorPrimaryDark">@color/primaryDarkColor</item>
         <item name="colorAccent">@color/primaryLightColor</item>
         <item name="android:textColor">@color/primaryTextColor</item>
-        <item name="android:windowTranslucentStatus">true</item>    <!--прозрачный статус-->
     </style>
 
     <!--fullScreen activity-->
@@ -13,6 +12,7 @@
         <item name="android:windowNoTitle">true</item>              <!--без заголовка-->
         <item name="android:windowActionBar">false</item>           <!--без actionBar-->
         <item name="android:windowTranslucentNavigation">true</item><!--прозрачная панель навигации-->
+        <item name="android:windowTranslucentStatus">true</item>    <!--прозрачный статус-->
     </style>
 
     <!--    Анимация-->
@@ -31,6 +31,11 @@
         <item name="android:textSize">16sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/white</item>
+    </style>
+
+    <!--Тег с загругленными краями-->
+    <style name="tag" parent="@style/Widget.AppCompat.Button.Colored">
+        <item name="android:background">@drawable/tag_rounded_corner</item>
     </style>
 
 </resources>

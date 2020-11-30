@@ -1,16 +1,16 @@
-package com.startup.eventsearcher.main.ui.events.dummy;
+package com.startup.eventsearcher.main.ui.events.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DummyContent {
+public class EventContent {
 
-    public static final List<DummyItem> ITEMS = new ArrayList<DummyItem>();
-    public static final Map<String, DummyItem> ITEM_MAP = new HashMap<String, DummyItem>();
+    public static final List<EventItem> ITEMS = new ArrayList<>();
+    public static final Map<String, EventItem> ITEM_MAP = new HashMap<>();
 
-    private static final int COUNT = 25;
+    private static final int COUNT = 7;
 
     static {
         // Add some sample items.
@@ -19,24 +19,24 @@ public class DummyContent {
         }
     }
 
-    private static void addItem(DummyItem item) {
+    private static void addItem(EventItem item) {
         ITEMS.add(item);
         ITEM_MAP.put(item.id, item);
     }
 
-    private static DummyItem createDummyItem(int position) {
-        return new DummyItem(String.valueOf(position), "Футбол " + position, "Спортивная",
+    private static EventItem createDummyItem(int position) {
+        return new EventItem(String.valueOf(position), "Футбол " + position, "Спортивная",
                 "6", "19:30");
     }
 
-    public static class DummyItem {
+    public static class EventItem {
         public final String id;
         public final String title;
         public final String address;
         public final String countPeople;
         public final String time;
 
-        public DummyItem(String id, String title, String address, String countPeople, String time) {
+        public EventItem(String id, String title, String address, String countPeople, String time) {
             this.id = id;
             this.title = title;
             this.address = address;

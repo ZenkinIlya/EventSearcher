@@ -1,5 +1,6 @@
 package com.startup.eventsearcher.main.ui.events;
 
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.view.LayoutInflater;
@@ -8,18 +9,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.dummy.DummyContent.DummyItem;
+import com.startup.eventsearcher.main.ui.events.model.EventContent.EventItem;
 
 import java.util.List;
 
-public class MyEventRecyclerViewAdapter extends RecyclerView.Adapter<MyEventRecyclerViewAdapter.ViewHolder> {
+public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
 
-    private final List<DummyItem> Values;
+    private final List<EventItem> listEvents;
 
-    public MyEventRecyclerViewAdapter(List<DummyItem> items) {
-        Values = items;
+    public EventRecyclerViewAdapter(List<EventItem> items) {
+        listEvents = items;
     }
 
+    @NonNull
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
@@ -29,19 +31,18 @@ public class MyEventRecyclerViewAdapter extends RecyclerView.Adapter<MyEventRecy
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-//        holder.mItem = Values.get(position);
-        holder.eventTitle.setText(Values.get(position).title);
-        holder.eventAddress.setText(Values.get(position).address);
-        holder.eventCountPeople.setText(Values.get(position).countPeople);
-        holder.eventTime.setText(Values.get(position).time);
+        holder.eventTitle.setText(listEvents.get(position).title);
+        holder.eventAddress.setText(listEvents.get(position).address);
+        holder.eventCountPeople.setText(listEvents.get(position).countPeople);
+        holder.eventTime.setText(listEvents.get(position).time);
     }
 
     @Override
     public int getItemCount() {
-        return Values.size();
+        return listEvents.size();
     }
 
-    public class ViewHolder extends RecyclerView.ViewHolder {
+    public static class ViewHolder extends RecyclerView.ViewHolder {
         public final View View;
         public final TextView eventTitle;
         public final TextView eventAddress;
