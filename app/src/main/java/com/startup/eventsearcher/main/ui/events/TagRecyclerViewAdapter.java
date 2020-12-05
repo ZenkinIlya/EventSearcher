@@ -18,6 +18,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.utils.animation.MovingAnimation;
+import com.startup.eventsearcher.utils.animation.ResizeAnimation;
 
 import java.util.List;
 
@@ -49,13 +51,19 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                 int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
                 int duration = 300;
                 if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
-                    showImageSearchOnTheTag(holder.imageView, true);
-                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
+                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32);
+                    resizeAnimation.setDuration(400);
+                    holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(startColor, endColor, duration, holder.tagCard);
+                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
+                    holder.imageView.setVisibility(View.VISIBLE);
                 } else {
-                    showImageSearchOnTheTag(holder.imageView, false);
-                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
+                    holder.imageView.setVisibility(View.INVISIBLE);
+                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32);
+                    resizeAnimation.setDuration(400);
+                    holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(endColor, startColor, duration, holder.tagCard);
+                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
                 }
             }
         });
