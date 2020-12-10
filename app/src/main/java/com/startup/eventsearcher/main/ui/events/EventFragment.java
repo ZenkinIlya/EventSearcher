@@ -28,8 +28,10 @@ public class EventFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventList);
         eventRecyclerView.setAdapter(new EventRecyclerViewAdapter(EventContent.ITEMS));
+
         RecyclerView tagRecyclerView = view.findViewById(R.id.eventTagList);
-        tagRecyclerView.setAdapter(new TagRecyclerViewAdapter(Arrays.asList(requireContext().getResources().getStringArray(R.array.category))));
+        tagRecyclerView.setAdapter(new TagRecyclerViewAdapter(
+                Arrays.asList(requireContext().getResources().getStringArray(R.array.category))));
 
         return view;
     }

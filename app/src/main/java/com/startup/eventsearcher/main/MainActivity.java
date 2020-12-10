@@ -21,6 +21,8 @@ import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static final String TAG = "myMain";
+
     @BindView(R.id.main_frame) FrameLayout mainFrame;
     @BindView(R.id.main_nav) BottomNavigationView bottomNavigationView;
 

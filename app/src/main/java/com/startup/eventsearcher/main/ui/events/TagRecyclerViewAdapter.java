@@ -21,6 +21,7 @@ import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.utils.animation.MovingAnimation;
 import com.startup.eventsearcher.utils.animation.ResizeAnimation;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.ViewHolder> {
@@ -28,7 +29,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
     private final List<String> listTags;
 
     public TagRecyclerViewAdapter(List<String> items) {
-        listTags = items;
+        this.listTags = items;
     }
 
     @NonNull
@@ -46,21 +47,20 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
         holder.tagCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                 int startColor = ContextCompat.getColor(view.getContext(), R.color.primaryLightColor);
                 int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
                 int duration = 300;
                 if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
                     ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32);
-                    resizeAnimation.setDuration(400);
+                    resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(startColor, endColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
                     holder.imageView.setVisibility(View.VISIBLE);
-                } else {
+                } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
                     holder.imageView.setVisibility(View.INVISIBLE);
                     ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32);
-                    resizeAnimation.setDuration(400);
+                    resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(endColor, startColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
@@ -87,14 +87,6 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
             }
         });
         anim.start();
-    }
-
-    private void showImageSearchOnTheTag(ImageView imageView, boolean show){
-        if (show){
-            imageView.setImageResource(R.drawable.ic_search);
-        }else {
-            imageView.setImageDrawable(null);
-        }
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder{
