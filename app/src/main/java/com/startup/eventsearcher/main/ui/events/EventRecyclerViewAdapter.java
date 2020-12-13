@@ -3,11 +3,15 @@ package com.startup.eventsearcher.main.ui.events;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Context;
+import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.model.EventContent.EventItem;
 
@@ -16,8 +20,10 @@ import java.util.List;
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
 
     private final List<EventItem> listEvents;
+    private Context context;
 
-    public EventRecyclerViewAdapter(List<EventItem> items) {
+    public EventRecyclerViewAdapter(Context context, List<EventItem> items) {
+        this.context = context;
         listEvents = items;
     }
 
@@ -35,6 +41,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         holder.eventAddress.setText(listEvents.get(position).address);
         holder.eventCountPeople.setText(listEvents.get(position).countPeople);
         holder.eventTime.setText(listEvents.get(position).time);
+        Glide.with(context).load(R.drawable.img_soccer).into(holder.eventImage);
     }
 
     @Override
@@ -48,6 +55,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         public final TextView eventAddress;
         public final TextView eventCountPeople;
         public final TextView eventTime;
+        public final ImageView eventImage;
 
         public ViewHolder(View view) {
             super(view);
@@ -56,6 +64,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             eventAddress = (TextView) view.findViewById(R.id.list_events_address);
             eventCountPeople = (TextView) view.findViewById(R.id.list_events_count_people);
             eventTime = (TextView) view.findViewById(R.id.list_events_time);
+            eventImage = view.findViewById(R.id.list_events_image_category);
         }
     }
 }

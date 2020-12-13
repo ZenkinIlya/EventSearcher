@@ -7,6 +7,7 @@ import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -15,6 +16,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
@@ -56,9 +58,9 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(startColor, endColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
-                    holder.imageView.setVisibility(View.VISIBLE);
+                    animateSearchImage(holder.imageView, duration);
                 } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
-                    holder.imageView.setVisibility(View.INVISIBLE);
+                    animateSearchImage(holder.imageView, duration);
                     ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32);
                     resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
@@ -72,6 +74,35 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
     @Override
     public int getItemCount() {
         return listTags.size();
+    }
+
+    private void animateSearchImage(final ImageView imageView, int duration){
+        final float alpha;
+        if (imageView.getVisibility() == View.INVISIBLE){
+            alpha = 1f;
+            ViewCompat.animate(imageView).withStartAction(new Runnable() {
+                @Override
+                public void run() {
+                    imageView.setVisibility(View.VISIBLE);
+                }
+            })
+                    .alpha(alpha)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .setDuration(duration)
+                    .start();
+        }else {
+            alpha = 0f;
+            ViewCompat.animate(imageView).withEndAction(new Runnable() {
+                @Override
+                public void run() {
+                    imageView.setVisibility(View.INVISIBLE);
+                }
+            })
+                    .alpha(alpha)
+                    .setInterpolator(new AccelerateDecelerateInterpolator())
+                    .setDuration(duration)
+                    .start();
+        }
     }
 
     private void startColorAnimation(int startColor, int endColor, int duration, final CardView tagCard) {

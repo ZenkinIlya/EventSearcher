@@ -12,6 +12,7 @@ import com.startup.eventsearcher.R;
 
 public class Design {
 
+    //Фон под всем activity
     public static void setStatusBarGradient(Activity activity) {
         Window window = activity.getWindow();
         Drawable background = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.gradient, null);

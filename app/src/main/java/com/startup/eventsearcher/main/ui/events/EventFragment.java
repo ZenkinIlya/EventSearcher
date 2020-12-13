@@ -27,7 +27,7 @@ public class EventFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventList);
-        eventRecyclerView.setAdapter(new EventRecyclerViewAdapter(EventContent.ITEMS));
+        eventRecyclerView.setAdapter(new EventRecyclerViewAdapter(getContext(), EventContent.ITEMS));
 
         RecyclerView tagRecyclerView = view.findViewById(R.id.eventTagList);
         tagRecyclerView.setAdapter(new TagRecyclerViewAdapter(
