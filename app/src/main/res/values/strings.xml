@@ -17,12 +17,11 @@
     <string name="confirmPassword">Подтвердите пароль</string>
     <string name="forget_password">Забыли пароль</string>
     <string name="registrationSuccess">Вы успешно зарегистрированы!</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="Map">Карта</string>
     <string name="Events">Эвенты</string>
     <string name="Subscribers">Подписки</string>
     <string name="Profile">Профиль</string>
+    <string name="addEvent">Добавить эвент</string>
 
     <string-array name="category">
         <item>Футбол</item>

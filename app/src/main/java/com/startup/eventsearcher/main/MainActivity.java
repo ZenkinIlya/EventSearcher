@@ -1,30 +1,18 @@
 package com.startup.eventsearcher.main;
 
-import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.DialogFragment;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.fragment.NavHostFragment;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
 import android.content.DialogInterface;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
-import com.google.android.gms.dynamic.SupportFragmentWrapper;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.fragment.NavHostFragment;
+
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.EventFragment;
-import com.startup.eventsearcher.main.ui.map.MapsFragment;
-import com.startup.eventsearcher.main.ui.profile.ProfileFragment;
-import com.startup.eventsearcher.main.ui.subscribe.SubscribeFragment;
-import com.startup.eventsearcher.utils.Design;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
