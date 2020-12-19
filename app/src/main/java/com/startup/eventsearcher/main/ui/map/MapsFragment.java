@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.ColorStateList;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -14,6 +15,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,7 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
-import androidx.fragment.app.DialogFragment;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentTransaction;
 
@@ -40,6 +43,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
 
 import java.io.IOException;
 import java.util.List;
@@ -67,8 +71,14 @@ public class MapsFragment extends Fragment {
 
     @BindView(R.id.map_search_view)
     SearchView searchView;
-    @BindView(R.id.map_fab_add_event)
+    @BindView(R.id.map_fab_show_marker)
     FloatingActionButton fabAddEvent;
+    @BindView(R.id.map_add_event)
+    Button btnAddEvent;
+    @BindView(R.id.map_add_event_marker)
+    ImageView imageViewAddEventMarker;
+
+
 
     @Nullable
     @Override
@@ -222,18 +232,7 @@ public class MapsFragment extends Fragment {
                 }
             }
             case PLACE_PICKER_REQUEST: {
-                //***BILLING***
-/*                if (resultCode == RESULT_OK) {
-                    Place place = Autocomplete.getPlaceFromIntent(data);
-                    Log.i(TAG, "Place: " + place.getName() + ", " + place.getId());
-                } else if (resultCode == AutocompleteActivity.RESULT_ERROR) {
-                    Status status = Autocomplete.getStatusFromIntent(data);
-                    if (status.getStatusMessage() != null) {
-                        Log.i(TAG, status.getStatusMessage());
-                    }
-                } else if (resultCode == RESULT_CANCELED) {
-                    Log.d(TAG, "onActivityResult: Пользователь отменил операцию");
-                }*/
+                Log.d(TAG, "onActivityResult: placePickerRequest");
             }
         }
     }
@@ -260,14 +259,17 @@ public class MapsFragment extends Fragment {
                 fragmentTransaction.remove(prev);
             }
             fragmentTransaction.addToBackStack(null);
-            DialogFragment dialogFragment = new ConfirmAddress();
+
+            Intent intent = new Intent(getContext(), EventCreatorActivity.class);
+            startActivity(intent);
+/*            DialogFragment dialogFragment = new ConfirmAddress();
 
             Bundle args = new Bundle();
             args.putDouble("lat", latLng.latitude);
             args.putDouble("long", latLng.longitude);
             args.putString("address", address);
             dialogFragment.setArguments(args);
-            dialogFragment.show(fragmentTransaction, "dd");
+            dialogFragment.show(fragmentTransaction, "dialog");*/
             return address;
         } catch (IOException e) {
             e.printStackTrace();
@@ -275,35 +277,41 @@ public class MapsFragment extends Fragment {
         }
     }
 
-    //Добавление эвента
+    //Добавление эвента / вызывать только после инициализаци map в onMapReady
     private void addPlace() {
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+        fabAddEvent.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onMapClick(LatLng latLng) {
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(latLng);
-
-                markerOptions.title(getAddress(latLng));
-                map.clear();
-                CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
-                        latLng, 15);
-                map.animateCamera(location);
-                map.addMarker(markerOptions);
+            public void onClick(View view) {
+                if (imageViewAddEventMarker.getVisibility() == View.INVISIBLE){
+                    imageViewAddEventMarker.setVisibility(View.VISIBLE);
+                    btnAddEvent.setVisibility(View.VISIBLE);
+                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_remove));
+                    fabAddEvent.setBackgroundTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(view.getContext(), R.color.warning)));
+                }else{
+                    imageViewAddEventMarker.setVisibility(View.INVISIBLE);
+                    btnAddEvent.setVisibility(View.INVISIBLE);
+                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_add));
+                    fabAddEvent.setBackgroundTintList(ColorStateList.valueOf(
+                            ContextCompat.getColor(view.getContext(), R.color.primaryLightColor)));
+                }
             }
         });
 
-        fabAddEvent.setOnClickListener(view -> {
+        btnAddEvent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                LatLng target = map.getCameraPosition().target;
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(target);
 
-            //***BILLING***
-/*            if (!Places.isInitialized()) {
-                Places.initialize(requireContext(), getString(R.string.google_maps_key));
+                markerOptions.title(getAddress(target));
+                CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
+                        target, 15);
+                map.animateCamera(location);
+                map.addMarker(markerOptions);
+                Log.d(TAG, "onClick: end btnAddEventOnClick");
             }
-            List<Place.Field> fields = Arrays.asList(Place.Field.ID, Place.Field.NAME);
-
-            Intent intent = new Autocomplete.IntentBuilder(
-                    AutocompleteActivityMode.FULLSCREEN, fields)
-                    .build(requireContext());
-            startActivityForResult(intent, PLACE_PICKER_REQUEST);*/
         });
     }
 
@@ -355,7 +363,7 @@ public class MapsFragment extends Fragment {
             //Инициализация добавления места
             addPlace();
             //Установка отступа для элементов GoogleMap
-            map.setPadding(0, 90, 0, 0);
+            map.setPadding(0, 90, 0, 90);
             try {
                 if (locationPermissionGranted) {
                     getDeviceLocation();

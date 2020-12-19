@@ -22,17 +22,39 @@
         android:elevation="5dp"
         android:background="@drawable/bg_round_corners"/>
 
+    <ImageView
+        android:id="@+id/map_add_event_marker"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="invisible"
+        android:src="@drawable/ic_marker"
+        android:contentDescription="@string/newEventPlace" />
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/map_fab_add_event"
+        android:id="@+id/map_fab_show_marker"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="end|bottom"
         android:scaleType="fitXY"
         android:src="@drawable/ic_add"
-        android:background="@color/white"
-        android:contentDescription="@string/addEvent"
+        android:contentDescription="@string/showMarker"
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_margin="16dp" />
+
+    <Button
+        android:id="@+id/map_add_event"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/addEvent"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="20dp"
+        android:padding="16dp"
+        android:textColor="@color/white"
+        android:translationZ="6dp"
+        android:visibility="invisible"
+        android:background="@drawable/blue_circle"/>
 
 </RelativeLayout>

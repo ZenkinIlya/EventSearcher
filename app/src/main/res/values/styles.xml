@@ -7,6 +7,13 @@
         <item name="android:textColor">@color/primaryTextColor</item>
     </style>
 
+    <style name="AppThemeWithActionBar" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="colorPrimary">@color/primaryColor</item>
+        <item name="colorPrimaryDark">@color/primaryDarkColor</item>
+        <item name="colorAccent">@color/primaryLightColor</item>
+        <item name="android:textColor">@color/primaryTextColor</item>
+    </style>
+
     <!--fullScreen activity-->
     <style name="FullScreen" parent="AppTheme">
         <item name="android:windowNoTitle">true</item>              <!--без заголовка-->
@@ -36,7 +43,8 @@
     <!--Карточка с загругленными краями-->
     <style name="Card" parent="@style/Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">20dp</item>
-        <item name="cardElevation">8dp</item>
+        <item name="cardElevation">6dp</item>
+        <item name="android:translationZ">6dp</item>
         <item name="cardBackgroundColor">@color/primaryLightColor</item>
     </style>
 

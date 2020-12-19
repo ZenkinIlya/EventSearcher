@@ -28,6 +28,8 @@ import com.startup.eventsearcher.R;
 public class ConfirmAddress extends DialogFragment implements
         android.view.View.OnClickListener, OnMapReadyCallback {
 
+    private static final String TAG = "confirmAddress";
+
     public Activity c;
     public Dialog d;
     public Button yes, no;
@@ -69,6 +71,7 @@ public class ConfirmAddress extends DialogFragment implements
             public void onClick(View v) {
                 Toast.makeText(getActivity(), myAddress.getText().toString(), Toast.LENGTH_LONG).show();
                 getChildFragmentManager().beginTransaction().remove(mapFragment).commit();
+                Log.d(TAG, "onClick: selectBtn");
                 dismiss();
             }
         });

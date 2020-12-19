@@ -8,8 +8,7 @@
         <item>
             <shape android:shape="rectangle">
                 <corners android:radius="20dp"/>
-                <gradient android:startColor="@color/primaryLightColor"
-                    android:endColor="@color/primaryDarkColor"/>
+                <solid android:color="@color/primaryLightColor"/>
             </shape>
         </item>
     </ripple>
