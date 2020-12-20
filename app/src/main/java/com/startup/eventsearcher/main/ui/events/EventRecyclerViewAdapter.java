@@ -4,7 +4,6 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -41,7 +40,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         holder.eventAddress.setText(listEvents.get(position).address);
         holder.eventCountPeople.setText(listEvents.get(position).countPeople);
         holder.eventTime.setText(listEvents.get(position).time);
-        Glide.with(context).load(R.drawable.img_soccer).into(holder.eventImage);
+        Glide.with(context).load(R.drawable.img_football).into(holder.eventImage);
     }
 
     @Override

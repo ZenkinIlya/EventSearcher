@@ -1,5 +1,6 @@
 package com.startup.eventsearcher.main.ui.map.createEvent;
 
+import android.content.res.TypedArray;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.MenuItem;
@@ -17,6 +18,7 @@ import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequ
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.ErrorServerHandler;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -42,6 +44,9 @@ public class EventCreatorActivity extends AppCompatActivity {
     private static ErrorServerHandler errorServer;
     private Handler handler;
 
+    private ArrayList<Integer> categoryArrayList = new ArrayList<>();
+    private CategoryAdapter categoryAdapter;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -51,7 +56,25 @@ public class EventCreatorActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setTitle("Создание эвента");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        categoryAdapter = new CategoryAdapter(this, categoryArrayList);
+        viewPagerCategory.setAdapter(categoryAdapter);
+
         componentListener();
+        initCategorySlider();
+    }
+
+    private void initCategorySlider() {
+        TypedArray categoryImageResources = getResources()
+                .obtainTypedArray(R.array.sports_images);
+
+        categoryArrayList.clear();
+
+        for (int i = 0; i < categoryImageResources.length(); i++) {
+            categoryArrayList.add(categoryImageResources.getResourceId(i, 0));
+        }
+
+        categoryImageResources.recycle();
+        categoryAdapter.notifyDataSetChanged();
     }
 
     private void componentListener() {

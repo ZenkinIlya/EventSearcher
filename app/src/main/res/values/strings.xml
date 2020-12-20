@@ -31,13 +31,26 @@
     <string name="accept">Подтвердить</string>
 
     <string-array name="category">
-        <item>Футбол</item>
-        <item>Баскетбол</item>
-        <item>Волейбол</item>
-        <item>Теннис</item>
-        <item>Настольный теннис</item>
-        <item>Бокс</item>
-        <item>Workout</item>
         <item>Бадминтон</item>
+        <item>Баскетбол</item>
+        <item>Боулинг</item>
+        <item>Гольф</item>
+        <item>Бег</item>
+        <item>Футбол</item>
+        <item>Плаванье</item>
+        <item>Настольный теннис</item>
+        <item>Большой теннис</item>
     </string-array>
+
+    <array name="sports_images">
+        <item>@drawable/img_badminton</item>
+        <item>@drawable/img_basketball</item>
+        <item>@drawable/img_bowling</item>
+        <item>@drawable/img_golf</item>
+        <item>@drawable/img_running</item>
+        <item>@drawable/img_football</item>
+        <item>@drawable/img_swimming</item>
+        <item>@drawable/img_tabletennis</item>
+        <item>@drawable/img_tennis</item>
+    </array>
 </resources>
