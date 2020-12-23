@@ -26,32 +26,37 @@ import androidx.appcompat.widget.SearchView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.main.ui.events.EventsList;
+import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.app.Activity.RESULT_OK;
 
 public class MapsFragment extends Fragment {
 
@@ -60,7 +65,7 @@ public class MapsFragment extends Fragment {
     public static final int ERROR_DIALOG_REQUEST = 9001;
     private static final int PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION = 9002;
     private static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
-    private static final int PLACE_PICKER_REQUEST = 1;
+    private static final int CREATE_EVENT = 1;
 
     private boolean locationPermissionGranted = false;
 
@@ -109,6 +114,12 @@ public class MapsFragment extends Fragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         Log.d(TAG, "onActivityCreated()");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState():");
     }
 
     @Override
@@ -219,61 +230,53 @@ public class MapsFragment extends Fragment {
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         Log.d(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
-        Log.d(TAG, "onActivityResult: requireContext() = " +requireContext());
-        Log.d(TAG, "onActivityResult: data = " + data);
-        switch (requestCode) {
-            case PERMISSIONS_REQUEST_ENABLE_GPS: {
-                if (locationPermissionGranted) {
-                    Log.d(TAG, "onActivityResult: Доступ к геолокации предоставлен");
-                    initMap();
-                } else {
-                    Log.d(TAG, "onActivityResult: Доступ к геолокации НЕ предоставлен");
-                    getLocationPermission();
+        if (resultCode == RESULT_OK) {
+            switch (requestCode) {
+                case PERMISSIONS_REQUEST_ENABLE_GPS: {
+                    Log.d(TAG, "onActivityResult: PERMISSIONS_REQUEST_ENABLE_GPS");
+                    if (locationPermissionGranted) {
+                        Log.d(TAG, "onActivityResult: Доступ к геолокации предоставлен");
+                        initMap();
+                    } else {
+                        Log.d(TAG, "onActivityResult: Доступ к геолокации НЕ предоставлен");
+                        getLocationPermission();
+                    }
+                }
+                case CREATE_EVENT: {
+                    //Получаю координаты и стаавлю метку на карте
+                    //Либо это можно не делать, так как при создании эвент будет грузиться на
+                    //сервер и после перехода на карту будут подгружаться с сервера все эвенты
+                    //хотя это не точно
+                    Log.d(TAG, "onActivityResult: CREATE_EVENT");
+                    Event event = (Event) data.getSerializableExtra("Event");
+                    Log.d(TAG, "buttonAccept: event = " + Objects.requireNonNull(event).toString());
                 }
             }
-            case PLACE_PICKER_REQUEST: {
-                Log.d(TAG, "onActivityResult: placePickerRequest");
-            }
+        }else{
+            Log.w(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
         }
     }
 
-    private String getAddress(LatLng latLng){
-
+    private void getAddress(LatLng latLng){
         Geocoder geocoder;
         List<Address> addresses;
+        Address addressObject;
         geocoder = new Geocoder(requireContext(), Locale.getDefault());
-
         try {
-            // Here 1 represent max location result to returned, by documents it recommended 1 to 5
             addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
-            // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
-            String address = addresses.get(0).getAddressLine(0);
-            String city = addresses.get(0).getLocality();
-            String state = addresses.get(0).getAdminArea();
-            String country = addresses.get(0).getCountryName();
-            String postalCode = addresses.get(0).getPostalCode();
-            String knownName = addresses.get(0).getFeatureName();
-            FragmentTransaction fragmentTransaction = getChildFragmentManager().beginTransaction();
-            Fragment prev = getChildFragmentManager().findFragmentByTag("dialog");
-            if (prev != null) {
-                fragmentTransaction.remove(prev);
-            }
-            fragmentTransaction.addToBackStack(null);
+            addressObject = addresses.get(0);
+
+            //в addressObject лежит ближайшая координата к области, отмеченной пользователем
+            //Нам нужна та координата которую поставил непосредсвенно пользователь
+            addressObject.setLatitude(latLng.latitude);
+            addressObject.setLongitude(latLng.longitude);
 
             Intent intent = new Intent(getContext(), EventCreatorActivity.class);
-            startActivity(intent);
-/*            DialogFragment dialogFragment = new ConfirmAddress();
+            intent.putExtra("Address", addressObject);
+            startActivityForResult(intent, CREATE_EVENT);
 
-            Bundle args = new Bundle();
-            args.putDouble("lat", latLng.latitude);
-            args.putDouble("long", latLng.longitude);
-            args.putString("address", address);
-            dialogFragment.setArguments(args);
-            dialogFragment.show(fragmentTransaction, "dialog");*/
-            return address;
         } catch (IOException e) {
             e.printStackTrace();
-            return "No Address Found";
         }
     }
 
@@ -302,15 +305,7 @@ public class MapsFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 LatLng target = map.getCameraPosition().target;
-                MarkerOptions markerOptions = new MarkerOptions();
-                markerOptions.position(target);
-
-                markerOptions.title(getAddress(target));
-                CameraUpdate location = CameraUpdateFactory.newLatLngZoom(
-                        target, 15);
-                map.animateCamera(location);
-                map.addMarker(markerOptions);
-                Log.d(TAG, "onClick: end btnAddEventOnClick");
+                getAddress(target);
             }
         });
     }
@@ -360,10 +355,13 @@ public class MapsFragment extends Fragment {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             map = googleMap;
+            map.setOnMarkerClickListener(callbackMarkerClickListener);
             //Инициализация добавления места
             addPlace();
             //Установка отступа для элементов GoogleMap
-            map.setPadding(0, 90, 0, 90);
+            map.setPadding(0, 90, 0, 130);
+            //Расставляем все эвент-маркеры на карте
+            setEventMarkerOnMap();
             try {
                 if (locationPermissionGranted) {
                     getDeviceLocation();
@@ -383,6 +381,20 @@ public class MapsFragment extends Fragment {
             map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         }
     };
+
+    //Установка эвент-маркеров на карте
+    private void setEventMarkerOnMap() {
+        ArrayList<Event> eventArrayList = EventsList.getEventArrayList();
+        for (Event event: eventArrayList){
+            LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
+                    event.getEventAddress().getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            markerOptions.title(event.getHeader());
+            Marker marker = map.addMarker(markerOptions);
+            marker.setTag(event);
+        }
+    }
 
     private void getDeviceLocation() {
         fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(requireContext());
@@ -434,7 +446,7 @@ public class MapsFragment extends Fragment {
                     if (addressList != null && !addressList.isEmpty()) {
                         Address address = addressList.get(0);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-                        map.addMarker(new MarkerOptions().position(latLng).title("Marker in Sydney"));
+                        map.addMarker(new MarkerOptions().position(latLng).title(address.getSubLocality()));
                         map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
                     }
                     return false;
@@ -446,4 +458,20 @@ public class MapsFragment extends Fragment {
                 }
             };
 
+    private GoogleMap.OnMarkerClickListener callbackMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
+        @Override
+        public boolean onMarkerClick(Marker marker) {
+            //Получаем тег маркера, т.е. получаем эвент который привязан к маркеру
+            Event event = (Event) marker.getTag();
+
+            Intent intent = new Intent(getContext(), EventActivity.class);
+            intent.putExtra("Event", event);
+            startActivity(intent);
+
+            // Return false to indicate that we have not consumed the event and that we wish
+            // for the default behavior to occur (which is for the camera to move such that the
+            // marker is centered and for the marker's info window to open, if it has one).
+            return false;
+        }
+    };
 }

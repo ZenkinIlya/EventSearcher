@@ -1,24 +1,38 @@
 package com.startup.eventsearcher.main.ui.map.createEvent;
 
-import android.content.res.TypedArray;
+import android.content.Intent;
+import android.location.Address;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.viewpager.widget.ViewPager;
 
+import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
+import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
+import com.startup.eventsearcher.main.ui.events.EventsList;
+import com.startup.eventsearcher.main.ui.events.model.Category;
+import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.main.ui.events.model.EventAddress;
+import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
+import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
+import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.ErrorServerHandler;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -26,12 +40,16 @@ import butterknife.ButterKnife;
 
 public class EventCreatorActivity extends AppCompatActivity {
 
+    private static final String TAG = "myEventCreator";
+
     @BindView(R.id.event_creator_header)
     TextInputLayout textFieldHeader;
     @BindView(R.id.event_creator_category)
     ViewPager viewPagerCategory;
+    @BindView(R.id.event_creator_tab_layout)
+    TabLayout tabLayoutCategory;
     @BindView(R.id.event_creator_location)
-    TextInputLayout textFieldLocation;
+    TextView textFieldLocation;
     @BindView(R.id.event_creator_start_time)
     TextInputLayout textFieldStartTime;
     @BindView(R.id.event_creator_comment)
@@ -44,8 +62,10 @@ public class EventCreatorActivity extends AppCompatActivity {
     private static ErrorServerHandler errorServer;
     private Handler handler;
 
-    private ArrayList<Integer> categoryArrayList = new ArrayList<>();
+    private ArrayList<Category> categoryArrayList = new ArrayList<>();
     private CategoryAdapter categoryAdapter;
+    private Event event;
+    private Address address;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,35 +75,32 @@ public class EventCreatorActivity extends AppCompatActivity {
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Создание эвента");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        handler = new Handler(Looper.getMainLooper());
+
+        address = getIntent().getParcelableExtra("Address");
 
         categoryAdapter = new CategoryAdapter(this, categoryArrayList);
         viewPagerCategory.setAdapter(categoryAdapter);
+        tabLayoutCategory.setupWithViewPager(viewPagerCategory);
 
         componentListener();
         initCategorySlider();
+
+        if (address != null) {
+            fillAddress(address);
+        }
+    }
+
+    private void fillAddress(Address address) {
+        textFieldLocation.setText(address.getAddressLine(0));
     }
 
     private void initCategorySlider() {
-        TypedArray categoryImageResources = getResources()
-                .obtainTypedArray(R.array.sports_images);
-
-        categoryArrayList.clear();
-
-        for (int i = 0; i < categoryImageResources.length(); i++) {
-            categoryArrayList.add(categoryImageResources.getResourceId(i, 0));
-        }
-
-        categoryImageResources.recycle();
+        categoryArrayList.addAll(App.getCategoryArrayList());
         categoryAdapter.notifyDataSetChanged();
     }
 
     private void componentListener() {
-        textFieldLocation.setEndIconOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
         textFieldStartTime.setEndIconOnClickListener(new View.OnClickListener() {
             @Override
@@ -137,6 +154,41 @@ public class EventCreatorActivity extends AppCompatActivity {
                                 }
                             });
                         }else {
+                            //Получаем загаловок
+                            String header = Objects.requireNonNull(textFieldHeader.getEditText()).getText().toString();
+
+                            //Получаем категорию
+                            int posCurrentCategory = viewPagerCategory.getCurrentItem();
+                            String category = App.getCategoryArrayList().get(posCurrentCategory).getCategoryName();
+
+                            //Получаю адресс и координаты местонахождения
+                            EventAddress eventAddress = new EventAddress(
+                                    textFieldLocation.getText().toString(),
+                                    address.getLatitude(), address.getLongitude());
+
+                            //Получаем время начала
+                            String startTime = Objects.requireNonNull(textFieldStartTime.getEditText()).getText().toString();
+
+                            //получаем создателя эвента
+                            Person personCreator = CurrentPerson.getPerson();
+
+                            //Получаем комментарий
+                            String comment = Objects.requireNonNull(textFieldComment.getEditText()).getText().toString();
+
+                            //Ининциализация списка подписчиков
+                            HashMap<Person, ExtraDate> personExtraDateHashMap = new HashMap<>();
+                            personExtraDateHashMap.put(personCreator, new ExtraDate(startTime, ""));
+
+                            event = new Event(header, category, eventAddress, startTime,
+                                    CurrentPerson.getPerson(), personExtraDateHashMap, comment);
+
+                            //Добавляем в общий список эвентов
+                            EventsList.addEvent(event);
+
+                            Log.d(TAG, "buttonAccept: event = " +event.toString());
+                            Intent intent = new Intent();
+                            intent.putExtra("Event", event);
+                            setResult(RESULT_OK, intent);
                             finish();
                         }
                     }

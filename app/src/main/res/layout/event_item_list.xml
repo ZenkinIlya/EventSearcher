@@ -49,13 +49,14 @@
                 <TextView
                     android:id="@+id/list_events_title"
                     style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:text="Футбол"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    app:layout_constraintBottom_toBottomOf="@+id/list_events_image_category"
+                    app:layout_constraintBottom_toTopOf="@+id/list_events_address"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.05"
+                    app:layout_constraintWidth_percent="0.95"
+                    app:layout_constraintHorizontal_bias="0.5"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.80" />
@@ -66,11 +67,37 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="ул. Спортивная"
+                    app:layout_constraintWidth_max="170dp"
                     android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    app:layout_constraintBottom_toBottomOf="@+id/list_events_image_category"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintHorizontal_bias="0"
+                    app:layout_constraintEnd_toStartOf="@id/list_events_count_people"
+                    app:layout_constraintStart_toStartOf="@id/list_events_title"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.95" />
+
+                <TextView
+                    android:id="@+id/list_events_count_people"
+                    style="@style/TextAppearance.AppCompat.Headline"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="40"
+                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
+                    app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.05"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintHorizontal_bias="0.6"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintVertical_bias="0.98" />
+
+                <ImageView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_group"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.03"
+                    app:layout_constraintStart_toEndOf="@+id/list_events_count_people"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.95" />
 
@@ -87,32 +114,6 @@
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent"
                     app:layout_constraintVertical_bias="0.95"  />
-
-                <TextView
-                    android:id="@+id/list_events_count_people"
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="200dp"
-                    android:text="40"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.98" />
-
-                <ImageView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/ic_group"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.03"
-                    app:layout_constraintStart_toEndOf="@+id/list_events_count_people"
-                    app:layout_constraintTop_toTopOf="parent"
-                    app:layout_constraintVertical_bias="0.95" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 

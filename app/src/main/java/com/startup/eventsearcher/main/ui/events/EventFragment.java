@@ -1,19 +1,16 @@
 package com.startup.eventsearcher.main.ui.events;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.model.EventContent;
 
 import java.util.Arrays;
-import java.util.Objects;
 
 public class EventFragment extends Fragment {
 
@@ -27,7 +24,8 @@ public class EventFragment extends Fragment {
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
         RecyclerView eventRecyclerView = view.findViewById(R.id.eventList);
-        eventRecyclerView.setAdapter(new EventRecyclerViewAdapter(getContext(), EventContent.ITEMS));
+        eventRecyclerView.setAdapter(new EventRecyclerViewAdapter(getContext(), eventRecyclerView,
+                EventsList.getEventArrayList()));
 
         RecyclerView tagRecyclerView = view.findViewById(R.id.eventTagList);
         tagRecyclerView.setAdapter(new TagRecyclerViewAdapter(

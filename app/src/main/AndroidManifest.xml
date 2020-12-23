@@ -17,14 +17,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.ui.map.createEvent.EventCreatorActivity"
-            android:theme="@style/AppThemeWithActionBar"/>
+        <activity android:name=".main.ui.events.event.EventActivity"
+            android:theme="@style/AppThemeWithActionBar" />
+        <activity
+            android:name=".main.ui.map.createEvent.EventCreatorActivity"
+            android:theme="@style/AppThemeWithActionBar" />
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
 
-        <activity android:name=".utils.SuccessActivity"/>
+        <activity android:name=".utils.SuccessActivity" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -51,7 +54,7 @@
         </activity>
         <activity
             android:name=".introduction.IntroductionActivity"
-            android:theme="@style/FullScreen"/>
+            android:theme="@style/FullScreen" />
     </application>
 
 </manifest>

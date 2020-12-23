@@ -29,6 +29,7 @@
     <string name="startData">Дата начала</string>
     <string name="comment">Комментарий</string>
     <string name="accept">Подтвердить</string>
+    <string name="members">Участники</string>
 
     <string-array name="category">
         <item>Бадминтон</item>
@@ -42,7 +43,7 @@
         <item>Большой теннис</item>
     </string-array>
 
-    <array name="sports_images">
+    <array name="category_images">
         <item>@drawable/img_badminton</item>
         <item>@drawable/img_basketball</item>
         <item>@drawable/img_bowling</item>
