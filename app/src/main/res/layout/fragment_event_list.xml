@@ -7,39 +7,135 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <androidx.appcompat.widget.SearchView
-        android:id="@+id/eventSearch"
+    <RelativeLayout
+        android:id="@+id/event_list_action_bar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.appcompat.widget.SearchView
+            android:id="@+id/event_list_search"
+            android:layout_height="wrap_content"
+            android:layout_width="match_parent"
+            app:queryHint="Поиск..."
+            app:iconifiedByDefault="false"
+            app:queryBackground="@null"
+            android:layout_toStartOf="@id/event_list_btn_filter"/>
+
+        <ImageView
+            android:id="@+id/event_list_btn_filter"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="15dp"
+            android:adjustViewBounds="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_filter"
+            android:layout_alignParentEnd="true"
+            android:layout_above="@id/event_list_filters"
+            android:layout_alignParentTop="true"
+            android:contentDescription="@string/Filter" />
+
+        <RelativeLayout
+            android:id="@+id/event_list_filters"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_below="@id/event_list_search"
+            android:layout_margin="8dp">
+
+            <Spinner
+                android:id="@+id/event_list_filters_city_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"/>
+
+            <ImageView
+                android:id="@+id/event_list_filters_icon_members"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="14dp"
+                android:src="@drawable/ic_group"
+                android:adjustViewBounds="true"
+                android:scaleType="fitCenter"
+                android:contentDescription="@string/members"
+                app:tint="@color/quantum_grey"
+                android:layout_below="@id/event_list_filters_city_spinner"
+                android:layout_above="@id/event_list_filters_start_date"/>
+
+            <com.jaygoo.widget.RangeSeekBar
+                android:id="@+id/event_list_filters_range_members"
+                android:layout_width="match_parent"
+                android:layout_height="46dp"
+                app:rsb_mode="range"
+                app:rsb_max="50"
+                app:rsb_min_interval="1"
+                app:rsb_progress_color="@color/primaryLightColor"
+                app:rsb_tick_mark_layout_gravity="top"
+                app:rsb_tick_mark_text_array="@array/markArray"
+                app:rsb_tick_mark_gravity="center"
+                app:rsb_tick_mark_mode="number"
+                app:rsb_tick_mark_text_margin="20dp"
+                android:layout_toEndOf="@id/event_list_filters_icon_members"
+                android:layout_below="@id/event_list_filters_city_spinner"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/event_list_filters_start_date"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/TheDateOfTheEvent"
+                app:startIconDrawable="@drawable/ic_calendar"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                android:layout_below="@id/event_list_filters_range_members">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:maxLines="1"
+                    android:imeOptions="actionDone"
+                    android:inputType="date"
+                    android:focusable="false"
+                    android:fontFamily="sans-serif-condensed"/>
+            </com.google.android.material.textfield.TextInputLayout>
+
+        </RelativeLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/event_list_tag"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:orientation="horizontal"
+            android:scrollbars="none"
+            android:layout_below="@id/event_list_filters"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".main.ui.events.EventFragment"
+            tools:listitem="@layout/tag_item_list" />
+
+    </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventTagList"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="8dp"
-        android:orientation="horizontal"
-        android:scrollbars="none"
-        android:elevation="8dp"
-        app:layoutManager="LinearLayoutManager"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventSearch"
-        tools:context=".main.ui.events.EventFragment"
-        tools:listitem="@layout/tag_item_list" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/eventList"
+        android:id="@+id/event_list"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layoutManager="LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/eventTagList"
+        app:layout_constraintTop_toBottomOf="@+id/event_list_action_bar"
         tools:context=".main.ui.events.EventFragment"
         tools:listitem="@layout/event_item_list" />
+
+    <TextView
+        android:id="@+id/event_list_gone"
+        style="@style/TextAppearance.AppCompat.Headline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/EventsGone"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

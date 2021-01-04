@@ -2,17 +2,24 @@ package com.startup.eventsearcher.main;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.main.ui.events.EventFragment;
+import com.startup.eventsearcher.main.ui.map.MapsFragment;
+import com.startup.eventsearcher.main.ui.profile.ProfileFragment;
+import com.startup.eventsearcher.main.ui.subscribe.SubscribeFragment;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -31,9 +38,42 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        openFragment(MapsFragment.newInstance("", ""));
+
         if (savedInstanceState == null){
-            setupButtonNavigationBar();
+//            setupButtonNavigationBar();
         }
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart()");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume()");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop()");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
     }
 
     @Override
@@ -52,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
                 });
 
         builder.setNegativeButton(
-                "No",
+                "Нет",
                 new DialogInterface.OnClickListener() {
                     public void onClick(DialogInterface dialog, int id) {
                         dialog.cancel();
@@ -63,14 +103,35 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    private void setupButtonNavigationBar() {
-      /*  AppBarConfiguration appBarConfiguration = new AppBarConfiguration.Builder(
-                R.id.mapsFragment, R.id.eventFragment, R.id.subscribeFragment, R.id.profileFragment).build();
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(fragmentContainer.getId());
-        NavController navController = navHostFragment.getNavController();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-        NavigationUI.setupWithNavController(bottomNavigationView, navController);*/
+    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
+            new BottomNavigationView.OnNavigationItemSelectedListener() {
+                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                    switch (item.getItemId()) {
+                        case R.id.nav_item_map:
+                            openFragment(MapsFragment.newInstance("", ""));
+                            return true;
+                        case R.id.nav_item_events:
+                            openFragment(EventFragment.newInstance("", ""));
+                            return true;
+                        case R.id.nav_item_favorite:
+                            openFragment(SubscribeFragment.newInstance("", ""));
+                            return true;
+                        case R.id.nav_item_profile:
+                            openFragment(ProfileFragment.newInstance("", ""));
+                            return true;
+                    }
+                    return false;
+                }
+            };
 
+    public void openFragment(Fragment fragment) {
+        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
+        transaction.replace(fragmentContainer.getId(), fragment);
+        transaction.addToBackStack(null);
+        transaction.commit();
+    }
+
+    private void setupButtonNavigationBar() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(fragmentContainer.getId());
         if (navHostFragment != null) {
             final NavController navController = navHostFragment.getNavController();
@@ -101,6 +162,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-        setupButtonNavigationBar();
+//        setupButtonNavigationBar();
     }
 }

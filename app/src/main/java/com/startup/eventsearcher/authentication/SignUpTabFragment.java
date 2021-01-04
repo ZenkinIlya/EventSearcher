@@ -19,11 +19,10 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.utils.Config;
-import com.startup.eventsearcher.utils.ErrorServerHandler;
 import com.startup.eventsearcher.authentication.Utils.DataVerification;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
-import com.startup.eventsearcher.main.MainActivity;
+import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.ErrorServerHandler;
 import com.startup.eventsearcher.utils.SuccessActivity;
 
 import butterknife.BindView;
@@ -82,7 +81,7 @@ public class SignUpTabFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
-                                        //TODO Отправка данных о пользователе и регистрация его
+                                        //TODO Отправка данных о пользователе на сервер и регистрация его
                                         TestRequester.testRequest();
                                         Thread.sleep(Config.delay);
                                     } catch (InterruptedException e) {

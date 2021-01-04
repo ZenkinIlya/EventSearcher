@@ -1,9 +1,5 @@
 package com.startup.eventsearcher.authentication;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.fragment.app.Fragment;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -19,16 +15,19 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.utils.Config;
-import com.startup.eventsearcher.utils.ErrorServerHandler;
 import com.startup.eventsearcher.authentication.Utils.DataVerification;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
 import com.startup.eventsearcher.main.MainActivity;
+import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.ErrorServerHandler;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.Unbinder;
 
 public class SignInTabFragment extends Fragment {
 
@@ -86,7 +85,7 @@ public class SignInTabFragment extends Fragment {
                                 @Override
                                 public void run() {
                                     try {
-                                        //TODO Проверка пользователя на существование в базе (реализовать в DataVerification)
+                                        //TODO Проверка пользователя на наличие в базе сервера
                                         TestRequester.testRequest();
 /*                                        SignInMessage signInMessage = new SignInMessage(
                                                 String.valueOf(editTextLogin.getText()), String.valueOf(editTextPassword.getText()));

@@ -1,17 +1,12 @@
 package com.startup.eventsearcher.main.ui.events;
 
 import android.animation.ValueAnimator;
-import android.content.Context;
-import android.graphics.drawable.ColorDrawable;
-import android.media.Image;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -20,7 +15,6 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.utils.animation.MovingAnimation;
 import com.startup.eventsearcher.utils.animation.ResizeAnimation;
 
 import java.util.ArrayList;
@@ -29,9 +23,13 @@ import java.util.List;
 public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> listTags;
+    private EventRecyclerViewAdapter eventRecyclerViewAdapter;
+    private ArrayList<String> arrayListActiveCategory;
 
-    public TagRecyclerViewAdapter(List<String> items) {
+    public TagRecyclerViewAdapter(List<String> items, EventRecyclerViewAdapter eventRecyclerViewAdapter) {
         this.listTags = items;
+        this.eventRecyclerViewAdapter = eventRecyclerViewAdapter;
+        arrayListActiveCategory = new ArrayList<>();
     }
 
     @NonNull
@@ -53,22 +51,33 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                 int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
                 int duration = 300;
                 if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
-                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32);
+                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32, 0);
                     resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(startColor, endColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
                     animateSearchImage(holder.imageView, duration);
+
+                    arrayListActiveCategory.add(holder.tagText.getText().toString());
+                    filterEventList();
+
                 } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
                     animateSearchImage(holder.imageView, duration);
-                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32);
+                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32, 0);
                     resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(endColor, startColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
+
+                    arrayListActiveCategory.remove(holder.tagText.getText().toString());
+                    filterEventList();
                 }
             }
         });
+    }
+
+    private void filterEventList() {
+        eventRecyclerViewAdapter.filterByCategory(arrayListActiveCategory);
     }
 
     @Override

@@ -1,49 +1,48 @@
 package com.startup.eventsearcher.main.ui.subscribe;
 
+import android.content.Context;
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.gson.reflect.TypeToken;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.main.ui.events.model.EventsList;
+import com.startup.eventsearcher.main.ui.events.model.Subscriber;
+import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
+import com.startup.eventsearcher.utils.JsonHandler;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link SubscribeFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
 public class SubscribeFragment extends Fragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    private static final String TAG = "mySubscribeList";
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    @BindView(R.id.subscribe_event_list)
+    RecyclerView subscribeRecyclerView;
+    @BindView(R.id.subscribe_event_list_gone)
+    TextView textViewSubscribeEventListGone;
 
-    public SubscribeFragment() {
-        // Required empty public constructor
-    }
+    private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment SubscribeFragment.
-     */
-    // TODO: Rename and change types and number of parameters
     public static SubscribeFragment newInstance(String param1, String param2) {
         SubscribeFragment fragment = new SubscribeFragment();
         Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putString("ARG_PARAM1", param1);
+        args.putString("ARG_PARAM2", param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -51,16 +50,110 @@ public class SubscribeFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_subscribe, container, false);
+        View view = inflater.inflate(R.layout.fragment_subscribe, container, false);
+        ButterKnife.bind(this, view);
+
+        Type type = new TypeToken<ArrayList<Event>>(){}.getType();
+        EventsList.setEventArrayList(JsonHandler.getSavedObjectFromPreference(requireContext(), "Events",
+                "eventKey", type));
+
+        //Берем эвенты из списка на которые подписан пользователь
+        ArrayList<Event> subscribeEventsArrayList = getSubscribeEvents(EventsList.getEventArrayList());
+
+        subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
+                this,
+                subscribeRecyclerView,
+                subscribeEventsArrayList,
+                textViewSubscribeEventListGone);
+        subscribeRecyclerView.setAdapter(subscribeEventsRecyclerViewAdapter);
+
+        return view;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated():");
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "onAttach()");
+    }
+
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        Log.d(TAG, "onActivityCreated()");
+    }
+
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle outState) {
+        super.onSaveInstanceState(outState);
+        Log.d(TAG, "onSaveInstanceState():");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart()");
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Log.d(TAG, "onResume()");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause()");
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        Log.d(TAG, "onStop()");
+        JsonHandler.saveObjectToSharedPreference(requireContext(),
+                "Events",
+                "eventKey",
+                EventsList.getEventArrayList());
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView()");
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        Log.d(TAG, "onDestroy()");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "onDetach()");
+    }
+
+    private ArrayList<Event> getSubscribeEvents(ArrayList<Event> arrayList) {
+        ArrayList<Event> subscribeEventsArrayList = new ArrayList<>();
+        for (Event event : arrayList){
+            for (Subscriber subscriber : event.getSubscribers()){
+                if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
+                    subscribeEventsArrayList.add(event);
+                }
+            }
+        }
+        return subscribeEventsArrayList;
     }
 }

@@ -11,20 +11,18 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
-import com.startup.eventsearcher.main.ui.profile.model.Person;
+import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 
-import java.util.List;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecyclerViewAdapter.ViewHolder> {
 
-    private final List<Map.Entry<Person, ExtraDate>> personExtraDateList;
+    private final ArrayList<Subscriber> subscribers;
     private Context context;
     private RecyclerView recyclerView;
 
-    public PersonRecyclerViewAdapter(List<Map.Entry<Person, ExtraDate>> personExtraDateList, Context context, RecyclerView recyclerView) {
-        this.personExtraDateList = personExtraDateList;
+    public PersonRecyclerViewAdapter(ArrayList<Subscriber> subscribers, Context context, RecyclerView recyclerView) {
+        this.subscribers = subscribers;
         this.context = context;
         this.recyclerView = recyclerView;
     }
@@ -39,7 +37,7 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
             @Override
             public void onClick(View view) {
                 int itemPosition = recyclerView.getChildLayoutPosition(view);
-                Toast.makeText(context, "", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "itemPosition = " + itemPosition, Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -48,14 +46,14 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.personLogin.setText(personExtraDateList.get(position).getKey().getLogin());
-        holder.personArrivalTime.setText(personExtraDateList.get(position).getValue().getArrivalTime());
-        holder.personComment.setText(personExtraDateList.get(position).getValue().getComment());
+        holder.personLogin.setText(subscribers.get(position).getPerson().getLogin());
+        holder.personArrivalTime.setText(subscribers.get(position).getExtraDate().getArrivalTime());
+        holder.personComment.setText(subscribers.get(position).getExtraDate().getComment());
     }
 
     @Override
     public int getItemCount() {
-        return personExtraDateList.size();
+        return subscribers.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

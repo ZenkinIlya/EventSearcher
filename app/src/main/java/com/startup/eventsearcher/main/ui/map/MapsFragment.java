@@ -43,9 +43,10 @@ import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
-import com.startup.eventsearcher.main.ui.events.EventsList;
+import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
+import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -69,10 +70,10 @@ public class MapsFragment extends Fragment {
 
     private boolean locationPermissionGranted = false;
 
-    FusedLocationProviderClient fusedLocationProviderClient;
-    SupportMapFragment mapFragment;
-    GoogleMap map;
-    private static final float DEFAULT_ZOOM = 15f;
+    private FusedLocationProviderClient fusedLocationProviderClient;
+    private SupportMapFragment mapFragment;
+    private GoogleMap map;
+    private boolean flgFirstEnterToMapFragment = true;
 
     @BindView(R.id.map_search_view)
     SearchView searchView;
@@ -82,8 +83,22 @@ public class MapsFragment extends Fragment {
     Button btnAddEvent;
     @BindView(R.id.map_add_event_marker)
     ImageView imageViewAddEventMarker;
+    @BindView(R.id.map_zoom_in)
+    FloatingActionButton fabZoomIn;
+    @BindView(R.id.map_zoom_out)
+    FloatingActionButton fabZoomOut;
+    @BindView(R.id.map_location)
+    FloatingActionButton fabLocation;
 
-
+    public static MapsFragment newInstance(String param1, String param2) {
+        Log.d(TAG, "newInstance:");
+        MapsFragment fragment = new MapsFragment();
+        Bundle args = new Bundle();
+        args.putString("ARG_PARAM1", param1);
+        args.putString("ARG_PARAM2", param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
 
     @Nullable
     @Override
@@ -214,8 +229,12 @@ public class MapsFragment extends Fragment {
     //
     private void buildAlertMessageNoGps() {
         final AlertDialog.Builder builder = new AlertDialog.Builder(requireContext());
-        builder.setMessage("Для работы приложения необоходимо включить геолокацию, хотите ли вы включить геолокацию?")
-                .setCancelable(true)
+        builder.setMessage("Для работы приложения необоходимо включить геолокацию, включить?")
+                .setNegativeButton("Нет, спасибо", new DialogInterface.OnClickListener() {
+                    public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
+                        //Отказ о предоставлении приложению доступа к геолокации
+                    }
+                })
                 .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
@@ -252,8 +271,6 @@ public class MapsFragment extends Fragment {
                     Log.d(TAG, "buttonAccept: event = " + Objects.requireNonNull(event).toString());
                 }
             }
-        }else{
-            Log.w(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
         }
     }
 
@@ -276,6 +293,7 @@ public class MapsFragment extends Fragment {
             startActivityForResult(intent, CREATE_EVENT);
 
         } catch (IOException e) {
+            Toast.makeText(getContext(), "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
             e.printStackTrace();
         }
     }
@@ -293,10 +311,10 @@ public class MapsFragment extends Fragment {
                             ContextCompat.getColor(view.getContext(), R.color.warning)));
                 }else{
                     imageViewAddEventMarker.setVisibility(View.INVISIBLE);
-                    btnAddEvent.setVisibility(View.INVISIBLE);
-                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_add));
+                    btnAddEvent.setVisibility(View.GONE);
+                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_add_location));
                     fabAddEvent.setBackgroundTintList(ColorStateList.valueOf(
-                            ContextCompat.getColor(view.getContext(), R.color.primaryLightColor)));
+                            ContextCompat.getColor(view.getContext(), R.color.primaryColor)));
                 }
             }
         });
@@ -358,8 +376,10 @@ public class MapsFragment extends Fragment {
             map.setOnMarkerClickListener(callbackMarkerClickListener);
             //Инициализация добавления места
             addPlace();
+            //Инициализация интерфейса (локация, зум)
+            initUiMap();
             //Установка отступа для элементов GoogleMap
-            map.setPadding(0, 90, 0, 130);
+            map.setPadding(0, 90, 0, 0);
             //Расставляем все эвент-маркеры на карте
             setEventMarkerOnMap();
             try {
@@ -367,11 +387,13 @@ public class MapsFragment extends Fragment {
                     getDeviceLocation();
                     Log.d(TAG, "OnMapReadyCallback: Ппоказ интерфейса геолокации");
                     map.setMyLocationEnabled(true);
-                    map.getUiSettings().setMyLocationButtonEnabled(true);
+                    map.getUiSettings().setMyLocationButtonEnabled(false);
+                    fabLocation.setVisibility(View.VISIBLE);
                 } else {
                     Log.d(TAG, "OnMapReadyCallback: Сскрытие интерфейса геолокации");
                     map.setMyLocationEnabled(false);
                     map.getUiSettings().setMyLocationButtonEnabled(false);
+                    fabLocation.setVisibility(View.GONE);
                 }
             } catch (SecurityException e) {
                 Log.d(TAG, Objects.requireNonNull(e.getMessage()));
@@ -381,6 +403,30 @@ public class MapsFragment extends Fragment {
             map.addMarker(new MarkerOptions().position(sydney).title("Marker in Sydney"));
         }
     };
+
+    private void initUiMap() {
+        fabLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                flgFirstEnterToMapFragment = true;
+                getDeviceLocation();
+            }
+        });
+
+        fabZoomIn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                map.animateCamera(CameraUpdateFactory.zoomIn());
+            }
+        });
+
+        fabZoomOut.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                map.animateCamera(CameraUpdateFactory.zoomOut());
+            }
+        });
+    }
 
     //Установка эвент-маркеров на карте
     private void setEventMarkerOnMap() {
@@ -410,7 +456,10 @@ public class MapsFragment extends Fragment {
                             Log.d(TAG, "getDeviceLocation: Текущая геолокация определена");
                             LatLng latLng = new LatLng(currentLocation.getLatitude(),
                                     currentLocation.getLongitude());
-                            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+                            if (flgFirstEnterToMapFragment){
+                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
+                                flgFirstEnterToMapFragment = false;
+                            }
                         } else {
                             Log.d(TAG, "getDeviceLocation: Текущая геолокация НЕ определена");
                             Toast.makeText(getContext(), "Текущая геолокация не определена", Toast.LENGTH_LONG).show();
@@ -447,7 +496,7 @@ public class MapsFragment extends Fragment {
                         Address address = addressList.get(0);
                         LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
                         map.addMarker(new MarkerOptions().position(latLng).title(address.getSubLocality()));
-                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, DEFAULT_ZOOM));
+                        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
                     }
                     return false;
                 }

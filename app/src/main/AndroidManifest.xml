@@ -17,7 +17,10 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".main.ui.events.event.EventActivity"
+        <activity android:name=".main.ui.subscribe.SubscribeActivity"
+            android:theme="@style/AppThemeWithActionBar"/>
+        <activity
+            android:name=".main.ui.events.event.EventActivity"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".main.ui.map.createEvent.EventCreatorActivity"

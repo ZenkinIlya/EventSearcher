@@ -1,6 +1,7 @@
 package com.startup.eventsearcher.main.ui.profile.model;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Person implements Serializable {
     private String login;
@@ -46,5 +47,22 @@ public class Person implements Serializable {
                 ", surname='" + surname + '\'' +
                 ", email='" + email + '\'' +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Person person = (Person) o;
+        return login.equals(person.login) &&
+                password.equals(person.password) &&
+                name.equals(person.name) &&
+                surname.equals(person.surname) &&
+                email.equals(person.email);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(login, password, name, surname, email);
     }
 }

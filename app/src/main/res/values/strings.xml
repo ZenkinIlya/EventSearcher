@@ -30,6 +30,16 @@
     <string name="comment">Комментарий</string>
     <string name="accept">Подтвердить</string>
     <string name="members">Участники</string>
+    <string name="subscribe">подписаться</string>
+    <string name="event">эвент</string>
+    <string name="startTime">Время начала</string>
+    <string name="Subscribe">Подписаться</string>
+    <string name="EventsGone">Эвенты отсутствуют</string>
+    <string name="Filter">Фильтер</string>
+    <string name="TheDateOfTheEvent">Дата проведения эвента</string>
+    <string name="subscribersGone">У вас нет подписок</string>
+    <string name="zoomIn">Приблизить</string>
+    <string name="zoomOut">Отдаление</string>
 
     <string-array name="category">
         <item>Бадминтон</item>
@@ -54,4 +64,19 @@
         <item>@drawable/img_tabletennis</item>
         <item>@drawable/img_tennis</item>
     </array>
+
+    <string-array name="markArray">
+        <item>0</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>20</item>
+        <item>25</item>
+        <item>30</item>
+        <item>35</item>
+        <item>40</item>
+        <item>45</item>
+        <item>50</item>
+    </string-array>
+
 </resources>

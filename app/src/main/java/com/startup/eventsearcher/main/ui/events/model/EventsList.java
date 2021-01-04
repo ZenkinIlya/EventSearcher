@@ -1,6 +1,4 @@
-package com.startup.eventsearcher.main.ui.events;
-
-import com.startup.eventsearcher.main.ui.events.model.Event;
+package com.startup.eventsearcher.main.ui.events.model;
 
 import java.util.ArrayList;
 
@@ -11,6 +9,10 @@ public class EventsList {
 
     public static ArrayList<Event> getEventArrayList() {
         return eventArrayList;
+    }
+
+    public static void setEventArrayList(ArrayList<Event> eventArrayList) {
+        EventsList.eventArrayList = eventArrayList;
     }
 
     public static void addEvent(Event event){

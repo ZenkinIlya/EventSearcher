@@ -1,5 +1,7 @@
 package com.startup.eventsearcher.main.ui.map.createEvent;
 
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
@@ -9,8 +11,9 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.FrameLayout;
-import android.widget.TextView;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -21,18 +24,20 @@ import com.google.android.material.textfield.TextInputLayout;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
-import com.startup.eventsearcher.main.ui.events.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventAddress;
+import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
+import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.ErrorServerHandler;
+import com.startup.eventsearcher.utils.JsonHandler;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Calendar;
 import java.util.Objects;
 
 import butterknife.BindView;
@@ -49,7 +54,9 @@ public class EventCreatorActivity extends AppCompatActivity {
     @BindView(R.id.event_creator_tab_layout)
     TabLayout tabLayoutCategory;
     @BindView(R.id.event_creator_location)
-    TextView textFieldLocation;
+    TextInputLayout textFieldLocation;
+    @BindView(R.id.event_creator_start_date)
+    TextInputLayout textFieldStartDate;
     @BindView(R.id.event_creator_start_time)
     TextInputLayout textFieldStartTime;
     @BindView(R.id.event_creator_comment)
@@ -66,6 +73,13 @@ public class EventCreatorActivity extends AppCompatActivity {
     private CategoryAdapter categoryAdapter;
     private Event event;
     private Address address;
+
+    private Calendar calendar;
+    private int lastSelectedYear;
+    private int lastSelectedMonth;
+    private int lastSelectedDayOfMonth;
+    private int lastSelectedHour = -1;
+    private int lastSelectedMinute = -1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -89,10 +103,16 @@ public class EventCreatorActivity extends AppCompatActivity {
         if (address != null) {
             fillAddress(address);
         }
+
+        // Get Current Date
+        calendar = Calendar.getInstance();
+        lastSelectedYear = calendar.get(Calendar.YEAR);
+        lastSelectedMonth = calendar.get(Calendar.MONTH);
+        lastSelectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
     }
 
     private void fillAddress(Address address) {
-        textFieldLocation.setText(address.getAddressLine(0));
+        Objects.requireNonNull(textFieldLocation.getEditText()).setText(address.getAddressLine(0));
     }
 
     private void initCategorySlider() {
@@ -102,10 +122,53 @@ public class EventCreatorActivity extends AppCompatActivity {
 
     private void componentListener() {
 
-        textFieldStartTime.setEndIconOnClickListener(new View.OnClickListener() {
+        Objects.requireNonNull(textFieldStartDate.getEditText()).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
+                DatePickerDialog.OnDateSetListener dateSetListener = new DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year,
+                                          int monthOfYear, int dayOfMonth) {
+                        String date = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
+                        textFieldStartDate.getEditText().setText(date);
+                        lastSelectedYear = year;
+                        lastSelectedMonth = monthOfYear;
+                        lastSelectedDayOfMonth = dayOfMonth;
+                    }
+                };
+
+                DatePickerDialog datePickerDialog = null;
+                datePickerDialog = new DatePickerDialog(view.getContext(),
+                        android.R.style.Theme_DeviceDefault_Dialog,
+                        dateSetListener, lastSelectedYear, lastSelectedMonth, lastSelectedDayOfMonth);
+                datePickerDialog.show();
+            }
+        });
+
+        Objects.requireNonNull(textFieldStartTime.getEditText()).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if(lastSelectedHour == -1)  {
+                    lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
+                    lastSelectedMinute = calendar.get(Calendar.MINUTE);
+                }
+
+                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        String time = hourOfDay + ":" + minute;
+                        textFieldStartTime.getEditText().setText(time);
+                        lastSelectedHour = hourOfDay;
+                        lastSelectedMinute = minute;
+                    }
+                };
+
+                TimePickerDialog timePickerDialog = null;
+                timePickerDialog = new TimePickerDialog(view.getContext(),
+                        android.R.style.Theme_DeviceDefault_Dialog,
+                        timeSetListener, lastSelectedHour, lastSelectedMinute, true);
+                timePickerDialog.show();
             }
         });
 
@@ -163,7 +226,7 @@ public class EventCreatorActivity extends AppCompatActivity {
 
                             //Получаю адресс и координаты местонахождения
                             EventAddress eventAddress = new EventAddress(
-                                    textFieldLocation.getText().toString(),
+                                    Objects.requireNonNull(textFieldLocation.getEditText()).getText().toString(),
                                     address.getLatitude(), address.getLongitude());
 
                             //Получаем время начала
@@ -176,14 +239,19 @@ public class EventCreatorActivity extends AppCompatActivity {
                             String comment = Objects.requireNonNull(textFieldComment.getEditText()).getText().toString();
 
                             //Ининциализация списка подписчиков
-                            HashMap<Person, ExtraDate> personExtraDateHashMap = new HashMap<>();
-                            personExtraDateHashMap.put(personCreator, new ExtraDate(startTime, ""));
+                            ArrayList<Subscriber> subscribers = new ArrayList<>();
+                            subscribers.add(new Subscriber(personCreator, new ExtraDate(startTime, "")));
 
                             event = new Event(header, category, eventAddress, startTime,
-                                    CurrentPerson.getPerson(), personExtraDateHashMap, comment);
+                                    CurrentPerson.getPerson(), subscribers, comment);
 
                             //Добавляем в общий список эвентов
                             EventsList.addEvent(event);
+
+                            JsonHandler.saveObjectToSharedPreference(view.getContext(),
+                                    "Events",
+                                    "eventKey",
+                                    EventsList.getEventArrayList());
 
                             Log.d(TAG, "buttonAccept: event = " +event.toString());
                             Intent intent = new Intent();

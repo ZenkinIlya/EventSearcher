@@ -9,7 +9,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="6dp"
-        style="@style/Card"
+        style="@style/CardWhite"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -17,16 +17,33 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="5dp">
+
+        <ImageView
+            android:id="@+id/person_ava"
+            android:layout_width="35dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="10dp"
+            android:src="@drawable/ic_profile"
+            android:background="@color/primaryLightColor"
+            android:adjustViewBounds="true"
+            android:scaleType="centerCrop"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:contentDescription="@string/subscribe" />
 
         <TextView
             android:id="@+id/person_login"
             style="@style/TextAppearance.AppCompat.Headline"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:paddingStart="15dp"
+            android:paddingEnd="15dp"
             android:text="Navalniy"
             app:layout_constraintEnd_toStartOf="@id/person_arrival_time"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/person_ava"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintWidth_percent="0.7"/>
 
@@ -43,15 +60,15 @@
 
         <TextView
             android:id="@+id/person_comment"
-            style="@style/TextAppearance.AppCompat.Body1"
+            style="@style/TextAppearance.AppCompat.Caption"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:text="Комментарий"
+            android:hint="@string/comment"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintWidth_percent="0.90"
+            app:layout_constraintWidth_percent="0.78"
             app:layout_constraintHorizontal_bias="0.5"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintStart_toEndOf="@id/person_ava"
             app:layout_constraintTop_toBottomOf="@id/person_login"/>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
