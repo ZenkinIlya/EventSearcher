@@ -60,8 +60,6 @@ public class EventFragment extends Fragment {
     RecyclerView tagRecyclerView;
     @BindView(R.id.event_list_btn_filter)
     ImageView imageViewFilter;
-    @BindView(R.id.event_list_filters)
-    RelativeLayout filtersRelativeLayout;
 
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private TagRecyclerViewAdapter tagRecyclerViewAdapter;
