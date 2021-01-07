@@ -47,8 +47,8 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
         holder.tagCard.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int startColor = ContextCompat.getColor(view.getContext(), R.color.primaryLightColor);
-                int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
+                int startColor = ContextCompat.getColor(view.getContext(), R.color.white);
+                int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryColor);
                 int duration = 300;
                 if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
                     ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32, 0);
@@ -67,7 +67,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                     resizeAnimation.setDuration(duration);
                     holder.tagCard.startAnimation(resizeAnimation);
                     startColorAnimation(endColor, startColor, duration, holder.tagCard);
-                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.black));
+                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.greyText));
 
                     arrayListActiveCategory.remove(holder.tagText.getText().toString());
                     filterEventList();

@@ -1,12 +1,14 @@
 package com.startup.eventsearcher.main.ui.events;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -15,6 +17,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.target.ViewTarget;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
@@ -77,7 +80,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         holder.eventTime.setText(event.getStartTime());
 
         int resourceId = getResourceIdImage(event);
-        Glide.with(context).load(resourceId).into(holder.eventImage);
+        holder.eventImage.setImageResource(resourceId);
+//        Glide.with(context).load(resourceId).into(holder.eventImage);
 
         if (currentPersonIsSubscribe(event) != null){
             holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_favorite));
@@ -206,7 +210,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         public final TextView eventTime;
         public final ImageView eventImage;
         public final ImageView eventSubscribe;
-        private final ImageView eventLocationMarker;
+        private final LinearLayout eventLocationMarker;
 
         public ViewHolder(View view) {
             super(view);
@@ -217,7 +221,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             eventTime = view.findViewById(R.id.list_events_time);
             eventImage = view.findViewById(R.id.list_events_image_category);
             eventSubscribe = view.findViewById(R.id.list_events_subscribe);
-            eventLocationMarker = view.findViewById(R.id.list_events_location);
+            eventLocationMarker = view.findViewById(R.id.list_events_layout_location);
         }
     }
 }

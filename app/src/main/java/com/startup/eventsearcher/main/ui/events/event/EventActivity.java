@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -47,8 +48,8 @@ public class EventActivity extends AppCompatActivity {
     TextView textViewEventTime;
     @BindView(R.id.list_events_image_category)
     ImageView imageViewCategory;
-    @BindView(R.id.list_events_location)
-    ImageView imageViewLocation;
+    @BindView(R.id.list_events_layout_location)
+    LinearLayout imageViewLocation;
     @BindView(R.id.list_events_subscribe)
     ImageView imageViewSubscribe;
     @BindView(R.id.event_comment)
@@ -133,7 +134,9 @@ public class EventActivity extends AppCompatActivity {
         imageViewLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
+/*                LocationEventFragment locationEventFragment = LocationEventFragment.newInstance(event);
+                locationEventFragment.setTargetFragment(, 300);
+                locationEventFragment.show(fragmentManager, "fragment_location_event");*/
             }
         });
 
@@ -175,7 +178,8 @@ public class EventActivity extends AppCompatActivity {
         setImageSubscribe();
 
         int resourceId = getResourceIdImage(event);
-        Glide.with(this).load(resourceId).into(imageViewCategory);
+        imageViewCategory.setImageResource(resourceId);
+//        Glide.with(this).load(resourceId).into(imageViewCategory);
 
         textViewComment.setText(event.getComment());
     }

@@ -19,7 +19,7 @@
             android:theme="@style/AppThemeWithActionBar"/>
         <activity
             android:name=".main.ui.events.event.EventActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".main.ui.map.createEvent.EventCreatorActivity"
             android:theme="@style/AppThemeWithActionBar" />

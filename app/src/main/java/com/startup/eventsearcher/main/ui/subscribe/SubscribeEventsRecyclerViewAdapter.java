@@ -71,7 +71,8 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
         holder.eventTime.setText(event.getStartTime());
 
         int resourceId = getResourceIdImage(event);
-        Glide.with(context).load(resourceId).into(holder.eventImage);
+        holder.eventImage.setImageResource(resourceId);
+//        Glide.with(context).load(resourceId).into(holder.eventImage);
 
         holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_favorite));
 

@@ -10,7 +10,8 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="6dp"
+        android:layout_marginVertical="6dp"
+        android:layout_marginHorizontal="14dp"
         style="@style/Card"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -21,133 +22,222 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
-            <ImageView
-                android:id="@+id/list_events_image_category"
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/list_events_image_constraint"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:src="@drawable/img_tabletennis"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                android:contentDescription="@string/event">
-            </ImageView>
+                app:layout_constraintTop_toTopOf="parent">
 
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="70dp"
-                android:adjustViewBounds="true"
-                android:src="@drawable/transparent_gradient"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent" />
+                <ImageView
+                    android:id="@+id/list_events_image_category"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/img_tabletennis"
+                    android:scaleType="fitXY"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    android:contentDescription="@string/event">
+                </ImageView>
 
-            <LinearLayout
-                android:id="@+id/list_events_header_layout"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginTop="5dp"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                tools:ignore="UseCompoundDrawables">
+                <ImageView
+                    android:layout_width="match_parent"
+                    android:layout_height="70dp"
+                    android:adjustViewBounds="true"
+                    android:src="@drawable/transparent_gradient"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent" />
 
                 <TextView
                     android:id="@+id/list_events_title"
                     style="@style/TextAppearance.AppCompat.Headline"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:layout_gravity="center"
-                    android:text="Настольный теннис"/>
-
-                <TextView
-                    android:id="@+id/list_events_time"
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="19:30"/>
-            </LinearLayout>
-
-            <TextView
-                android:id="@+id/list_events_address"
-                style="@style/TextAppearance.AppCompat.Body1"
-                android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="15dp"
-                android:maxWidth="270dp"
-                android:text="ул. Спортивная"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/list_events_header_layout"/>
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginStart="5dp"
-                android:layout_marginEnd="5dp"
-                android:layout_marginBottom="5dp"
-                android:paddingStart="5dp"
-                android:paddingEnd="5dp"
-                tools:ignore="UseCompoundDrawables">
-
-                <TextView
-                    android:id="@+id/list_events_count_people"
-                    style="@style/TextAppearance.AppCompat.Headline"
-                    android:theme="@style/ThemeOverlay.AppCompat.Dark"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:text="40"/>
+                    android:layout_marginHorizontal="15dp"
+                    android:layout_marginBottom="5dp"
+                    android:text="Настольный теннис"
+                    android:textColor="@color/white"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"/>
 
                 <ImageView
-                    android:layout_width="wrap_content"
+                    android:id="@+id/list_events_subscribe"
+                    android:layout_width="35dp"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/ic_group"
+                    android:layout_marginBottom="5dp"
+                    android:layout_marginEnd="10dp"
+                    android:layout_gravity="end"
+                    android:src="@drawable/ic_favorite"
                     android:adjustViewBounds="true"
                     android:scaleType="centerCrop"
-                    android:layout_marginStart="5dp"
-                    android:layout_gravity="center"
-                    android:contentDescription="@string/members" />
-            </LinearLayout>
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:contentDescription="@string/subscribe" />
 
-            <ImageView
-                android:id="@+id/list_events_location"
-                android:layout_width="35dp"
-                android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="5dp"
-                android:src="@drawable/ic_place"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@id/list_events_subscribe"
-                android:contentDescription="@string/subscribe" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
 
-            <ImageView
-                android:id="@+id/list_events_subscribe"
-                android:layout_width="35dp"
+            <androidx.cardview.widget.CardView
+                android:id="@+id/list_events_date_card"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_margin="10dp"
+                style="@style/CardLowRadius"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/list_events_date_number"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:text="25"
+                        android:textColor="@color/primaryDarkColor"
+                        android:textSize="23sp"
+                        android:gravity="center"
+                        android:textStyle="bold"/>
+
+                    <TextView
+                        android:id="@+id/list_events_date_month"
+                        android:layout_width="match_parent"
+                        android:layout_height="0dp"
+                        android:layout_weight="1"
+                        android:text="окт"
+                        android:textColor="@color/primaryDarkColor"
+                        android:textSize="16sp"
+                        android:gravity="top|center" />
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/list_events_body_constraint"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="5dp"
-                android:layout_marginEnd="10dp"
-                android:src="@drawable/ic_favorite"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                android:contentDescription="@string/subscribe" />
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/list_events_image_constraint">
 
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    android:layout_marginHorizontal="10dp"
+                    android:layout_marginVertical="5dp">
+
+                    <TextView
+                        android:id="@+id/list_events_address"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="5dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="ул. Спортивная"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <LinearLayout
+                            android:id="@+id/list_events_layout_location"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="8dp"
+                            android:elevation="2dp"
+                            android:translationZ="2dp"
+                            android:background="@drawable/circle_middle_light_low_radius"
+                            android:layout_alignParentStart="true">
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_place"
+                                app:tint="@color/white"
+                                android:contentDescription="@string/subscribe" />
+
+                            <TextView
+                                style="@style/TextAppearance.AppCompat.Body1"
+                                android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="на карте"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/list_events_layout_time"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp"
+                            android:orientation="horizontal"
+                            android:layout_gravity="end"
+                            android:layout_alignParentEnd="true">
+
+                            <TextView
+                                android:id="@+id/list_events_time"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="19:30"/>
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="wrap_content"
+                                android:src="@drawable/ic_time"
+                                app:tint="@color/greyText"
+                                android:adjustViewBounds="true"
+                                android:layout_marginStart="2dp"
+                                android:layout_gravity="center"
+                                android:contentDescription="@string/startTime"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="end"
+                            android:layout_marginStart="5dp"
+                            android:layout_toStartOf="@+id/list_events_layout_time"
+                            android:orientation="horizontal"
+                            android:paddingHorizontal="6dp"
+                            android:paddingVertical="2dp">
+
+                            <TextView
+                                android:id="@+id/list_events_count_people"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:text="40" />
+
+                            <ImageView
+                                android:layout_width="18dp"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center"
+                                android:layout_marginStart="2dp"
+                                android:src="@drawable/ic_group"
+                                app:tint="@color/greyText"
+                                android:scaleType="centerCrop"
+                                android:adjustViewBounds="true"
+                                android:contentDescription="@string/members" />
+                        </LinearLayout>
+
+                    </RelativeLayout>
+                </LinearLayout>
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
 </androidx.constraintlayout.widget.ConstraintLayout>
