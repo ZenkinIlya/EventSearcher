@@ -44,7 +44,7 @@
         app:layout_constraintTop_toBottomOf="@+id/sign_in_login"
         app:layout_constraintWidth_percent=".8" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sign_in_to_come_in"
         android:text="@string/toComeIn"
         style="@style/RoundedCornerButton"

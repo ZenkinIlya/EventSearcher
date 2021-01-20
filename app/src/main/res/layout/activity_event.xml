@@ -6,6 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@color/background"
     tools:context=".main.ui.events.event.EventActivity">
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -27,7 +28,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/event_info"
-            app:layout_constraintWidth_percent="0.88"
+            app:layout_constraintWidth_percent="0.85"
             app:layout_constraintHorizontal_bias="0.5"/>
 
         <TextView
@@ -36,15 +37,13 @@
             android:theme="@style/ThemeOverlay.AppCompat.Dark"
             android:layout_width="0dp"
             android:layout_height="match_parent"
-            android:paddingStart="15dp"
-            android:paddingEnd="15dp"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
+            android:paddingHorizontal="15dp"
+            android:paddingVertical="8dp"
             android:background="@drawable/edit_text_border_white"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/event_text_view_comment"
-            app:layout_constraintWidth_percent="0.95"
+            app:layout_constraintWidth_percent="0.92"
             app:layout_constraintHorizontal_bias="0.5"/>
 
         <include layout="@layout/event_item_list"
@@ -78,6 +77,7 @@
             android:id="@+id/event_members"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:paddingHorizontal="15dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/event_members_header"
@@ -88,7 +88,4 @@
             tools:listitem="@layout/person_item_list" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-
-
 </LinearLayout>

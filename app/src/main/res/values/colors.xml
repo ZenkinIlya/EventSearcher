@@ -12,4 +12,6 @@
     <color name="transparent">#00000000</color>
     <color name="red">#E53935</color>
     <color name="greyText">@color/quantum_grey600</color>
+    <color name="background">@color/quantum_vanillablue50</color>
+    <color name="backgroundCurrentUser">@color/quantum_vanillablue100</color>
 </resources>

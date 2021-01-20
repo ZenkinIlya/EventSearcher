@@ -15,7 +15,7 @@ public class Design {
     //Фон под всем activity
     public static void setStatusBarGradient(Activity activity) {
         Window window = activity.getWindow();
-        Drawable background = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.gradient, null);
+        Drawable background = ResourcesCompat.getDrawable(activity.getResources(), R.drawable.header_background, null);
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         window.setStatusBarColor(ContextCompat.getColor(activity, android.R.color.transparent));
         window.setNavigationBarColor(ContextCompat.getColor(activity, android.R.color.transparent));

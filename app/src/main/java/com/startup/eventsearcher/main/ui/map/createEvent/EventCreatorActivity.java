@@ -13,6 +13,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -34,7 +35,6 @@ import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.ErrorServerHandler;
-import com.startup.eventsearcher.utils.JsonHandler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -43,7 +43,7 @@ import java.util.Objects;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
-public class EventCreatorActivity extends AppCompatActivity {
+public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.Callback{
 
     private static final String TAG = "myEventCreator";
 
@@ -55,6 +55,8 @@ public class EventCreatorActivity extends AppCompatActivity {
     TabLayout tabLayoutCategory;
     @BindView(R.id.event_creator_location)
     TextInputLayout textFieldLocation;
+    @BindView(R.id.event_creator_redaction_location)
+    ImageView imageViewRedactionLocation;
     @BindView(R.id.event_creator_start_date)
     TextInputLayout textFieldStartDate;
     @BindView(R.id.event_creator_start_time)
@@ -86,6 +88,7 @@ public class EventCreatorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_event_creator);
         ButterKnife.bind(this);
+        SetLocationEventFragment.registerSetLocationEventFragmentCallback(this);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Создание эвента");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -122,6 +125,15 @@ public class EventCreatorActivity extends AppCompatActivity {
 
     private void componentListener() {
 
+        //Изменение местоположения эвента
+        imageViewRedactionLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                SetLocationEventFragment setLocationEventFragment = SetLocationEventFragment.newInstance(address);
+                setLocationEventFragment.show(getSupportFragmentManager(), "fragment_set_location_event");
+            }
+        });
+
         Objects.requireNonNull(textFieldStartDate.getEditText()).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -130,7 +142,7 @@ public class EventCreatorActivity extends AppCompatActivity {
                     @Override
                     public void onDateSet(DatePicker view, int year,
                                           int monthOfYear, int dayOfMonth) {
-                        String date = dayOfMonth + "-" + (monthOfYear + 1) + "-" + year;
+                        String date = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
                         textFieldStartDate.getEditText().setText(date);
                         lastSelectedYear = year;
                         lastSelectedMonth = monthOfYear;
@@ -224,10 +236,13 @@ public class EventCreatorActivity extends AppCompatActivity {
                             int posCurrentCategory = viewPagerCategory.getCurrentItem();
                             String category = App.getCategoryArrayList().get(posCurrentCategory).getCategoryName();
 
-                            //Получаю адресс и координаты местонахождения
+                            //Получаю адрес и координаты местонахождения
                             EventAddress eventAddress = new EventAddress(
                                     Objects.requireNonNull(textFieldLocation.getEditText()).getText().toString(),
                                     address.getLatitude(), address.getLongitude());
+
+                            //Получеам дату начала
+                            String startDate = textFieldStartDate.getEditText().getText().toString();
 
                             //Получаем время начала
                             String startTime = Objects.requireNonNull(textFieldStartTime.getEditText()).getText().toString();
@@ -242,16 +257,15 @@ public class EventCreatorActivity extends AppCompatActivity {
                             ArrayList<Subscriber> subscribers = new ArrayList<>();
                             subscribers.add(new Subscriber(personCreator, new ExtraDate(startTime, "")));
 
-                            event = new Event(header, category, eventAddress, startTime,
+                            event = new Event(header, category, eventAddress, startDate, startTime,
                                     CurrentPerson.getPerson(), subscribers, comment);
 
                             //Добавляем в общий список эвентов
                             EventsList.addEvent(event);
 
-                            JsonHandler.saveObjectToSharedPreference(view.getContext(),
-                                    "Events",
-                                    "eventKey",
-                                    EventsList.getEventArrayList());
+                            //Сохранение списка эвентов в JSON
+                            //Сохранение необходимо выполнить тут, так как onStop Срабатывает после initMap
+                            EventsList.saveEventArrayListInJSON(view.getContext());
 
                             Log.d(TAG, "buttonAccept: event = " +event.toString());
                             Intent intent = new Intent();
@@ -277,5 +291,11 @@ public class EventCreatorActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void returnAddress(Address address) {
+        this.address = address;
+        fillAddress(address);
     }
 }

@@ -83,7 +83,7 @@
         app:layout_constraintTop_toBottomOf="@+id/sign_up_password"
         app:layout_constraintWidth_percent=".8" />
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/sign_up_registration"
         android:text="@string/registrationWithoutUnderline"
         style="@style/RoundedCornerButton"

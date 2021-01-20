@@ -8,10 +8,13 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
+import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 
 import java.util.ArrayList;
 
@@ -46,6 +49,9 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        if (CurrentPerson.getPerson().equals(subscribers.get(position).getPerson())){
+            holder.personCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.backgroundCurrentUser));
+        }
         holder.personLogin.setText(subscribers.get(position).getPerson().getLogin());
         holder.personArrivalTime.setText(subscribers.get(position).getExtraDate().getArrivalTime());
         holder.personComment.setText(subscribers.get(position).getExtraDate().getComment());
@@ -61,6 +67,7 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         public final TextView personLogin;
         public final TextView personArrivalTime;
         public final TextView personComment;
+        public final CardView personCardView;
 
         public ViewHolder(View view) {
             super(view);
@@ -68,6 +75,7 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
             personLogin = view.findViewById(R.id.person_login);
             personArrivalTime = view.findViewById(R.id.person_arrival_time);
             personComment = view.findViewById(R.id.person_comment);
+            personCardView = view.findViewById(R.id.person_card);
         }
     }
 }

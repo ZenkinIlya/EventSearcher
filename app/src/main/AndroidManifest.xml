@@ -15,6 +15,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:name=".main.ui.events.filter.FilterActivity"
+            android:theme="@style/FullScreen"/>
+        <activity
             android:name=".main.ui.subscribe.SubscribeActivity"
             android:theme="@style/AppThemeWithActionBar"/>
         <activity
@@ -31,7 +34,8 @@
             android:theme="@style/FullScreen" />
         <activity
             android:name=".introduction.IntroductionActivity"
-            android:theme="@style/FullScreen" />
+            android:theme="@style/FullScreen">
+        </activity>
         <activity
             android:name=".main.MainActivity"
             android:theme="@style/FullScreen">
@@ -49,6 +53,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
+        <meta-data
+            android:name="preloaded_fonts"
+            android:resource="@array/preloaded_fonts" />
     </application>
 
 </manifest>

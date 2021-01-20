@@ -21,6 +21,8 @@ import androidx.fragment.app.Fragment;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.authentication.Utils.DataVerification;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
+import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
+import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.ErrorServerHandler;
 import com.startup.eventsearcher.utils.SuccessActivity;
@@ -119,6 +121,13 @@ public class SignUpTabFragment extends Fragment {
                                     }
                                 });
                             } else {
+                                CurrentPerson.setPerson(new Person(
+                                        login.getText().toString(),
+                                        password.getText().toString(),
+                                        "Pacient",
+                                        "Navalniy",
+                                        email.getText().toString()
+                                ));
                                 Intent intent = new Intent(getContext(), SuccessActivity.class);
                                 intent.putExtra("text", getResources().getString(R.string.registrationSuccess));
                                 startActivity(intent);

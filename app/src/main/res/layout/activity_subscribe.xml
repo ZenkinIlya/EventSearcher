@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"/>
     </com.google.android.material.textfield.TextInputLayout>
 
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/subscribe_subscribe"
         android:text="@string/Subscribe"
         app:layout_constraintEnd_toEndOf="parent"

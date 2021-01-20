@@ -66,19 +66,20 @@
     </array>
 
     <string-array name="markArray">
-        <item>0</item>
-        <item>5</item>
-        <item>10</item>
-        <item>15</item>
         <item>20</item>
-        <item>25</item>
         <item>30</item>
-        <item>35</item>
-        <item>40</item>
-        <item>45</item>
-        <item>50</item>
     </string-array>
-    <!-- TODO: Remove or change this placeholder text -->
+
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="apply">Применить</string>
+    <string name="userName">Имя пользователя</string>
+    <string name="userSecondName">Фамилия пользователя</string>
+    <string name="Settings">Настройки</string>
+    <string name="Avatar">Аватар пользователя</string>
+    <string name="Close">Закрыть</string>
+    <string name="City">Город</string>
+    <string name="CountMembers">Количество участников</string>
+    <string name="ChooseCity">Выберите город</string>
+    <string name="Reset">Сбросить</string>
 
 </resources>

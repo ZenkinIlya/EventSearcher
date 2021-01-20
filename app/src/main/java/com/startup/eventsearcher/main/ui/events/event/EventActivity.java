@@ -12,11 +12,10 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.model.Category;
@@ -28,11 +27,18 @@ import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.Objects;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+/*Активити отображения эвента
+* На вход принимает эвент для отображения
+* При нажатии на "подписаться" появляется окно подписки. После успешного завершение подписки
+* файл json перезаписывается в onActivityResult. При снятии подписки json тут же обновляется*/
 
 public class EventActivity extends AppCompatActivity {
 
@@ -40,6 +46,10 @@ public class EventActivity extends AppCompatActivity {
 
     @BindView(R.id.list_events_title)
     TextView textViewEventTitle;
+    @BindView(R.id.list_events_date_number)
+    TextView textViewEventDateDay;
+    @BindView(R.id.list_events_date_month)
+    TextView textViewEventDateMonth;
     @BindView(R.id.list_events_address)
     TextView textViewEventAddress;
     @BindView(R.id.list_events_count_people)
@@ -50,7 +60,7 @@ public class EventActivity extends AppCompatActivity {
     ImageView imageViewCategory;
     @BindView(R.id.list_events_layout_location)
     LinearLayout imageViewLocation;
-    @BindView(R.id.list_events_subscribe)
+    @BindView(R.id .list_events_subscribe)
     ImageView imageViewSubscribe;
     @BindView(R.id.event_comment)
     TextView textViewComment;
@@ -93,16 +103,23 @@ public class EventActivity extends AppCompatActivity {
                         int indexOfEvent = data.getIntExtra("index", 0);
                         String time = data.getStringExtra("time");
                         String comment = data.getStringExtra("comment");
+                        Log.d(TAG, "onActivityResult: index = " + indexOfEvent +
+                                "; time = " + time + "; comment = " + comment);
 
-                        //По индексу ищем эвент и добавляем туда пользователя
+                        //По индексу ищем эвент и добавляем туда пользователя-подписчика
                         Subscriber subscriber = new Subscriber(CurrentPerson.getPerson(),
                                 new ExtraDate(time, comment));
                         EventsList.getEventArrayList().get(indexOfEvent).getSubscribers().add(subscriber);
+                        //Обновляем текущий эвент
                         event.getSubscribers().add(subscriber);
+                        //Сохраняем список эвентов в JSON
+                        EventsList.saveEventArrayListInJSON(this);
 
                         fillFields();
                         personRecyclerViewAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "onActivityResult: EventList = " + EventsList.getEventArrayList().toString());
                         Log.d(TAG, "onActivityResult: Пользователь подписался");
+                        break;
                     }
                 }
                 break;
@@ -112,6 +129,7 @@ public class EventActivity extends AppCompatActivity {
                     case Config.SUBSCRIBE:{
                         personRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь отменил этап подписки");
+                        break;
                     }
                 }
                 break;
@@ -134,9 +152,9 @@ public class EventActivity extends AppCompatActivity {
         imageViewLocation.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-/*                LocationEventFragment locationEventFragment = LocationEventFragment.newInstance(event);
-                locationEventFragment.setTargetFragment(, 300);
-                locationEventFragment.show(fragmentManager, "fragment_location_event");*/
+                LocationEventFragment locationEventFragment = LocationEventFragment.newInstance(event);
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                locationEventFragment.show(fragmentManager, "fragment_location_event");
             }
         });
 
@@ -144,7 +162,7 @@ public class EventActivity extends AppCompatActivity {
         imageViewSubscribe.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                //Если пользователь подписан
+                //Если пользователь не подписан
                 Subscriber subscriber = currentPersonIsSubscribe(event);
                 if (subscriber == null){
                     //Осуществляется подписка
@@ -159,10 +177,14 @@ public class EventActivity extends AppCompatActivity {
                             break;
                         }
                     }
+                    //Получаем позицию пользователя в списке
+                    int index = event.getSubscribers().indexOf(subscriber);
                     event.getSubscribers().remove(subscriber);
+                    //Сохраняем список эвентов в JSON
+                    EventsList.saveEventArrayListInJSON(view.getContext());
 
                     fillFields();  //Убираем сердечко
-                    personRecyclerViewAdapter.notifyDataSetChanged();
+                    personRecyclerViewAdapter.notifyItemRemoved(index);
                 }
             }
         });
@@ -171,6 +193,12 @@ public class EventActivity extends AppCompatActivity {
     //Заполняем поля
     private void fillFields() {
         textViewEventTitle.setText(event.getHeader());
+
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        textViewEventDateDay.setText(event.getDateFormatDay(simpleDateFormat));
+        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        textViewEventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+
         textViewEventAddress.setText(event.getEventAddress().getAddress());
         textViewCountPeople.setText(String.valueOf(event.getSubscribers().size()));
         textViewEventTime.setText(event.getStartTime());
@@ -203,6 +231,7 @@ public class EventActivity extends AppCompatActivity {
         return null;
     }
 
+    //Получаем картинку в зависимости от категории эвента
     private int getResourceIdImage(Event event) {
         ArrayList<Category> categoryArrayList = App.getCategoryArrayList();
         for (Category category: categoryArrayList){

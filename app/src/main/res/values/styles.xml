@@ -6,6 +6,7 @@
         <item name="colorAccent">@color/primaryLightColor</item>
         <item name="colorSecondary">@color/primaryColor</item>
         <item name="colorOnSecondary">@color/white</item>
+
 <!--        <item name="android:textColor">@color/primaryTextColor</item>-->
 <!--        <item name="colorPrimary">#212121</item>
         <item name="colorPrimaryVariant">#000000</item>
@@ -54,6 +55,13 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <!--warning кнопка с загругленными краями-->
+    <style name="RoundedCornerButtonWarning" parent="RoundedCornerButton">
+        <item name="android:background">@drawable/btn_warning_rounded_corner</item>
+        <item name="android:textSize">13sp</item>
+        <item name="android:textStyle">normal</item>
+    </style>
+
     <!--Карточка с загругленными краями-->
     <style name="Card" parent="@style/Widget.MaterialComponents.CardView">
         <item name="cardCornerRadius">20dp</item>
@@ -71,6 +79,14 @@
     <style name="CollapsingToolbarLayoutExpandedTextStyle" parent="AppTheme">
         <item name="android:textColor">@android:color/transparent</item>
         <item name="android:textSize">0sp</item>
+    </style>
+
+    <style name="CaptionText" parent="TextAppearance.AppCompat.Caption">
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="BodyText" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">17sp</item>
     </style>
 
 </resources>

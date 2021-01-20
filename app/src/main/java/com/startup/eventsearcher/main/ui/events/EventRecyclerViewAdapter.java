@@ -1,7 +1,6 @@
 package com.startup.eventsearcher.main.ui.events;
 
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,8 +15,6 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.bumptech.glide.Glide;
-import com.bumptech.glide.request.target.ViewTarget;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
@@ -28,8 +25,10 @@ import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> implements Filterable {
 
@@ -72,7 +71,13 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
         Event event = listEventsFilter.get(position);
+
         holder.eventTitle.setText(event.getHeader());
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        holder.eventDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
+        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
+        holder.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+
         holder.eventAddress.setText(event.getEventAddress().getAddress());
 
         int countPeople = event.getSubscribers().size();
@@ -115,6 +120,12 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 EventFragment.showEventLocation(context, event);
             }
         });
+    }
+
+    //Обновление фильтрованного списка
+    public void addAllItemsToFilterList(){
+        listEventsFilter.clear();
+        listEventsFilter.addAll(listEvents);
     }
 
     //Проверка подписан ли пользователь на эвент
@@ -163,7 +174,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
             @Override
             protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                listEventsFilter = (ArrayList<Event>)filterResults.values;
+                listEventsFilter = (List<Event>) filterResults.values;
                 notifyDataSetChanged();
             }
         };
@@ -211,6 +222,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         public final ImageView eventImage;
         public final ImageView eventSubscribe;
         private final LinearLayout eventLocationMarker;
+        private final TextView eventDateNumber;
+        private final TextView eventDateMonth;
 
         public ViewHolder(View view) {
             super(view);
@@ -222,6 +235,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             eventImage = view.findViewById(R.id.list_events_image_category);
             eventSubscribe = view.findViewById(R.id.list_events_subscribe);
             eventLocationMarker = view.findViewById(R.id.list_events_layout_location);
+            eventDateNumber = view.findViewById(R.id.list_events_date_number);
+            eventDateMonth = view.findViewById(R.id.list_events_date_month);
         }
     }
 }

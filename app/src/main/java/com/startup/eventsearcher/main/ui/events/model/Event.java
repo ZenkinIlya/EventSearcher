@@ -3,7 +3,12 @@ package com.startup.eventsearcher.main.ui.events.model;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Locale;
 import java.util.Objects;
 
 public class Event implements Serializable {
@@ -11,16 +16,18 @@ public class Event implements Serializable {
     private String header;
     private String category;
     private EventAddress eventAddress;
+    private String startDate;
     private String startTime;
     private Person personCreator;
     private ArrayList<Subscriber> subscribers;
     private String comment;
 
-    public Event(String header, String category, EventAddress eventAddress, String startTime,
+    public Event(String header, String category, EventAddress eventAddress, String startDate, String startTime,
                  Person personCreator, ArrayList<Subscriber> subscribers, String comment) {
         this.header = header;
         this.category = category;
         this.eventAddress = eventAddress;
+        this.startDate = startDate;
         this.startTime = startTime;
         this.personCreator = personCreator;
         this.subscribers = subscribers;
@@ -37,6 +44,10 @@ public class Event implements Serializable {
 
     public EventAddress getEventAddress() {
         return eventAddress;
+    }
+
+    public String getStartDate() {
+        return startDate;
     }
 
     public String getStartTime() {
@@ -61,6 +72,7 @@ public class Event implements Serializable {
                 "header='" + header + '\'' +
                 ", category='" + category + '\'' +
                 ", eventAddress=" + eventAddress +
+                ", startDate='" + startDate + '\'' +
                 ", startTime='" + startTime + '\'' +
                 ", personCreator=" + personCreator +
                 ", subscribers=" + subscribers +
@@ -76,6 +88,7 @@ public class Event implements Serializable {
         return Objects.equals(header, event.header) &&
                 Objects.equals(category, event.category) &&
                 Objects.equals(eventAddress, event.eventAddress) &&
+                Objects.equals(startDate, event.startDate) &&
                 Objects.equals(startTime, event.startTime) &&
                 Objects.equals(personCreator, event.personCreator) &&
                 Objects.equals(subscribers, event.subscribers) &&
@@ -84,6 +97,38 @@ public class Event implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, category, eventAddress, startTime, personCreator, subscribers, comment);
+        return Objects.hash(header, category, eventAddress, startDate, startTime, personCreator, subscribers, comment);
+    }
+
+    public String getDateFormatDay(SimpleDateFormat simpleDateFormat) {
+        String defaultResult = "-";
+        try {
+            Date date = simpleDateFormat.parse(this.getStartDate());
+            if (date == null){
+                return defaultResult;
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return defaultResult;
+    }
+
+    public String getDateFormatMonth(SimpleDateFormat simpleDateFormat) {
+        String defaultResult = "-";
+        try {
+            Date date = simpleDateFormat.parse(this.getStartDate());
+            if (date == null){
+                return defaultResult;
+            }
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            return String.valueOf(calendar.getDisplayName(Calendar.MONTH, Calendar.SHORT, Locale.getDefault()));
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        return defaultResult;
     }
 }

@@ -5,32 +5,35 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.reflect.TypeToken;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
+import com.startup.eventsearcher.main.ui.events.filter.FilterActivity;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
+import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.Config;
-import com.startup.eventsearcher.utils.JsonHandler;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Objects;
 
@@ -86,17 +89,16 @@ public class EventFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_event_list, container, false);
         ButterKnife.bind(this, view);
         fragmentManager = getParentFragmentManager();
+        Toolbar toolbar = view.findViewById(R.id.event_list_toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        setHasOptionsMenu(true);
 
         //TODO Получаем с сервера список эвентов
-
-        Type type = new TypeToken<ArrayList<Event>>(){}.getType();
-        EventsList.setEventArrayList(JsonHandler.getSavedObjectFromPreference(requireContext(), "Events",
-                "eventKey", type));
 
         eventRecyclerViewAdapter = new EventRecyclerViewAdapter(
                 this,
                 eventRecyclerView,
-                EventsList.getEventArrayList(),
+                EventsList.getEventArrayListFromJSON(getContext()),
                 eventEventsGone);
         eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
 
@@ -156,10 +158,7 @@ public class EventFragment extends Fragment {
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        JsonHandler.saveObjectToSharedPreference(requireContext(),
-                "Events",
-                "eventKey",
-                EventsList.getEventArrayList());
+        EventsList.saveEventArrayListInJSON(getContext());
     }
 
     @Override
@@ -187,7 +186,7 @@ public class EventFragment extends Fragment {
         switch (resultCode){
             case RESULT_OK:{
                 switch (requestCode) {
-                    case Config.SUBSCRIBE: {
+                    case Config.SUBSCRIBE:{
                         int indexOfEvent = Objects.requireNonNull(data).getIntExtra("index", 0);
                         String time = data.getStringExtra("time");
                         String comment = data.getStringExtra("comment");
@@ -198,6 +197,26 @@ public class EventFragment extends Fragment {
 
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь подписался");
+                        break;
+                    }
+                    case Config.CREATE_EVENT:{
+                        eventRecyclerViewAdapter.addAllItemsToFilterList();
+                        eventRecyclerViewAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "onActivityResult: Пользователь создал эвент из меню");
+                        break;
+                    }
+                    case Config.SHOW_FILTER:{
+                        if (data != null){
+                            String city = data.getStringExtra("city");
+                            int startCountMembers = data.getIntExtra("startCountMembers", 0);
+                            int endCountMembers = data.getIntExtra("endCountMembers", 50);
+                            String date = data.getStringExtra("date");
+                            Toast.makeText(getContext(), city +"; "+ startCountMembers+ "; "+ endCountMembers+ "; " + date, Toast.LENGTH_SHORT).show();
+
+                            //Фильтрация через адаптер
+                            
+                        }
+                        break;
                     }
                 }
                 break;
@@ -207,14 +226,40 @@ public class EventFragment extends Fragment {
                     case Config.SUBSCRIBE:{
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь отменил этап подписки");
+                        break;
                     }
                     case Config.SHOW_EVENT:{
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь вышел из подробного просмотра эвента");
+                        break;
+                    }
+                    case Config.SHOW_FILTER:{
+                        eventRecyclerViewAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "onActivityResult: Пользователь вышел из фильтра");
+                        break;
                     }
                 }
                 break;
             }
+        }
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.event_list_menu, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.add_event:
+                //Создание эвента без начального выбора адреса
+                Intent intent = new Intent(getContext(), EventCreatorActivity.class);
+                startActivityForResult(intent, Config.CREATE_EVENT);
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
         }
     }
 
@@ -233,11 +278,9 @@ public class EventFragment extends Fragment {
         });
 
         //Показ подробного фильтра
-        imageViewFilter.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                //TODO Реализовать AlertDialog
-            }
+        imageViewFilter.setOnClickListener(view -> {
+            Intent intent = new Intent(getContext(), FilterActivity.class);
+            startActivityForResult(intent, Config.SHOW_FILTER);
         });
     }
 

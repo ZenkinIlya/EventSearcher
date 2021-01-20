@@ -1,6 +1,7 @@
 package com.startup.eventsearcher.main.ui.subscribe;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -13,19 +14,20 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.reflect.TypeToken;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
-import com.startup.eventsearcher.utils.JsonHandler;
+import com.startup.eventsearcher.utils.Config;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
 
 public class SubscribeFragment extends Fragment {
 
@@ -37,6 +39,7 @@ public class SubscribeFragment extends Fragment {
     TextView textViewSubscribeEventListGone;
 
     private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
+    private ArrayList<Event> subscribeEvents = new ArrayList<>();
 
     public static SubscribeFragment newInstance(String param1, String param2) {
         SubscribeFragment fragment = new SubscribeFragment();
@@ -58,17 +61,16 @@ public class SubscribeFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_subscribe, container, false);
         ButterKnife.bind(this, view);
 
-        Type type = new TypeToken<ArrayList<Event>>(){}.getType();
-        EventsList.setEventArrayList(JsonHandler.getSavedObjectFromPreference(requireContext(), "Events",
-                "eventKey", type));
+        //TODO Получаем с сервера список эвентов
 
-        //Берем эвенты из списка на которые подписан пользователь
-        ArrayList<Event> subscribeEventsArrayList = getSubscribeEvents(EventsList.getEventArrayList());
+        EventsList.getEventArrayListFromJSON(getContext());
+
+        getSubscribeEvents(EventsList.getEventArrayList());
 
         subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
                 this,
                 subscribeRecyclerView,
-                subscribeEventsArrayList,
+                subscribeEvents,
                 textViewSubscribeEventListGone);
         subscribeRecyclerView.setAdapter(subscribeEventsRecyclerViewAdapter);
 
@@ -121,10 +123,7 @@ public class SubscribeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        JsonHandler.saveObjectToSharedPreference(requireContext(),
-                "Events",
-                "eventKey",
-                EventsList.getEventArrayList());
+        EventsList.saveEventArrayListInJSON(getContext());
     }
 
     @Override
@@ -145,15 +144,40 @@ public class SubscribeFragment extends Fragment {
         Log.d(TAG, "onDetach()");
     }
 
-    private ArrayList<Event> getSubscribeEvents(ArrayList<Event> arrayList) {
-        ArrayList<Event> subscribeEventsArrayList = new ArrayList<>();
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
+        switch (resultCode){
+            case RESULT_OK:{
+                break;
+            }
+            case RESULT_CANCELED:{
+                switch (requestCode){
+                    case Config.SHOW_EVENT:{
+                        getSubscribeEvents(EventsList.getEventArrayList());
+                        subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
+                        Log.d(TAG, "onActivityResult: Пользователь вышел из подробного просмотра эвента");
+                        break;
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    private void getSubscribeEvents(ArrayList<Event> arrayList) {
+        subscribeEvents.clear();
         for (Event event : arrayList){
             for (Subscriber subscriber : event.getSubscribers()){
                 if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
-                    subscribeEventsArrayList.add(event);
+                    subscribeEvents.add(event);
                 }
             }
         }
-        return subscribeEventsArrayList;
+    }
+
+    public void myStartActivityForResult(Intent intent, int showEvent) {
+        startActivityForResult(intent, showEvent);
     }
 }

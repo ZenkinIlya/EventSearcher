@@ -48,7 +48,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
             @Override
             public void onClick(View view) {
                 int startColor = ContextCompat.getColor(view.getContext(), R.color.white);
-                int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryColor);
+                int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
                 int duration = 300;
                 if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
                     ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32, 0);
