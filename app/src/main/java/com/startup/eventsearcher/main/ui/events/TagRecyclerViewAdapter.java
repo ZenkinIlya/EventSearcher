@@ -15,6 +15,7 @@ import androidx.core.view.ViewCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.utils.animation.ResizeAnimation;
 
 import java.util.ArrayList;
@@ -58,7 +59,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
                     animateSearchImage(holder.imageView, duration);
 
-                    arrayListActiveCategory.add(holder.tagText.getText().toString());
+                    arrayListActiveCategory.add(holder.tagText.getText().toString().toLowerCase());
                     filterEventList();
 
                 } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
@@ -69,7 +70,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
                     startColorAnimation(endColor, startColor, duration, holder.tagCard);
                     holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.greyText));
 
-                    arrayListActiveCategory.remove(holder.tagText.getText().toString());
+                    arrayListActiveCategory.remove(holder.tagText.getText().toString().toLowerCase());
                     filterEventList();
                 }
             }
@@ -77,7 +78,8 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
     }
 
     private void filterEventList() {
-        eventRecyclerViewAdapter.filterByCategory(arrayListActiveCategory);
+        FilterHandler.setArrayListCategory(arrayListActiveCategory);
+        eventRecyclerViewAdapter.filter();
     }
 
     @Override

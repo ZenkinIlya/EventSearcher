@@ -1,6 +1,7 @@
 package com.startup.eventsearcher.main.ui.events.filter;
 
 public class Filter {
+
     //при сбросе: ""
     private String city;
 

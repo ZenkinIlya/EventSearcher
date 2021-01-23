@@ -118,7 +118,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 app:values="@array/markArray"
-                android:valueFrom="1"
+                android:valueFrom="0"
                 android:valueTo="50"
 
                 app:labelBehavior="gone"/>

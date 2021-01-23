@@ -1,11 +1,11 @@
 package com.startup.eventsearcher.main.ui.events;
 
 import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Filter;
-import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -18,6 +18,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.main.ui.events.filter.Filter;
+import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
@@ -29,8 +31,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
-public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> implements Filterable {
+public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
+
+    private static final String TAG = "myEventAdapter";
 
     private List<Event> listEvents;
     private List<Event> listEventsFilter;
@@ -122,8 +127,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         });
     }
 
-    //Обновление фильтрованного списка
-    public void addAllItemsToFilterList(){
+    //Сброс фильтрованного списка
+    public void resetFilterList(){
         listEventsFilter.clear();
         listEventsFilter.addAll(listEvents);
     }
@@ -154,62 +159,38 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         return listEventsFilter.size();
     }
 
-    @Override
-    public Filter getFilter() {
-        return new Filter() {
-            @Override
-            protected FilterResults performFiltering(CharSequence charSequence) {
-                charSequence = charSequence.toString().toLowerCase();
-                FilterResults results = new FilterResults();
-                if (charSequence.length() == 0){
-                    synchronized(this)
-                    {
-                        results.values = listEvents;
-                    }
-                }else {
-                    results.values = getFilteredResults(charSequence.toString());
-                }
-                return results;
-            }
+    public void filter() {
+        Filter filter = FilterHandler.getFilter();
+        String searchText = FilterHandler.getSearchText();
+        ArrayList<String> arrayListCategory = FilterHandler.getArrayListCategory();
 
-            @Override
-            protected void publishResults(CharSequence charSequence, FilterResults filterResults) {
-                listEventsFilter = (List<Event>) filterResults.values;
-                notifyDataSetChanged();
-            }
-        };
-    }
+        Log.d(TAG, "filter: " + filter.toString() +
+                "; searchText = " +searchText +
+                "; arrayListCategory = " + arrayListCategory.toString());
 
-    protected List<Event> getFilteredResults(String constraint) {
-        List<Event> results = new ArrayList<>();
-
-        for (Event event : listEvents) {
-            if (event.getCategory().toLowerCase().contains(constraint)){
-                results.add(event);
-            }
-        }
-        return results;
-    }
-
-    //На вход фильтра приходят: категории, город, ренж участников, дата проведения
-    //Если изменился один из параматреов фильтрации, то фильтрация должна проходить и по остальным параметрам
-    //категория - город - ренж - дата
-    public void filterByCategory(ArrayList<String> arrayListFilterCategory){
-        if (arrayListFilterCategory.size() != 0){
-            List<Event> results = new ArrayList<>();
-            for (Event event : listEvents) {
-                for (String category: arrayListFilterCategory){
-                    if (event.getCategory().toLowerCase().contains(category.toLowerCase())){
-                        results.add(event);
-                        break;
-                    }
-                }
-            }
-            listEventsFilter = results;
-        }else{
-            listEventsFilter = listEvents;
+        String searchDate;
+        if (filter.getLastSelectedDayOfMonth() == 0 && filter.getLastSelectedMonth() == 0 &&
+                filter.getLastSelectedYear() == 0) {
+            searchDate = "";
+        } else {
+            searchDate = filter.getLastSelectedDayOfMonth() + "." +
+                    (filter.getLastSelectedMonth() + 1) + "." +
+                    filter.getLastSelectedYear();
         }
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            listEventsFilter = listEvents.stream()
+                    .filter(event -> {
+                        int countMembers = event.getSubscribers().size();
+                        return (searchText.isEmpty() || event.getHeader().equals(searchText)) &&
+                                (arrayListCategory.isEmpty() || arrayListCategory.contains(event.getCategory().toLowerCase())) &&
+                                (filter.getCity().isEmpty() || filter.getCity().toLowerCase().equals(event.getEventAddress().getCity().toLowerCase())) &&
+                                ((filter.getEndCountMembers() == -1 && filter.getStartCountMembers() <= countMembers) ||
+                                        (filter.getStartCountMembers() <= countMembers && countMembers <= filter.getEndCountMembers())) &&
+                                (searchDate.isEmpty() || event.getStartDate().equals(searchDate));
+                    })
+                    .collect(Collectors.toList());
+        }
         notifyDataSetChanged();
     }
 

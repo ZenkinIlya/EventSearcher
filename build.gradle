@@ -13,7 +13,6 @@ allprojects {
     repositories {
         google()
         jcenter()
-        maven { url 'https://jitpack.io' }  //нужно для ренж слайдера
     }
 }
 

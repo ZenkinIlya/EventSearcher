@@ -2,7 +2,6 @@ package com.startup.eventsearcher.main.ui.events.filter;
 
 import android.app.DatePickerDialog;
 import android.content.Intent;
-import android.location.Address;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
@@ -13,15 +12,12 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 
-import com.google.android.gms.maps.model.LatLng;
 import com.google.android.material.slider.RangeSlider;
 import com.google.android.material.textfield.TextInputLayout;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
-import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -80,13 +76,7 @@ public class FilterActivity extends AppCompatActivity {
     //Инициализация выпадающего списка с городами
     private void initCity() {
         for (Event event: EventsList.getEventArrayList()){
-            LatLng latLng = new LatLng(event.getEventAddress().getLatitude(), event.getEventAddress().getLongitude());
-            try {
-                Address address = MapHandler.getAddress(this, latLng);
-                arrayListCities.add(address.getLocality());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            arrayListCities.add(event.getEventAddress().getCity());
         }
         autoCompleteTextViewCitySpinner.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<>(arrayListCities)));
@@ -123,7 +113,7 @@ public class FilterActivity extends AppCompatActivity {
     //Сброс фильтра
     private void resetFilter() {
         filter.setCity("");
-        filter.setStartCountMembers(1);
+        filter.setStartCountMembers(0);
         filter.setEndCountMembers(-1);
         filter.setLastSelectedDayOfMonth(0);
         filter.setLastSelectedMonth(0);
@@ -164,12 +154,7 @@ public class FilterActivity extends AppCompatActivity {
         buttonApply.setOnClickListener(view -> {
             filter.setCity(autoCompleteTextViewCitySpinner.getText().toString());
             FilterHandler.saveFilterToJSON(this);
-
             Intent intent = new Intent();
-            intent.putExtra("city", autoCompleteTextViewCitySpinner.getText().toString());
-            intent.putExtra("startCountMembers", filter.getStartCountMembers());
-            intent.putExtra("endCountMembers", filter.getEndCountMembers());
-            intent.putExtra("date", Objects.requireNonNull(textInputLayoutStartDate.getEditText()).getText().toString());
             setResult(RESULT_OK, intent);
             finish();
         });

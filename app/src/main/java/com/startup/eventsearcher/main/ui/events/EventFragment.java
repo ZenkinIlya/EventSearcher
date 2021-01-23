@@ -12,7 +12,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -26,6 +25,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
 import com.startup.eventsearcher.main.ui.events.filter.FilterActivity;
+import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
@@ -195,27 +195,24 @@ public class EventFragment extends Fragment {
                         EventsList.getEventArrayList().get(indexOfEvent).getSubscribers().add(new Subscriber(CurrentPerson.getPerson(),
                                 new ExtraDate(time, comment)));
 
+                        //В адаптере два разных списка, но находящийся в них элементы одни и те же объекты,
+                        //поэтому изменение объекта одного списка отражается на изменении объекта другого списка
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь подписался");
                         break;
                     }
                     case Config.CREATE_EVENT:{
-                        eventRecyclerViewAdapter.addAllItemsToFilterList();
+                        //При создании нового эвента он помещается только в один список, являющийся
+                        //основным списокм на все приложния, а фильтрованный список не изменяется
+                        //поэтому в фильтрованный список необходимо добавить созданный эвент либо
+                        //пересобрать фильтрованный список
+                        eventRecyclerViewAdapter.resetFilterList();
                         eventRecyclerViewAdapter.notifyDataSetChanged();
                         Log.d(TAG, "onActivityResult: Пользователь создал эвент из меню");
                         break;
                     }
                     case Config.SHOW_FILTER:{
-                        if (data != null){
-                            String city = data.getStringExtra("city");
-                            int startCountMembers = data.getIntExtra("startCountMembers", 0);
-                            int endCountMembers = data.getIntExtra("endCountMembers", 50);
-                            String date = data.getStringExtra("date");
-                            Toast.makeText(getContext(), city +"; "+ startCountMembers+ "; "+ endCountMembers+ "; " + date, Toast.LENGTH_SHORT).show();
-
-                            //Фильтрация через адаптер
-                            
-                        }
+                        eventRecyclerViewAdapter.filter();
                         break;
                     }
                 }
@@ -272,7 +269,8 @@ public class EventFragment extends Fragment {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                eventRecyclerViewAdapter.getFilter().filter(newText);
+                FilterHandler.setSearchText(newText);
+                eventRecyclerViewAdapter.filter();
                 return true;
             }
         });

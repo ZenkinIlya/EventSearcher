@@ -22,6 +22,8 @@ import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
@@ -107,6 +109,14 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             fillAddress(address);
         }
 
+        MaterialTimePicker build = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(12)
+                .setMinute(10)
+                .build();
+        build.show(getSupportFragmentManager(), "tag");
+        build.addOnPositiveButtonClickListener(view -> Toast.makeText(this, "qwerty", Toast.LENGTH_SHORT).show());
+
         // Get Current Date
         calendar = Calendar.getInstance();
         lastSelectedYear = calendar.get(Calendar.YEAR);
@@ -114,7 +124,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
         lastSelectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
     }
 
-    private void fillAddress(Address address) {
+    private void fillAddress(Address address){
         Objects.requireNonNull(textFieldLocation.getEditText()).setText(address.getAddressLine(0));
     }
 
@@ -239,7 +249,11 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
                             //Получаю адрес и координаты местонахождения
                             EventAddress eventAddress = new EventAddress(
                                     Objects.requireNonNull(textFieldLocation.getEditText()).getText().toString(),
-                                    address.getLatitude(), address.getLongitude());
+                                    address.getLocality(), //city
+                                    address.getThoroughfare(),  //street
+                                    address.getSubThoroughfare(), //house
+                                    address.getLatitude(),
+                                    address.getLongitude());
 
                             //Получеам дату начала
                             String startDate = textFieldStartDate.getEditText().getText().toString();
