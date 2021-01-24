@@ -48,7 +48,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="70dp"
                     android:adjustViewBounds="true"
-                    android:src="@drawable/transparent_gradient"
+                    android:src="@drawable/transparent_gradient_to_primary_dark"
                     app:layout_constraintBottom_toBottomOf="parent"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent" />

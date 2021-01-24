@@ -37,6 +37,10 @@
         <item name="android:windowTranslucentStatus">true</item>    <!--прозрачный статус-->
     </style>
 
+    <style name="FullScreenLight" parent="FullScreen">
+        <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
+    </style>
+
     <!--Анимация-->
     <style name="LeftRightActivity" parent="@android:style/Animation.Activity">
         <item name="android:activityOpenEnterAnimation">@anim/activity_left_right_enter</item>

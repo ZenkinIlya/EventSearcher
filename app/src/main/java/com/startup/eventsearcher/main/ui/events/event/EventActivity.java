@@ -8,10 +8,16 @@ import android.view.MenuItem;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityEventBinding;
@@ -26,14 +32,13 @@ import com.startup.eventsearcher.utils.Config;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
-import java.util.Objects;
 
 /*Активити отображения эвента
 * На вход принимает эвент для отображения
 * При нажатии на "подписаться" появляется окно подписки. После успешного завершение подписки
 * файл json перезаписывается в onActivityResult. При снятии подписки json тут же обновляется*/
 
-public class EventActivity extends AppCompatActivity {
+public class EventActivity extends AppCompatActivity implements OnMapReadyCallback {
 
     private static final String TAG = "myEvent";
 
@@ -48,7 +53,9 @@ public class EventActivity extends AppCompatActivity {
         bind = ActivityEventBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        Objects.requireNonNull(getSupportActionBar()).setTitle("Эвент");
+        Toolbar toolbar = bind.eventToolbar;
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);  //удаление тени
 
@@ -59,6 +66,12 @@ public class EventActivity extends AppCompatActivity {
             RecyclerView recyclerView = findViewById(R.id.event_members);
             personRecyclerViewAdapter = new PersonRecyclerViewAdapter(event.getSubscribers(), this, recyclerView);
             recyclerView.setAdapter(personRecyclerViewAdapter);
+
+            SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
+                    .findFragmentById(R.id.event_location_event_map);
+            if (supportMapFragment != null) {
+                supportMapFragment.getMapAsync(this);
+            }
         }
 
         componentListener();
@@ -121,14 +134,9 @@ public class EventActivity extends AppCompatActivity {
     }
 
     private void componentListener() {
-        bind.eventInfo.listEventsLayoutLocation.setOnClickListener(view -> {
-            LocationEventFragment locationEventFragment = LocationEventFragment.newInstance(event);
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            locationEventFragment.show(fragmentManager, "fragment_location_event");
-        });
 
         //Подписка
-        bind.eventInfo.listEventsSubscribe.setOnClickListener(view -> {
+        bind.eventSubscribe.setOnClickListener(view -> {
             //Если пользователь не подписан
             Subscriber subscriber = currentPersonIsSubscribe(event);
             if (subscriber == null){
@@ -158,21 +166,21 @@ public class EventActivity extends AppCompatActivity {
 
     //Заполняем поля
     private void fillFields() {
-        bind.eventInfo.listEventsTitle.setText(event.getHeader());
+        bind.eventHeader.setText(event.getHeader());
 
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        bind.eventInfo.listEventsDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
+        bind.eventDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
         SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        bind.eventInfo.listEventsDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+        bind.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
 
-        bind.eventInfo.listEventsAddress.setText(event.getEventAddress().getAddress());
-        bind.eventInfo.listEventsTime.setText(String.valueOf(event.getSubscribers().size()));
-        bind.eventInfo.listEventsTime.setText(event.getStartTime());
+        bind.eventAddress.setText(event.getEventAddress().getAddress());
+        bind.eventCountPeople.setText(String.valueOf(event.getSubscribers().size()));
+        bind.eventTime.setText(event.getStartTime());
 
         setImageSubscribe();
 
         int resourceId = getResourceIdImage(event);
-        bind.eventInfo.listEventsImageCategory.setImageResource(resourceId);
+        bind.eventImageCategory.setImageResource(resourceId);
 //        Glide.with(this).load(resourceId).into(imageViewCategory);
 
         bind.eventComment.setText(event.getComment());
@@ -181,9 +189,9 @@ public class EventActivity extends AppCompatActivity {
     //Установка иконки подписки
     private void setImageSubscribe() {
         if (currentPersonIsSubscribe(event) != null){
-            bind.eventInfo.listEventsSubscribe.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite));
+            bind.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_favorite));
         }else {
-            bind.eventInfo.listEventsSubscribe.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_unfavorite));
+            bind.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(this, R.drawable.ic_unfavorite));
         }
     }
 
@@ -205,5 +213,15 @@ public class EventActivity extends AppCompatActivity {
             }
         }
         return 0;
+    }
+
+    @Override
+    public void onMapReady(GoogleMap googleMap) {
+        LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
+                event.getEventAddress().getLongitude());
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        googleMap.addMarker(markerOptions);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
     }
 }
