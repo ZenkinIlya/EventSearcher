@@ -24,8 +24,8 @@ import java.util.List;
 public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> listTags;
-    private EventRecyclerViewAdapter eventRecyclerViewAdapter;
-    private ArrayList<String> arrayListActiveCategory;
+    private final EventRecyclerViewAdapter eventRecyclerViewAdapter;
+    private final ArrayList<String> arrayListActiveCategory;
 
     public TagRecyclerViewAdapter(List<String> items, EventRecyclerViewAdapter eventRecyclerViewAdapter) {
         this.listTags = items;
@@ -45,34 +45,31 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
     public void onBindViewHolder(@NonNull final ViewHolder holder, int position) {
         holder.tagText.setText(listTags.get(position));
 
-        holder.tagCard.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int startColor = ContextCompat.getColor(view.getContext(), R.color.white);
-                int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
-                int duration = 300;
-                if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
-                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32, 0);
-                    resizeAnimation.setDuration(duration);
-                    holder.tagCard.startAnimation(resizeAnimation);
-                    startColorAnimation(startColor, endColor, duration, holder.tagCard);
-                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
-                    animateSearchImage(holder.imageView, duration);
+        holder.tagCard.setOnClickListener(view -> {
+            int startColor = ContextCompat.getColor(view.getContext(), R.color.white);
+            int endColor = ContextCompat.getColor(view.getContext(), R.color.primaryDarkColor);
+            int duration = 300;
+            if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == startColor) {
+                ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, 32, 0);
+                resizeAnimation.setDuration(duration);
+                holder.tagCard.startAnimation(resizeAnimation);
+                startColorAnimation(startColor, endColor, duration, holder.tagCard);
+                holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.white));
+                animateSearchImage(holder.imageView, duration);
 
-                    arrayListActiveCategory.add(holder.tagText.getText().toString().toLowerCase());
-                    filterEventList();
+                arrayListActiveCategory.add(holder.tagText.getText().toString().toLowerCase());
+                filterEventList();
 
-                } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
-                    animateSearchImage(holder.imageView, duration);
-                    ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32, 0);
-                    resizeAnimation.setDuration(duration);
-                    holder.tagCard.startAnimation(resizeAnimation);
-                    startColorAnimation(endColor, startColor, duration, holder.tagCard);
-                    holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.greyText));
+            } else if (holder.tagCard.getCardBackgroundColor().getDefaultColor() == endColor){
+                animateSearchImage(holder.imageView, duration);
+                ResizeAnimation resizeAnimation = new ResizeAnimation(holder.tagCard, -32, 0);
+                resizeAnimation.setDuration(duration);
+                holder.tagCard.startAnimation(resizeAnimation);
+                startColorAnimation(endColor, startColor, duration, holder.tagCard);
+                holder.tagText.setTextColor(ContextCompat.getColor(view.getContext(), R.color.greyText));
 
-                    arrayListActiveCategory.remove(holder.tagText.getText().toString().toLowerCase());
-                    filterEventList();
-                }
+                arrayListActiveCategory.remove(holder.tagText.getText().toString().toLowerCase());
+                filterEventList();
             }
         });
     }
@@ -91,24 +88,14 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
         final float alpha;
         if (imageView.getVisibility() == View.INVISIBLE){
             alpha = 1f;
-            ViewCompat.animate(imageView).withStartAction(new Runnable() {
-                @Override
-                public void run() {
-                    imageView.setVisibility(View.VISIBLE);
-                }
-            })
+            ViewCompat.animate(imageView).withStartAction(() -> imageView.setVisibility(View.VISIBLE))
                     .alpha(alpha)
                     .setInterpolator(new AccelerateDecelerateInterpolator())
                     .setDuration(duration)
                     .start();
         }else {
             alpha = 0f;
-            ViewCompat.animate(imageView).withEndAction(new Runnable() {
-                @Override
-                public void run() {
-                    imageView.setVisibility(View.INVISIBLE);
-                }
-            })
+            ViewCompat.animate(imageView).withEndAction(() -> imageView.setVisibility(View.INVISIBLE))
                     .alpha(alpha)
                     .setInterpolator(new AccelerateDecelerateInterpolator())
                     .setDuration(duration)
@@ -120,12 +107,9 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
         ValueAnimator anim;
         anim = ValueAnimator.ofArgb(startColor, endColor)
                 .setDuration(duration);
-        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
-            @Override
-            public void onAnimationUpdate(ValueAnimator valueAnimator) {
-                if (tagCard != null) {
-                    tagCard.setCardBackgroundColor((Integer) valueAnimator.getAnimatedValue());
-                }
+        anim.addUpdateListener(valueAnimator -> {
+            if (tagCard != null) {
+                tagCard.setCardBackgroundColor((Integer) valueAnimator.getAnimatedValue());
             }
         });
         anim.start();

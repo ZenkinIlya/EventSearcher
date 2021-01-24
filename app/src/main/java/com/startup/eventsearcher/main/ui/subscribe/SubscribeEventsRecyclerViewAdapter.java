@@ -29,10 +29,10 @@ import java.util.Locale;
 
 public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<SubscribeEventsRecyclerViewAdapter.ViewHolder> {
 
-    private Fragment context;
-    private RecyclerView subscribeRecyclerView;
-    private ArrayList<Event> subscribeEventsArrayList;
-    private TextView textViewSubscribeEventListGone;
+    private final Fragment context;
+    private final RecyclerView subscribeRecyclerView;
+    private final ArrayList<Event> subscribeEventsArrayList;
+    private final TextView textViewSubscribeEventListGone;
 
     public SubscribeEventsRecyclerViewAdapter(SubscribeFragment subscribeFragment,
                                               RecyclerView subscribeRecyclerView,
@@ -51,14 +51,11 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
                 .inflate(R.layout.event_item_list, parent, false);
 
         //Вызов подробной информации об эвенте
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int itemPosition = subscribeRecyclerView.getChildLayoutPosition(view);
-                Intent intent = new Intent(parent.getContext(), EventActivity.class);
-                intent.putExtra("Event", subscribeEventsArrayList.get(itemPosition));
-                ((SubscribeFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
-            }
+        view.setOnClickListener(view1 -> {
+            int itemPosition = subscribeRecyclerView.getChildLayoutPosition(view1);
+            Intent intent = new Intent(parent.getContext(), EventActivity.class);
+            intent.putExtra("Event", subscribeEventsArrayList.get(itemPosition));
+            ((SubscribeFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
         });
 
         return new ViewHolder(view);
@@ -87,23 +84,15 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
         holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_favorite));
 
         //Отписка, обратно подписаться нельзя, так как эвент исчезает из подписок
-        holder.eventSubscribe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                removeCurrentPersonFromSubscribers(event);
-                subscribeEventsArrayList.remove(event);
-                notifyItemRemoved(position);
-                notifyItemRangeChanged(position, getItemCount());
-            }
+        holder.eventSubscribe.setOnClickListener(view -> {
+            removeCurrentPersonFromSubscribers(event);
+            subscribeEventsArrayList.remove(event);
+            notifyItemRemoved(position);
+            notifyItemRangeChanged(position, getItemCount());
         });
 
         //Показ местоположения эвента
-        holder.eventLocationMarker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EventFragment.showEventLocation(context, event);
-            }
-        });
+        holder.eventLocationMarker.setOnClickListener(view -> EventFragment.showEventLocation(context, event));
 
     }
 
@@ -119,8 +108,7 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
     }
 
     private int getResourceIdImage(Event event) {
-        ArrayList<Category> categoryArrayList = App.getCategoryArrayList();
-        for (Category category: categoryArrayList){
+        for (Category category: App.getCategoryArrayList()){
             if (category.getCategoryName().equals(event.getCategory())){
                 return category.getCategoryImage();
             }

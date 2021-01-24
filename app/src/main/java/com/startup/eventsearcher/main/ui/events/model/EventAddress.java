@@ -1,16 +1,18 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
+import androidx.annotation.NonNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public class EventAddress implements Serializable {
 
-    private String address;
-    private String city;
-    private String street;
-    private String house;
-    private Double latitude;
-    private Double longitude;
+    private final String address;
+    private final String city;
+    private final String street;
+    private final String house;
+    private final Double latitude;
+    private final Double longitude;
 
     public EventAddress(String address, String city, String street, String house, Double latitude, Double longitude) {
         this.address = address;
@@ -45,6 +47,7 @@ public class EventAddress implements Serializable {
         return house;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "EventAddress{" +

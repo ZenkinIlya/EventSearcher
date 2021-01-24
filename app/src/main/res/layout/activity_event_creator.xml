@@ -5,7 +5,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".main.ui.map.createEvent.EventCreatorActivity">
+    tools:context=".main.ui.events.createEvent.EventCreatorActivity">
 
     <ScrollView
         android:id="@+id/event_creator_scroll_view"
@@ -15,178 +15,179 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:padding="10dp">
-
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/event_creator_header"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="@string/Header"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:layout_constraintBottom_toTopOf="@+id/event_creator_category"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:counterEnabled="true"
-                app:counterMaxLength="50"
-                app:errorEnabled="true">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <androidx.viewpager.widget.ViewPager
-                android:id="@+id/event_creator_category"
-                android:layout_width="0dp"
-                android:layout_height="150dp"
-                android:layout_marginTop="10dp"
-                android:background="@color/primaryLightColor"
-                app:layout_constraintBottom_toTopOf="@id/event_creator_location"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/event_creator_header"/>
-
-            <com.google.android.material.tabs.TabLayout
-                android:id="@+id/event_creator_tab_layout"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:background="@color/transparent"
-                app:tabBackground="@drawable/tab_selector"
-                app:tabIndicatorHeight="0dp"
-                app:tabGravity="center"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintBottom_toBottomOf="@id/event_creator_category"/>
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/event_creator_layout_location"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@id/event_creator_layout_date_time"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/event_creator_category">
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/event_creator_location"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:paddingTop="13dp"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:startIconDrawable="@drawable/ic_place"
-                    app:boxBackgroundColor="@color/quantum_grey200"
-                    app:errorEnabled="true"
-                    android:alpha="0.8"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:paddingStart="0dp"
-                        android:paddingEnd="40dp"
-                        android:textColor="@android:color/tab_indicator_text"
-                        android:imeOptions="actionDone"
-                        android:focusable="false"
-                        android:cursorVisible="false"
-                        android:hint="@string/Location"
-                        android:fontFamily="sans-serif-condensed"/>
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <ImageView
-                    android:id="@+id/event_creator_redaction_location"
-                    android:layout_width="30dp"
-                    android:layout_height="30dp"
-                    android:layout_weight="0.05"
-                    android:layout_marginEnd="15dp"
-                    android:src="@drawable/ic_redaction"
-                    android:background="@drawable/circle_white"
-                    android:scaleType="center"
-                    android:layout_gravity="center"
-                    app:layout_constraintEnd_toEndOf="@id/event_creator_location"
-                    app:layout_constraintTop_toTopOf="@id/event_creator_location"
-                    app:layout_constraintBottom_toBottomOf="@id/event_creator_location"
-                    app:layout_constraintVertical_bias="0.5"
-                    android:contentDescription="@string/Location" />
-            </androidx.constraintlayout.widget.ConstraintLayout>
+            android:layout_height="wrap_content">
 
             <LinearLayout
-                android:id="@+id/event_creator_layout_date_time"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@id/event_creator_comment"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:paddingHorizontal="10dp"
+                android:orientation="vertical"
+                app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/event_creator_layout_location">
+                app:layout_constraintBottom_toTopOf="@id/event_creator_accept_btn"
+                app:layout_constraintVertical_bias="0">
 
                 <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/event_creator_start_date"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginTop="10dp"
-                    android:paddingEnd="5dp"
-                    android:hint="@string/startData"
-                    app:startIconDrawable="@drawable/ic_calendar"
+                    android:id="@+id/event_creator_header"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/Header"
+                    app:counterEnabled="true"
+                    app:counterMaxLength="50"
                     app:errorEnabled="true">
                     <com.google.android.material.textfield.TextInputEditText
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:imeOptions="actionDone"
-                        android:inputType="date"
-                        android:focusable="false"
-                        android:fontFamily="sans-serif-condensed"/>
+                        android:layout_height="wrap_content" />
                 </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/event_creator_start_time"
-                    android:layout_width="0dp"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="0.5"
-                    android:layout_marginTop="10dp"
-                    android:paddingStart="5dp"
-                    android:hint="@string/startTime"
-                    app:startIconDrawable="@drawable/ic_time"
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    app:errorEnabled="true"
-                    android:alpha="0.8">
-                    <com.google.android.material.textfield.TextInputEditText
+                    android:layout_marginTop="10dp">
+
+                    <androidx.viewpager.widget.ViewPager
+                        android:id="@+id/event_creator_category"
+                        android:layout_width="0dp"
+                        android:layout_height="150dp"
+                        android:background="@color/primaryLightColor"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"/>
+
+                    <com.google.android.material.tabs.TabLayout
+                        android:id="@+id/event_creator_tab_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        app:tabBackground="@drawable/tab_selector"
+                        app:tabIndicatorHeight="0dp"
+                        app:tabGravity="center"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintBottom_toBottomOf="@id/event_creator_category"/>
+
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:id="@+id/event_creator_layout_location"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/event_creator_location"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:maxLines="1"
-                        android:imeOptions="actionDone"
-                        android:inputType="time"
-                        android:focusable="false"
-                        android:fontFamily="sans-serif-condensed"/>
-                </com.google.android.material.textfield.TextInputLayout>
-            </LinearLayout>
+                        android:paddingTop="13dp"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:startIconDrawable="@drawable/ic_place"
+                        app:errorEnabled="true"
+                        android:alpha="0.8"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:paddingStart="0dp"
+                            android:paddingEnd="40dp"
+                            android:textColor="@android:color/tab_indicator_text"
+                            android:imeOptions="actionDone"
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:hint="@string/Location"
+                            android:fontFamily="sans-serif-condensed"/>
+                    </com.google.android.material.textfield.TextInputLayout>
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/event_creator_comment"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dp"
-                android:hint="@string/comment"
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/event_creator_layout_date_time">
-                <com.google.android.material.textfield.TextInputEditText
+                    <ImageView
+                        android:id="@+id/event_creator_redaction_location"
+                        android:layout_width="30dp"
+                        android:layout_height="30dp"
+                        android:layout_weight="0.05"
+                        android:layout_marginEnd="15dp"
+                        android:src="@drawable/ic_redaction"
+                        android:background="@drawable/circle_white"
+                        android:scaleType="center"
+                        android:layout_gravity="center"
+                        app:layout_constraintEnd_toEndOf="@id/event_creator_location"
+                        app:layout_constraintTop_toTopOf="@id/event_creator_location"
+                        app:layout_constraintBottom_toBottomOf="@id/event_creator_location"
+                        app:layout_constraintVertical_bias="0.5"
+                        android:contentDescription="@string/Location" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <LinearLayout
+                    android:id="@+id/event_creator_layout_date_time"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"/>
-            </com.google.android.material.textfield.TextInputLayout>
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:orientation="horizontal"
+                    android:baselineAligned="false">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/event_creator_start_date"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:paddingStart="0dp"
+                        android:paddingEnd="5dp"
+                        android:hint="@string/startData"
+                        app:startIconDrawable="@drawable/ic_calendar"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:errorEnabled="true">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:imeOptions="actionDone"
+                            android:inputType="date"
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:fontFamily="sans-serif-condensed"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        android:id="@+id/event_creator_start_time"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="0.5"
+                        android:paddingStart="5dp"
+                        android:paddingEnd="0dp"
+                        android:hint="@string/startTime"
+                        app:startIconDrawable="@drawable/ic_time"
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                        app:errorEnabled="true">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:maxLines="1"
+                            android:imeOptions="actionDone"
+                            android:inputType="time"
+                            android:focusable="false"
+                            android:cursorVisible="false"
+                            android:fontFamily="sans-serif-condensed"/>
+                    </com.google.android.material.textfield.TextInputLayout>
+                </LinearLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/event_creator_comment"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="10dp"
+                    android:hint="@string/comment"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+            </LinearLayout>
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/event_creator_accept_btn"
-                android:layout_marginTop="10dp"
+                android:layout_margin="10dp"
                 android:text="@string/accept"
-                app:layout_constraintTop_toBottomOf="@id/event_creator_comment"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"
@@ -194,7 +195,6 @@
                 style="@style/RoundedCornerButton"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
-
     </ScrollView>
 
     <androidx.fragment.app.FragmentContainerView

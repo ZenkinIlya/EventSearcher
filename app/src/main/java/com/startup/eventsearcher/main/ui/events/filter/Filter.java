@@ -1,5 +1,7 @@
 package com.startup.eventsearcher.main.ui.events.filter;
 
+import androidx.annotation.NonNull;
+
 public class Filter {
 
     //при сбросе: ""
@@ -73,6 +75,7 @@ public class Filter {
         this.lastSelectedDayOfMonth = lastSelectedDayOfMonth;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Filter{" +

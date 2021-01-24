@@ -10,19 +10,17 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.FragmentEventListBinding;
+import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
 import com.startup.eventsearcher.main.ui.events.filter.FilterActivity;
 import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
@@ -30,15 +28,11 @@ import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.Config;
 
 import java.util.Arrays;
 import java.util.Objects;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -53,20 +47,9 @@ public class EventFragment extends Fragment {
 
     private static final String TAG = "myEventList";
 
-    @BindView(R.id.event_list_search)
-    SearchView searchView;
-    @BindView(R.id.event_list)
-    RecyclerView eventRecyclerView;
-    @BindView(R.id.event_list_gone)
-    TextView eventEventsGone;
-    @BindView(R.id.event_list_tag)
-    RecyclerView tagRecyclerView;
-    @BindView(R.id.event_list_btn_filter)
-    ImageView imageViewFilter;
+    private FragmentEventListBinding bind;
 
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
-    private TagRecyclerViewAdapter tagRecyclerViewAdapter;
-
     private static FragmentManager fragmentManager;
 
     public static EventFragment newInstance(String param1, String param2) {
@@ -84,32 +67,31 @@ public class EventFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_event_list, container, false);
-        ButterKnife.bind(this, view);
+        bind = FragmentEventListBinding.inflate(inflater, container, false);
+
         fragmentManager = getParentFragmentManager();
-        Toolbar toolbar = view.findViewById(R.id.event_list_toolbar);
-        ((AppCompatActivity) requireActivity()).setSupportActionBar(toolbar);
+        ((AppCompatActivity) requireActivity()).setSupportActionBar(bind.eventListToolbar);
         setHasOptionsMenu(true);
 
         //TODO Получаем с сервера список эвентов
 
         eventRecyclerViewAdapter = new EventRecyclerViewAdapter(
                 this,
-                eventRecyclerView,
+                bind.eventList,
                 EventsList.getEventArrayListFromJSON(getContext()),
-                eventEventsGone);
-        eventRecyclerView.setAdapter(eventRecyclerViewAdapter);
+                bind.eventListGone);
+        bind.eventList.setAdapter(eventRecyclerViewAdapter);
 
-        tagRecyclerViewAdapter = new TagRecyclerViewAdapter(
+        TagRecyclerViewAdapter tagRecyclerViewAdapter = new TagRecyclerViewAdapter(
                 Arrays.asList(requireContext().getResources().getStringArray(R.array.category)),
                 eventRecyclerViewAdapter);
-        tagRecyclerView.setAdapter(tagRecyclerViewAdapter);
+        bind.eventListTag.setAdapter(tagRecyclerViewAdapter);
 
         componentListener();
 
-        return view;
+        return bind.getRoot();
     }
 
     @Override
@@ -261,7 +243,7 @@ public class EventFragment extends Fragment {
     }
 
     private void componentListener() {
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        bind.eventListSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 return false;
@@ -276,7 +258,7 @@ public class EventFragment extends Fragment {
         });
 
         //Показ подробного фильтра
-        imageViewFilter.setOnClickListener(view -> {
+        bind.eventListBtnFilter.setOnClickListener(view -> {
             Intent intent = new Intent(getContext(), FilterActivity.class);
             startActivityForResult(intent, Config.SHOW_FILTER);
         });

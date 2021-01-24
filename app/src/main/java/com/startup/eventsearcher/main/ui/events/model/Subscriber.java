@@ -1,5 +1,7 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
+import androidx.annotation.NonNull;
+
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 
 import java.io.Serializable;
@@ -7,8 +9,8 @@ import java.util.Objects;
 
 public class Subscriber implements Serializable {
 
-    private Person person;
-    private ExtraDate extraDate;
+    private final Person person;
+    private final ExtraDate extraDate;
 
     public Subscriber(Person person, ExtraDate extraDate) {
         this.person = person;
@@ -23,6 +25,7 @@ public class Subscriber implements Serializable {
         return extraDate;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Subscriber{" +

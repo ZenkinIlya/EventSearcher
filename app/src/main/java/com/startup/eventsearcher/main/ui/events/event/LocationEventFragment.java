@@ -20,8 +20,7 @@ import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.utils.Config;
 
 public class LocationEventFragment extends DialogFragment implements OnMapReadyCallback {
-    
-    private GoogleMap map;
+
     private Event event;
 
     public LocationEventFragment() {
@@ -59,14 +58,13 @@ public class LocationEventFragment extends DialogFragment implements OnMapReadyC
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
 
         LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
                 event.getEventAddress().getLongitude());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title(event.getHeader());
-        map.addMarker(markerOptions);
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
+        googleMap.addMarker(markerOptions);
+        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
     }
 }

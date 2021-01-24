@@ -1,5 +1,7 @@
 package com.startup.eventsearcher.authentication.connectionToServer.test;
 
+import androidx.annotation.NonNull;
+
 public class Message {
     private long id;
     private long time;
@@ -38,6 +40,7 @@ public class Message {
         this.image = image;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Message{" +

@@ -2,10 +2,10 @@ package com.startup.eventsearcher.main.ui.events.model;
 
 public class Category {
 
-    private String categoryName;
-    private Integer categoryImage;
+    private final String categoryName;
+    private final int categoryImage;
 
-    public Category(String categoryName, Integer categoryImage){
+    public Category(String categoryName, int categoryImage){
         this.categoryImage = categoryImage;
         this.categoryName = categoryName;
     }
@@ -14,7 +14,7 @@ public class Category {
         return categoryName;
     }
 
-    public Integer getCategoryImage() {
+    public int getCategoryImage() {
         return categoryImage;
     }
 }

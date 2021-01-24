@@ -1,10 +1,7 @@
 package com.startup.eventsearcher.main;
 
-import android.content.DialogInterface;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.MenuItem;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -16,29 +13,26 @@ import androidx.navigation.fragment.NavHostFragment;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.ActivityMainBinding;
 import com.startup.eventsearcher.main.ui.events.EventFragment;
 import com.startup.eventsearcher.main.ui.map.MapsFragment;
 import com.startup.eventsearcher.main.ui.profile.ProfileFragment;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeFragment;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class MainActivity extends AppCompatActivity {
 
     private static final String TAG = "myMain";
 
-    @BindView(R.id.main_fragment_container) FrameLayout fragmentContainer;
-    @BindView(R.id.main_bottom_nav_view) BottomNavigationView bottomNavigationView;
+    private ActivityMainBinding bind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        Design.setStatusBarGradient(this);
-        setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        bind = ActivityMainBinding.inflate(getLayoutInflater());
+        setContentView(bind.getRoot());
 
-        bottomNavigationView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
+        bind.mainBottomNavView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
         openFragment(MapsFragment.newInstance("", ""));
 
         if (savedInstanceState == null){
@@ -84,77 +78,66 @@ public class MainActivity extends AppCompatActivity {
 
         builder.setPositiveButton(
                 "Да",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                        finish();
-                    }
+                (dialog, id) -> {
+                    dialog.cancel();
+                    finish();
                 });
 
         builder.setNegativeButton(
                 "Нет",
-                new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        dialog.cancel();
-                    }
-                });
+                (dialog, id) -> dialog.cancel());
 
         AlertDialog alertDialog = builder.create();
         alertDialog.show();
     }
 
     BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
-            new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    switch (item.getItemId()) {
-                        case R.id.nav_item_map:
-                            openFragment(MapsFragment.newInstance("", ""));
-                            return true;
-                        case R.id.nav_item_events:
-                            openFragment(EventFragment.newInstance("", ""));
-                            return true;
-                        case R.id.nav_item_favorite:
-                            openFragment(SubscribeFragment.newInstance("", ""));
-                            return true;
-                        case R.id.nav_item_profile:
-                            openFragment(ProfileFragment.newInstance("", ""));
-                            return true;
-                    }
-                    return false;
+            item -> {
+                switch (item.getItemId()) {
+                    case R.id.nav_item_map:
+                        openFragment(MapsFragment.newInstance("", ""));
+                        return true;
+                    case R.id.nav_item_events:
+                        openFragment(EventFragment.newInstance("", ""));
+                        return true;
+                    case R.id.nav_item_favorite:
+                        openFragment(SubscribeFragment.newInstance("", ""));
+                        return true;
+                    case R.id.nav_item_profile:
+                        openFragment(ProfileFragment.newInstance("", ""));
+                        return true;
                 }
+                return false;
             };
 
     public void openFragment(Fragment fragment) {
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(fragmentContainer.getId(), fragment);
+        transaction.replace(bind.mainFragmentContainer.getId(), fragment);
         transaction.addToBackStack(null);
         transaction.commit();
     }
 
     private void setupButtonNavigationBar() {
-        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(fragmentContainer.getId());
+        NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(bind.mainFragmentContainer.getId());
         if (navHostFragment != null) {
             final NavController navController = navHostFragment.getNavController();
-            bottomNavigationView.setOnNavigationItemSelectedListener(new BottomNavigationView.OnNavigationItemSelectedListener() {
-                @Override
-                public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-                    bottomNavigationView.getMenu().findItem(item.getItemId()).setChecked(true);
-                    switch (item.getItemId()){
-                        case R.id.nav_item_map:
-                            navController.navigate(R.id.mapsFragment);
-                            break;
-                        case R.id.nav_item_events:
-                            navController.navigate(R.id.eventFragment);
-                            break;
-                        case R.id.nav_item_favorite:
-                            navController.navigate(R.id.subscribeFragment);
-                            break;
-                        case R.id.nav_item_profile:
-                            navController.navigate(R.id.profileFragment);
-                            break;
-                    }
-                    return false;
+            bind.mainBottomNavView.setOnNavigationItemSelectedListener(item -> {
+                bind.mainBottomNavView.getMenu().findItem(item.getItemId()).setChecked(true);
+                switch (item.getItemId()){
+                    case R.id.nav_item_map:
+                        navController.navigate(R.id.mapsFragment);
+                        break;
+                    case R.id.nav_item_events:
+                        navController.navigate(R.id.eventFragment);
+                        break;
+                    case R.id.nav_item_favorite:
+                        navController.navigate(R.id.subscribeFragment);
+                        break;
+                    case R.id.nav_item_profile:
+                        navController.navigate(R.id.profileFragment);
+                        break;
                 }
+                return false;
             });
         }
     }

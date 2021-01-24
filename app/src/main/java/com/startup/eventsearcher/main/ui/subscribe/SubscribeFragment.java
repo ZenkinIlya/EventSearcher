@@ -7,14 +7,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
 
-import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.FragmentSubscribeBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
@@ -23,9 +21,6 @@ import com.startup.eventsearcher.utils.Config;
 
 import java.util.ArrayList;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
@@ -33,13 +28,10 @@ public class SubscribeFragment extends Fragment {
 
     private static final String TAG = "mySubscribeList";
 
-    @BindView(R.id.subscribe_event_list)
-    RecyclerView subscribeRecyclerView;
-    @BindView(R.id.subscribe_event_list_gone)
-    TextView textViewSubscribeEventListGone;
+    private FragmentSubscribeBinding bind;
 
     private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
-    private ArrayList<Event> subscribeEvents = new ArrayList<>();
+    private final ArrayList<Event> subscribeEvents = new ArrayList<>();
 
     public static SubscribeFragment newInstance(String param1, String param2) {
         SubscribeFragment fragment = new SubscribeFragment();
@@ -56,10 +48,9 @@ public class SubscribeFragment extends Fragment {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.fragment_subscribe, container, false);
-        ButterKnife.bind(this, view);
+        bind = FragmentSubscribeBinding.inflate(inflater, container, false);
 
         //TODO Получаем с сервера список эвентов
 
@@ -69,12 +60,12 @@ public class SubscribeFragment extends Fragment {
 
         subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
                 this,
-                subscribeRecyclerView,
+                bind.subscribeEventList,
                 subscribeEvents,
-                textViewSubscribeEventListGone);
-        subscribeRecyclerView.setAdapter(subscribeEventsRecyclerViewAdapter);
+                bind.subscribeEventListGone);
+        bind.subscribeEventList.setAdapter(subscribeEventsRecyclerViewAdapter);
 
-        return view;
+        return bind.getRoot();
     }
 
     @Override

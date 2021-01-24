@@ -37,11 +37,11 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
     private static final String TAG = "myEventAdapter";
 
-    private List<Event> listEvents;
+    private final List<Event> listEvents;
     private List<Event> listEventsFilter;
-    private Fragment context;
-    private RecyclerView recyclerView;
-    private TextView eventEventsGone;
+    private final Fragment context;
+    private final RecyclerView recyclerView;
+    private final TextView eventEventsGone;
 
 
     public EventRecyclerViewAdapter(Fragment context, RecyclerView recyclerView, List<Event> items, TextView eventEventsGone) {
@@ -60,14 +60,11 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 .inflate(R.layout.event_item_list, parent, false);
 
         //Вызов подробной информации об эвенте
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int itemPosition = recyclerView.getChildLayoutPosition(view);
-                Intent intent = new Intent(parent.getContext(), EventActivity.class);
-                intent.putExtra("Event", listEventsFilter.get(itemPosition));
-                ((EventFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
-            }
+        view.setOnClickListener(view1 -> {
+            int itemPosition = recyclerView.getChildLayoutPosition(view1);
+            Intent intent = new Intent(parent.getContext(), EventActivity.class);
+            intent.putExtra("Event", listEventsFilter.get(itemPosition));
+            ((EventFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
         });
 
         return new ViewHolder(view);
@@ -100,31 +97,23 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         }
 
         //Подписка
-        holder.eventSubscribe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Subscriber subscriber = currentPersonIsSubscribe(event);
-                //Если пользователь не подписан
-                if (subscriber == null){
-                    Intent intent = new Intent(context.requireContext(), SubscribeActivity.class);
-                    intent.putExtra("Event", event);
-                    ((EventFragment)context).myStartActivityForResult(intent, Config.SUBSCRIBE);
-                }else {
-                    //Убираем подписчика и обновляем список эвентов
-                    //TODO Отправка запроса на сервер об отписке
-                    event.getSubscribers().remove(subscriber);
-                    notifyDataSetChanged();
-                }
+        holder.eventSubscribe.setOnClickListener(view -> {
+            Subscriber subscriber = currentPersonIsSubscribe(event);
+            //Если пользователь не подписан
+            if (subscriber == null){
+                Intent intent = new Intent(context.requireContext(), SubscribeActivity.class);
+                intent.putExtra("Event", event);
+                ((EventFragment)context).myStartActivityForResult(intent, Config.SUBSCRIBE);
+            }else {
+                //Убираем подписчика и обновляем список эвентов
+                //TODO Отправка запроса на сервер об отписке
+                event.getSubscribers().remove(subscriber);
+                notifyDataSetChanged();
             }
         });
 
         //Показ местоположения эвента
-        holder.eventLocationMarker.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                EventFragment.showEventLocation(context, event);
-            }
-        });
+        holder.eventLocationMarker.setOnClickListener(view -> EventFragment.showEventLocation(context, event));
     }
 
     //Сброс фильтрованного списка
@@ -144,8 +133,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     }
 
     private int getResourceIdImage(Event event) {
-        ArrayList<Category> categoryArrayList = App.getCategoryArrayList();
-        for (Category category: categoryArrayList){
+        for (Category category: App.getCategoryArrayList()){
             if (category.getCategoryName().equals(event.getCategory())){
                 return category.getCategoryImage();
             }

@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.main.ui.map.createEvent;
+package com.startup.eventsearcher.main.ui.events.createEvent;
 
 import android.content.Context;
 import android.graphics.Typeface;
@@ -19,8 +19,8 @@ import java.util.ArrayList;
 
 public class CategoryAdapter extends PagerAdapter {
 
-    private Context context;
-    private ArrayList<Category> categoryArrayList;
+    private final Context context;
+    private final ArrayList<Category> categoryArrayList;
 
     public CategoryAdapter(Context context, ArrayList<Category> categoryArrayList) {
         this.context = context;

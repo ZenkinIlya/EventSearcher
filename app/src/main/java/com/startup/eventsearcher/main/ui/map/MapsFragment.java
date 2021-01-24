@@ -11,13 +11,10 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.widget.SearchView;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
@@ -26,22 +23,18 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.Marker;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.FragmentMapsBinding;
+import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
-import com.startup.eventsearcher.main.ui.map.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
 import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Objects;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -50,23 +43,11 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
 
     private static final String TAG = "myMap";
 
+    private FragmentMapsBinding bind;
+
     private GoogleMap map;
     private boolean flgFirstEnterToMapFragment = true;
 
-    @BindView(R.id.map_search_view)
-    SearchView searchView;
-    @BindView(R.id.map_fab_show_marker)
-    FloatingActionButton fabAddEvent;
-    @BindView(R.id.map_add_event)
-    Button btnAddEvent;
-    @BindView(R.id.map_add_event_marker)
-    ImageView imageViewAddEventMarker;
-    @BindView(R.id.map_zoom_in)
-    FloatingActionButton fabZoomIn;
-    @BindView(R.id.map_zoom_out)
-    FloatingActionButton fabZoomOut;
-    @BindView(R.id.map_location)
-    FloatingActionButton fabLocation;
 
     public static MapsFragment newInstance(String param1, String param2) {
         Log.d(TAG, "newInstance:");
@@ -84,16 +65,16 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                              @Nullable ViewGroup container,
                              @Nullable Bundle savedInstanceState) {
         Log.d(TAG, "onCreateView()");
-        View view = inflater.inflate(R.layout.fragment_maps, container, false);
-        ButterKnife.bind(this, view);
-        searchView.setOnQueryTextListener(onQueryTextListenerSearchView);
+        bind = FragmentMapsBinding.inflate(inflater, container, false);
+
+        bind.mapSearchView.setOnQueryTextListener(onQueryTextListenerSearchView);
         MapHandler.registerMapHandlerCallBack(this);
 
         //TODO Получаем с сервера список эвентов
 
         EventsList.getEventArrayListFromJSON(getContext());
 
-        return view;
+        return bind.getRoot();
     }
 
     @Override
@@ -226,39 +207,33 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
 
     //Добавление эвента / вызывать только после инициализаци map в onMapReady
     private void addPlace() {
-        fabAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if (imageViewAddEventMarker.getVisibility() == View.INVISIBLE){
-                    imageViewAddEventMarker.setVisibility(View.VISIBLE);
-                    btnAddEvent.setVisibility(View.VISIBLE);
-                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_remove));
-                    fabAddEvent.setBackgroundTintList(ColorStateList.valueOf(
-                            ContextCompat.getColor(view.getContext(), R.color.warning)));
-                }else{
-                    imageViewAddEventMarker.setVisibility(View.INVISIBLE);
-                    btnAddEvent.setVisibility(View.GONE);
-                    fabAddEvent.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_add_location));
-                    fabAddEvent.setBackgroundTintList(ColorStateList.valueOf(
-                            ContextCompat.getColor(view.getContext(), R.color.primaryColor)));
-                }
+        bind.mapFabShowMarker.setOnClickListener(view -> {
+            if (bind.mapAddEventMarker.getVisibility() == View.INVISIBLE){
+                bind.mapAddEventMarker.setVisibility(View.VISIBLE);
+                bind.mapAddEvent.setVisibility(View.VISIBLE);
+                bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_remove));
+                bind.mapFabShowMarker.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(view.getContext(), R.color.warning)));
+            }else{
+                bind.mapAddEventMarker.setVisibility(View.INVISIBLE);
+                bind.mapAddEvent.setVisibility(View.GONE);
+                bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(view.getContext(), R.drawable.ic_add_location));
+                bind.mapFabShowMarker.setBackgroundTintList(ColorStateList.valueOf(
+                        ContextCompat.getColor(view.getContext(), R.color.primaryColor)));
             }
         });
 
-        btnAddEvent.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LatLng target = map.getCameraPosition().target;
-                try {
-                    Address address = MapHandler.getAddress(getContext(), target);
-                    Intent intent = new Intent(getContext(), EventCreatorActivity.class);
-                    intent.putExtra("Address", address);
-                    startActivityForResult(intent, Config.CREATE_EVENT);
-                } catch (IOException e) {
-                    Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
-                            "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
+        bind.mapAddEvent.setOnClickListener(view -> {
+            LatLng target = map.getCameraPosition().target;
+            try {
+                Address address = MapHandler.getAddress(getContext(), target);
+                Intent intent = new Intent(getContext(), EventCreatorActivity.class);
+                intent.putExtra("Address", address);
+                startActivityForResult(intent, Config.CREATE_EVENT);
+            } catch (IOException e) {
+                Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
+                        "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
         });
     }
@@ -310,7 +285,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     }
 
 
-    private OnMapReadyCallback callback = new OnMapReadyCallback() {
+    private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
             if (map != null){
@@ -334,12 +309,12 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                     Log.d(TAG, "OnMapReadyCallback: Показ интерфейса геолокации");
                     map.setMyLocationEnabled(true);
                     map.getUiSettings().setMyLocationButtonEnabled(false);
-                    fabLocation.setVisibility(View.VISIBLE);
+                    bind.mapLocation.setVisibility(View.VISIBLE);
                 } else {
                     Log.d(TAG, "OnMapReadyCallback: Скрытие интерфейса геолокации");
                     map.setMyLocationEnabled(false);
                     map.getUiSettings().setMyLocationButtonEnabled(false);
-                    fabLocation.setVisibility(View.GONE);
+                    bind.mapLocation.setVisibility(View.GONE);
                 }
             } catch (SecurityException e) {
                 Log.d(TAG, Objects.requireNonNull(e.getMessage()));
@@ -348,35 +323,22 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     };
 
     private void initUiMap() {
-        fabLocation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                flgFirstEnterToMapFragment = true;  //при false локация устройства не будет показана
-                MapHandler.getDeviceLocation(getContext());
-            }
+        bind.mapLocation.setOnClickListener(view -> {
+            flgFirstEnterToMapFragment = true;  //при false локация устройства не будет показана
+            MapHandler.getDeviceLocation(getContext());
         });
 
-        fabZoomIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                map.animateCamera(CameraUpdateFactory.zoomIn());
-            }
-        });
+        bind.mapZoomIn.setOnClickListener(view -> map.animateCamera(CameraUpdateFactory.zoomIn()));
 
-        fabZoomOut.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                map.animateCamera(CameraUpdateFactory.zoomOut());
-            }
-        });
+        bind.mapZoomOut.setOnClickListener(view -> map.animateCamera(CameraUpdateFactory.zoomOut()));
     }
 
     //Поиск
-    private androidx.appcompat.widget.SearchView.OnQueryTextListener onQueryTextListenerSearchView =
+    private final androidx.appcompat.widget.SearchView.OnQueryTextListener onQueryTextListenerSearchView =
             new androidx.appcompat.widget.SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
-                    String location = searchView.getQuery().toString();
+                    String location = bind.mapSearchView.getQuery().toString();
                     Log.d(TAG, "onQueryTextSubmit: location = " + location);
                     List<Address> addressList = null;
 
@@ -402,22 +364,19 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                 }
             };
 
-    private GoogleMap.OnMarkerClickListener callbackMarkerClickListener = new GoogleMap.OnMarkerClickListener() {
-        @Override
-        public boolean onMarkerClick(Marker marker) {
-            //Получаем тег маркера, т.е. получаем эвент который привязан к маркеру
-            Event event = (Event) marker.getTag();
+    private final GoogleMap.OnMarkerClickListener callbackMarkerClickListener = marker -> {
+        //Получаем тег маркера, т.е. получаем эвент который привязан к маркеру
+        Event event = (Event) marker.getTag();
 
-            Log.d(TAG, "onMarkerClick: event = " + Objects.requireNonNull(event).toString());
+        Log.d(TAG, "onMarkerClick: event = " + Objects.requireNonNull(event).toString());
 
-            Intent intent = new Intent(getContext(), EventActivity.class);
-            intent.putExtra("Event", event);
-            startActivityForResult(intent, Config.SHOW_EVENT);
+        Intent intent = new Intent(getContext(), EventActivity.class);
+        intent.putExtra("Event", event);
+        startActivityForResult(intent, Config.SHOW_EVENT);
 
-            // Return false to indicate that we have not consumed the event and that we wish
-            // for the default behavior to occur (which is for the camera to move such that the
-            // marker is centered and for the marker's info window to open, if it has one).
-            return false;
-        }
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return false;
     };
 }

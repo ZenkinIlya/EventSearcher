@@ -1,5 +1,7 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
+import androidx.annotation.NonNull;
+
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 
 import java.io.Serializable;
@@ -13,14 +15,14 @@ import java.util.Objects;
 
 public class Event implements Serializable {
 
-    private String header;
-    private String category;
-    private EventAddress eventAddress;
-    private String startDate;
-    private String startTime;
-    private Person personCreator;
-    private ArrayList<Subscriber> subscribers;
-    private String comment;
+    private final String header;
+    private final String category;
+    private final EventAddress eventAddress;
+    private final String startDate;
+    private final String startTime;
+    private final Person personCreator;
+    private final ArrayList<Subscriber> subscribers;
+    private final String comment;
 
     public Event(String header, String category, EventAddress eventAddress, String startDate, String startTime,
                  Person personCreator, ArrayList<Subscriber> subscribers, String comment) {
@@ -66,6 +68,7 @@ public class Event implements Serializable {
         return comment;
     }
 
+    @NonNull
     @Override
     public String toString() {
         return "Event{" +

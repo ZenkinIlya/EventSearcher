@@ -24,7 +24,7 @@
             android:name=".main.ui.events.event.EventActivity"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
-            android:name=".main.ui.map.createEvent.EventCreatorActivity"
+            android:name=".main.ui.events.createEvent.EventCreatorActivity"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".utils.SuccessActivity"

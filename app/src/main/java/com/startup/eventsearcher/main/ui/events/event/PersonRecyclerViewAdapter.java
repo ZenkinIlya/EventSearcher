@@ -21,8 +21,8 @@ import java.util.ArrayList;
 public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecyclerViewAdapter.ViewHolder> {
 
     private final ArrayList<Subscriber> subscribers;
-    private Context context;
-    private RecyclerView recyclerView;
+    private final Context context;
+    private final RecyclerView recyclerView;
 
     public PersonRecyclerViewAdapter(ArrayList<Subscriber> subscribers, Context context, RecyclerView recyclerView) {
         this.subscribers = subscribers;
@@ -36,12 +36,9 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.person_item_list, parent, false);
 
-        view.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int itemPosition = recyclerView.getChildLayoutPosition(view);
-                Toast.makeText(context, "itemPosition = " + itemPosition, Toast.LENGTH_SHORT).show();
-            }
+        view.setOnClickListener(view1 -> {
+            int itemPosition = recyclerView.getChildLayoutPosition(view1);
+            Toast.makeText(context, "itemPosition = " + itemPosition, Toast.LENGTH_SHORT).show();
         });
 
         return new PersonRecyclerViewAdapter.ViewHolder(view);

@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.main.ui.map.createEvent;
+package com.startup.eventsearcher.main.ui.events.createEvent;
 
 import android.content.Intent;
 import android.location.Address;
@@ -7,7 +7,6 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -21,17 +20,17 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.FragmentSetLocationEventBinding;
 import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
 import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SetLocationEventFragment extends DialogFragment implements OnMapReadyCallback, MapHandler.Callback {
 
     private static final String TAG = "SetLocationEvent";
+
+    private FragmentSetLocationEventBinding bind;
 
     interface Callback{
         void returnAddress(Address address);
@@ -45,9 +44,6 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
 
     private GoogleMap map;
     private Address address;
-
-    @BindView(R.id.fragment_set_location_apply)
-    Button buttonApply;
 
     public SetLocationEventFragment() {
         // Empty constructor is required for DialogFragment
@@ -64,15 +60,15 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        return inflater.inflate(R.layout.fragment_set_location_event, container);
+        bind = FragmentSetLocationEventBinding.inflate(inflater, container, false);
+        return bind.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        ButterKnife.bind(this, view);
         MapHandler.registerMapHandlerCallBack(this);
 
         address = requireArguments().getParcelable("address");
@@ -88,20 +84,17 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
 
     private void componentListener() {
 
-        buttonApply.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                LatLng target = map.getCameraPosition().target;
-                try {
-                    Address address = MapHandler.getAddress(getContext(), target);
-                    callback.returnAddress(address);
-                } catch (IOException e) {
-                    Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
-                            "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
-                    e.printStackTrace();
-                }
-                dismiss();
+        bind.fragmentSetLocationApply.setOnClickListener(view -> {
+            LatLng target = map.getCameraPosition().target;
+            try {
+                Address address = MapHandler.getAddress(getContext(), target);
+                callback.returnAddress(address);
+            } catch (IOException e) {
+                Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
+                        "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
+            dismiss();
         });
     }
 

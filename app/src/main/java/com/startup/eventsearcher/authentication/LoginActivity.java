@@ -2,52 +2,45 @@ package com.startup.eventsearcher.authentication;
 
 import android.os.Bundle;
 import android.util.Log;
-import android.widget.FrameLayout;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.viewpager.widget.ViewPager;
 
 import com.google.android.material.tabs.TabLayout;
 import com.startup.eventsearcher.R;
-
-import butterknife.BindView;
-import butterknife.ButterKnife;
+import com.startup.eventsearcher.databinding.ActivityLoginBinding;
 
 public class LoginActivity extends AppCompatActivity {
 
     public static final String TAG = "Login";
 
-    @BindView(R.id.tab_layout) TabLayout tabLayout;
-    @BindView(R.id.view_pager) ViewPager viewPager;
-    @BindView(R.id.login_progress_bar) FrameLayout progressBar;
+    private ActivityLoginBinding bind;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        ButterKnife.bind(this);
+        bind = ActivityLoginBinding.inflate(getLayoutInflater());
+        setContentView(bind.getRoot());
 
-        tabLayout.addTab(tabLayout.newTab().setText(this.getString(R.string.entry)));
-        tabLayout.addTab(tabLayout.newTab().setText(this.getString(R.string.registrationWithoutUnderline)));
-        tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
+        bind.tabLayout.addTab(bind.tabLayout.newTab().setText(this.getString(R.string.entry)));
+        bind.tabLayout.addTab(bind.tabLayout.newTab().setText(this.getString(R.string.registrationWithoutUnderline)));
+        bind.tabLayout.setTabGravity(TabLayout.GRAVITY_FILL);
 
-        final LoginAdapter adapter = new LoginAdapter(getSupportFragmentManager(), this, tabLayout.getTabCount());
-        viewPager.setAdapter(adapter);
+        final LoginAdapter adapter = new LoginAdapter(getSupportFragmentManager(),  bind.tabLayout.getTabCount());
+        bind.viewPager.setAdapter(adapter);
 
-        viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(tabLayout));
-        tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(viewPager));
+        bind.viewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(bind.tabLayout));
+        bind.tabLayout.addOnTabSelectedListener(new TabLayout.ViewPagerOnTabSelectedListener(bind.viewPager));
 
-        //Анимация tabLayout
-        tabLayout.setTranslationX(800);
-        tabLayout.setAlpha(0);
-        tabLayout.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
+        //Анимация bind.tabLayout
+        bind.tabLayout.setTranslationX(800);
+        bind.tabLayout.setAlpha(0);
+        bind.tabLayout.animate().translationX(0).alpha(1).setDuration(800).setStartDelay(300).start();
 
     }
 
     public void setVisibleProgressBar(int visible) {
-        progressBar.setVisibility(visible);
+        bind.loginProgressBar.setVisibility(visible);
     }
 
     @Override

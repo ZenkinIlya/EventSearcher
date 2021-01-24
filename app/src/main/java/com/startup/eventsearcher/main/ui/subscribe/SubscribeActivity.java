@@ -4,32 +4,20 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TimePicker;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.android.material.textfield.TextInputLayout;
-import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.databinding.ActivitySubscribeBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
 
 import java.util.Calendar;
 import java.util.Objects;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-
 public class SubscribeActivity extends AppCompatActivity {
 
-    @BindView(R.id.subscribe_start_time)
-    TextInputLayout textFieldTime;
-    @BindView(R.id.subscribe_comment)
-    TextInputLayout textFieldComment;
-    @BindView(R.id.subscribe_subscribe)
-    Button buttonSubscribe;
+    private ActivitySubscribeBinding bind;
 
     private Event event;
     private Calendar calendar;
@@ -39,8 +27,8 @@ public class SubscribeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_subscribe);
-        ButterKnife.bind(this);
+        bind = ActivitySubscribeBinding.inflate(getLayoutInflater());
+        setContentView(bind.getRoot());
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Подписаться");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -53,47 +41,37 @@ public class SubscribeActivity extends AppCompatActivity {
 
     private void componentsListener() {
 
-        buttonSubscribe.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent();
-                //Получаем индекс выбранного эвента в списке
-                int indexOfEvent = EventsList.getEventArrayList().indexOf(event);
+        bind.subscribeBtnSubscribe.setOnClickListener(view -> {
+            Intent intent = new Intent();
+            //Получаем индекс выбранного эвента в списке
+            int indexOfEvent = EventsList.getEventArrayList().indexOf(event);
 
-                //TODO Отправка запрооса на сервер о подписке
+            //TODO Отправка запрооса на сервер о подписке
 
-                intent.putExtra("index", indexOfEvent);
-                intent.putExtra("time", Objects.requireNonNull(textFieldTime.getEditText()).getText().toString());
-                intent.putExtra("comment", Objects.requireNonNull(textFieldComment.getEditText()).getText().toString());
-                setResult(RESULT_OK, intent);
-                finish();
-            }
+            intent.putExtra("index", indexOfEvent);
+            intent.putExtra("time", Objects.requireNonNull(bind.subscribeStartTime.getEditText()).getText().toString());
+            intent.putExtra("comment", Objects.requireNonNull(bind.subscribeComment.getEditText()).getText().toString());
+            setResult(RESULT_OK, intent);
+            finish();
         });
 
-        Objects.requireNonNull(textFieldTime.getEditText()).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(lastSelectedHour == -1)  {
-                    lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
-                    lastSelectedMinute = calendar.get(Calendar.MINUTE);
-                }
-
-                TimePickerDialog.OnTimeSetListener timeSetListener = new TimePickerDialog.OnTimeSetListener() {
-                    @Override
-                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        String time = hourOfDay + ":" + minute;
-                        textFieldTime.getEditText().setText(time);
-                        lastSelectedHour = hourOfDay;
-                        lastSelectedMinute = minute;
-                    }
-                };
-
-                TimePickerDialog timePickerDialog = null;
-                timePickerDialog = new TimePickerDialog(view.getContext(),
-                        android.R.style.Theme_DeviceDefault_Dialog,
-                        timeSetListener, lastSelectedHour, lastSelectedMinute, true);
-                timePickerDialog.show();
+        Objects.requireNonNull(bind.subscribeStartTime.getEditText()).setOnClickListener(view -> {
+            if(lastSelectedHour == -1)  {
+                lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
+                lastSelectedMinute = calendar.get(Calendar.MINUTE);
             }
+
+            TimePickerDialog.OnTimeSetListener timeSetListener = (view1, hourOfDay, minute) -> {
+                String time = hourOfDay + ":" + minute;
+                bind.subscribeStartTime.getEditText().setText(time);
+                lastSelectedHour = hourOfDay;
+                lastSelectedMinute = minute;
+            };
+
+            TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
+                    android.R.style.Theme_DeviceDefault_Dialog,
+                    timeSetListener, lastSelectedHour, lastSelectedMinute, true);
+            timePickerDialog.show();
         });
     }
 

@@ -46,7 +46,7 @@
     </com.google.android.material.textfield.TextInputLayout>
 
     <androidx.appcompat.widget.AppCompatButton
-        android:id="@+id/subscribe_subscribe"
+        android:id="@+id/subscribe_btn_subscribe"
         android:text="@string/Subscribe"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"

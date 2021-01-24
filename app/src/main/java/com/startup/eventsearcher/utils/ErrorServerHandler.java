@@ -4,8 +4,8 @@ import android.util.Log;
 
 public class ErrorServerHandler {
 
-    private int code;
-    private String description;
+    private final int code;
+    private final String description;
 
     public ErrorServerHandler(String tag, int code, String description) {
         this.code = code;
