@@ -6,13 +6,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/background"
     tools:context=".main.ui.events.event.EventActivity"
     android:fitsSystemWindows="true">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="match_parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:id="@+id/event_header_constraint_layout"
@@ -36,7 +35,7 @@
                 android:layout_width="35dp"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="10dp"
-                android:layout_marginEnd="25dp"
+                android:layout_marginEnd="40dp"
                 android:src="@drawable/ic_favorite"
                 android:adjustViewBounds="true"
                 android:scaleType="centerCrop"
@@ -62,7 +61,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="100dp"
                 android:adjustViewBounds="true"
-                android:src="@drawable/transparent_gradient_to_background"
+                android:src="@drawable/transparent_gradient_to_white"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent" />
@@ -72,226 +71,239 @@
             android:layout_width="match_parent"
             android:layout_height="30dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/transparent_gradient_to_background"
+            android:src="@drawable/transparent_gradient_to_white"
             android:rotation="180"
             android:elevation="1dp"
             app:layout_constraintTop_toBottomOf="@id/event_header_constraint_layout"
             app:layout_constraintStart_toStartOf="parent"/>
 
-        <ScrollView
+        <LinearLayout
+            android:id="@+id/event_main_content"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="0dp"
+            android:orientation="vertical"
+            app:layout_constraintVertical_bias="1"
             app:layout_constraintTop_toBottomOf="@id/event_header_constraint_layout"
-            app:layout_constraintStart_toStartOf="parent">
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent">
 
-            <LinearLayout
+            <androidx.core.widget.NestedScrollView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginHorizontal="20dp"
-                android:orientation="vertical">
+                android:layout_height="match_parent">
 
-                <androidx.constraintlayout.widget.ConstraintLayout
+                <LinearLayout
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content">
+                    android:layout_height="wrap_content"
+                    android:paddingTop="15dp"
+                    android:layout_marginHorizontal="20dp"
+                    android:layout_marginBottom="20sp"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal">
+
+                        <LinearLayout
+                            android:id="@+id/event_layout_header"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:layout_gravity="center"
+                            android:orientation="vertical">
+
+                            <TextView
+                                android:id="@+id/event_header"
+                                style="@style/TitleText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="@string/Header"
+                                android:textColor="@color/primaryDarkColor"/>
+
+                            <LinearLayout
+                                android:id="@+id/event_layout_time"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:minWidth="67dp"
+                                android:paddingVertical="2dp"
+                                android:orientation="horizontal"
+                                android:gravity="end">
+
+                                <ImageView
+                                    android:layout_width="18dp"
+                                    android:layout_height="wrap_content"
+                                    android:src="@drawable/ic_time"
+                                    app:tint="@color/greyText"
+                                    android:adjustViewBounds="true"
+                                    android:layout_marginEnd="6dp"
+                                    android:layout_gravity="center"
+                                    android:contentDescription="@string/startTime"/>
+
+                                <TextView
+                                    style="@style/CommentText"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="5dp"
+                                    android:text="@string/TimeStartEvent"/>
+
+                                <TextView
+                                    style="@style/CommentText"
+                                    android:id="@+id/event_time"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_gravity="center"
+                                    android:text="19:30"/>
+
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <androidx.cardview.widget.CardView
+                            android:id="@+id/event_date_card"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
+                            android:layout_margin="10dp"
+                            style="@style/CardLowRadius">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/event_date_number"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:text="25"
+                                    android:textColor="@color/primaryDarkColor"
+                                    android:textSize="24sp"
+                                    android:gravity="center"
+                                    android:textStyle="bold"/>
+
+                                <TextView
+                                    android:id="@+id/event_date_month"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="0dp"
+                                    android:layout_weight="1"
+                                    android:text="окт"
+                                    android:textColor="@color/primaryDarkColor"
+                                    android:textSize="16sp"
+                                    android:gravity="top|center" />
+                            </LinearLayout>
+                        </androidx.cardview.widget.CardView>
+                    </LinearLayout>
+
+                    <TextView
+                        android:id="@+id/event_text_view_label_creator"
+                        style="@style/SubTitleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="10dp"
+                        android:textColor="@color/primaryDarkColor"
+                        android:text="@string/EventCreator"/>
+
+                    <TextView
+                        android:id="@+id/event_text_view_creator"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textStyle="bold"
+                        android:textSize="20sp"
+                        android:text="Qwerty"/>
+
+                    <TextView
+                        android:id="@+id/event_text_view_comment"
+                        style="@style/SubTitleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:textColor="@color/primaryDarkColor"
+                        android:text="@string/AboutEvent"/>
+
+                    <TextView
+                        style="@style/CommentText"
+                        android:id="@+id/event_comment"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:text="@string/CreatorNotAddComment"/>
+
+                    <TextView
+                        style="@style/SubTitleText"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="15dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="@string/Location"
+                        android:textColor="@color/primaryDarkColor"/>
+
+                    <TextView
+                        style="@style/CommentText"
+                        android:id="@+id/event_address"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="10dp"
+                        android:layout_marginBottom="5dp"
+                        android:text="@string/Location"/>
+
+                    <androidx.cardview.widget.CardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="4dp"
+                        style="@style/Card">
+
+                        <androidx.fragment.app.FragmentContainerView
+                            android:id="@+id/event_location_event_map"
+                            android:name="com.google.android.gms.maps.SupportMapFragment"
+                            android:layout_height="250dp"
+                            android:layout_width="match_parent"/>
+                    </androidx.cardview.widget.CardView>
 
                     <LinearLayout
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
+                        android:orientation="horizontal"
+                        android:layout_marginTop="20dp"
+                        android:layout_marginBottom="5dp">
 
                         <TextView
-                            android:id="@+id/event_header"
-                            style="@style/TextAppearance.MaterialComponents.Headline5"
+                            style="@style/SubTitleText"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="@string/Header"
                             android:textColor="@color/primaryDarkColor"
-                            android:textStyle="bold"/>
+                            android:text="@string/members"/>
 
-                        <LinearLayout
-                            android:id="@+id/event_layout_time"
+                        <TextView
+                            style="@style/SubTitleText"
+                            android:id="@+id/event_count_people"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:minWidth="67dp"
-                            android:paddingVertical="2dp"
-                            android:orientation="horizontal"
-                            android:gravity="end">
+                            android:layout_gravity="center"
+                            android:layout_marginStart="10dp"
+                            android:textColor="@color/primaryDarkColor"
+                            android:text="40" />
 
-                            <ImageView
-                                android:layout_width="18dp"
-                                android:layout_height="wrap_content"
-                                android:src="@drawable/ic_time"
-                                app:tint="@color/greyText"
-                                android:adjustViewBounds="true"
-                                android:layout_marginEnd="6dp"
-                                android:layout_gravity="center"
-                                android:contentDescription="@string/startTime"/>
-
-                            <TextView
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_marginEnd="5dp"
-                                android:text="@string/TimeStartEvent"
-                                android:textColor="@color/greyText"/>
-
-                            <TextView
-                                android:id="@+id/event_time"
-                                android:layout_width="wrap_content"
-                                android:layout_height="wrap_content"
-                                android:layout_gravity="center"
-                                android:textColor="@color/greyText"
-                                android:text="19:30"/>
-
-                        </LinearLayout>
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center"
+                            android:layout_marginStart="4dp"
+                            android:src="@drawable/ic_group"
+                            app:tint="@color/primaryDarkColor"
+                            android:scaleType="centerCrop"
+                            android:adjustViewBounds="true"
+                            android:contentDescription="@string/members" />
                     </LinearLayout>
 
-                    <androidx.cardview.widget.CardView
-                        android:id="@+id/event_date_card"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_margin="10dp"
-                        style="@style/CardLowRadius"
-                        app:layout_constraintTop_toTopOf="parent"
-                        app:layout_constraintEnd_toEndOf="parent"
-                        app:layout_constraintBottom_toBottomOf="parent">
-
-                        <LinearLayout
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:orientation="vertical">
-
-                            <TextView
-                                android:id="@+id/event_date_number"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:text="25"
-                                android:textColor="@color/primaryDarkColor"
-                                android:textSize="24sp"
-                                android:gravity="center"
-                                android:textStyle="bold"/>
-
-                            <TextView
-                                android:id="@+id/event_date_month"
-                                android:layout_width="match_parent"
-                                android:layout_height="0dp"
-                                android:layout_weight="1"
-                                android:text="окт"
-                                android:textColor="@color/primaryDarkColor"
-                                android:textSize="16sp"
-                                android:gravity="top|center" />
-                        </LinearLayout>
-                    </androidx.cardview.widget.CardView>
-
-                </androidx.constraintlayout.widget.ConstraintLayout>
-
-                <TextView
-                    android:id="@+id/event_text_view_creator"
-                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:textColor="@color/primaryDarkColor"
-                    android:text="@string/EventCreator"/>
-
-                <TextView
-                    android:id="@+id/event_text_view_comment"
-                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:textColor="@color/primaryDarkColor"
-                    android:text="@string/comment"/>
-
-                <TextView
-                    android:id="@+id/event_comment"
-                    style="@style/TextAppearance.AppCompat.Body1"
-                    android:theme="@style/ThemeOverlay.AppCompat"
-                    android:layout_width="match_parent"
-                    android:layout_height="match_parent"
-                    android:paddingHorizontal="15dp"
-                    android:paddingVertical="8dp"
-                    android:background="@drawable/edit_text_border_gray"/>
-
-                <TextView
-                    style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:text="@string/Location"
-                    android:textColor="@color/primaryDarkColor"/>
-
-                <TextView
-                    android:id="@+id/event_address"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="10dp"
-                    android:layout_marginBottom="5dp"
-                    android:textColor="@color/greyText"
-                    android:text="@string/Location"/>
-
-                <androidx.cardview.widget.CardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginHorizontal="4dp"
-                    style="@style/Card">
-
-                    <androidx.fragment.app.FragmentContainerView
-                        android:id="@+id/event_location_event_map"
-                        android:name="com.google.android.gms.maps.SupportMapFragment"
-                        android:layout_height="250dp"
-                        android:layout_width="match_parent"/>
-                </androidx.cardview.widget.CardView>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal"
-                    android:layout_marginTop="20dp"
-                    android:layout_marginBottom="5dp">
-
-                    <TextView
-                        style="@style/TextAppearance.MaterialComponents.Subtitle1"
-                        android:layout_width="wrap_content"
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/event_members"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:textColor="@color/primaryDarkColor"
-                        android:text="@string/members"/>
+                        app:layoutManager="LinearLayoutManager"
+                        tools:context=".main.ui.events.EventFragment"
+                        tools:listitem="@layout/person_item_list" />
 
-                    <TextView
-                        android:id="@+id/event_count_people"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="10dp"
-                        android:textColor="@color/primaryDarkColor"
-                        android:text="40" />
-
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center"
-                        android:layout_marginStart="4dp"
-                        android:src="@drawable/ic_group"
-                        app:tint="@color/primaryDarkColor"
-                        android:scaleType="centerCrop"
-                        android:adjustViewBounds="true"
-                        android:contentDescription="@string/members" />
                 </LinearLayout>
-
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/event_members"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    app:layoutManager="LinearLayoutManager"
-                    tools:context=".main.ui.events.EventFragment"
-                    tools:listitem="@layout/person_item_list" />
-
-            </LinearLayout>
-        </ScrollView>
+            </androidx.core.widget.NestedScrollView>
+        </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </LinearLayout>

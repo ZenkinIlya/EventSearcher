@@ -81,7 +81,9 @@
     <string name="CountMembers">Количество участников</string>
     <string name="ChooseCity">Выберите город</string>
     <string name="Reset">Сбросить</string>
-    <string name="EventCreator">Организатор эвента</string>
+    <string name="EventCreator">Организатор</string>
     <string name="TimeStartEvent">Начало в</string>
+    <string name="AboutEvent">Об эвенте</string>
+    <string name="CreatorNotAddComment">Организатор не оставил комментарий</string>
 
 </resources>

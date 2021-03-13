@@ -37,6 +37,7 @@
         <item name="android:windowTranslucentStatus">true</item>    <!--прозрачный статус-->
     </style>
 
+    <!--fullScreen with white backArrow-->
     <style name="FullScreenLight" parent="FullScreen">
         <item name="android:homeAsUpIndicator">@drawable/ic_back</item>
     </style>
@@ -91,6 +92,22 @@
 
     <style name="BodyText" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">17sp</item>
+    </style>
+
+    <style name="TitleText">
+        <item name="android:textSize">30sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="SubTitleText">
+        <item name="android:textSize">18sp</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="CommentText">
+        <item name="android:textSize">14sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:textColor">@color/greyText</item>
     </style>
 
 </resources>

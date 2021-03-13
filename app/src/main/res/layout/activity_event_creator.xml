@@ -20,7 +20,7 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingHorizontal="10dp"
+                android:paddingHorizontal="20dp"
                 android:orientation="vertical"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -186,7 +186,7 @@
 
             <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/event_creator_accept_btn"
-                android:layout_margin="10dp"
+                android:layout_margin="20dp"
                 android:text="@string/accept"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
