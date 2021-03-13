@@ -179,7 +179,6 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                     })
                     .collect(Collectors.toList());
         }
-        notifyDataSetChanged();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {

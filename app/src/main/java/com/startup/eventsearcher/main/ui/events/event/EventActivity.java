@@ -18,6 +18,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityEventBinding;
@@ -32,6 +33,7 @@ import com.startup.eventsearcher.utils.Config;
 
 import java.text.SimpleDateFormat;
 import java.util.Locale;
+import java.util.Objects;
 
 /*Активити отображения эвента
 * На вход принимает эвент для отображения
@@ -55,7 +57,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
 
         Toolbar toolbar = bind.eventToolbar;
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("");
+        Objects.requireNonNull(getSupportActionBar()).setTitle("");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);  //удаление тени
 
@@ -173,6 +175,8 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
         bind.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
 
+        bind.eventTextViewCreator.setText(event.getPersonCreator().getLogin());
+
         bind.eventAddress.setText(event.getEventAddress().getAddress());
         bind.eventCountPeople.setText(String.valueOf(event.getSubscribers().size()));
         bind.eventTime.setText(event.getStartTime());
@@ -181,8 +185,9 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
 
         int resourceId = getResourceIdImage(event);
         bind.eventImageCategory.setImageResource(resourceId);
-//        Glide.with(this).load(resourceId).into(imageViewCategory);
-
+        Picasso.get()
+                .load(resourceId)
+                .into(bind.eventImageCategory);
         bind.eventComment.setText(event.getComment());
     }
 
@@ -223,5 +228,8 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         markerOptions.position(latLng);
         googleMap.addMarker(markerOptions);
         googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
+        //Запрет на перемещение по карте
+        googleMap.getUiSettings().setAllGesturesEnabled(false);
+
     }
 }

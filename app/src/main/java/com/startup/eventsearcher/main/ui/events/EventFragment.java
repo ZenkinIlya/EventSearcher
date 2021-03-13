@@ -10,14 +10,15 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.jakewharton.rxbinding4.appcompat.RxSearchView;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentEventListBinding;
 import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
@@ -33,6 +34,11 @@ import com.startup.eventsearcher.utils.Config;
 
 import java.util.Arrays;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.disposables.Disposable;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -243,19 +249,28 @@ public class EventFragment extends Fragment {
     }
 
     private void componentListener() {
-        bind.eventListSearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                return false;
-            }
 
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                FilterHandler.setSearchText(newText);
-                eventRecyclerViewAdapter.filter();
-                return true;
-            }
-        });
+        /*Строка поиска
+        * doOnNext() выполнется в io потоке*/
+        Disposable disposable = RxSearchView.queryTextChanges(bind.eventListSearch)
+                .debounce(500, TimeUnit.MILLISECONDS)
+                .distinctUntilChanged()
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .doOnNext(charSequence -> {
+                    Log.d(TAG, "componentListener io: " + charSequence);
+                    FilterHandler.setSearchText(charSequence.toString());
+                    eventRecyclerViewAdapter.filter();
+                })
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(charSequence -> {
+                            Log.d(TAG, "componentListener main: " + charSequence);
+                            eventRecyclerViewAdapter.notifyDataSetChanged();
+                            },
+                        throwable -> {
+                            Toast.makeText(getContext(), throwable.getMessage(), Toast.LENGTH_SHORT).show();
+                            Log.e(TAG, "componentListener: " + throwable.getMessage(), throwable);
+                        });
 
         //Показ подробного фильтра
         bind.eventListBtnFilter.setOnClickListener(view -> {
