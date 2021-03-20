@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.startup.eventsearcher">
 
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -14,12 +13,17 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <activity android:name=".authentication.mvpAuth.views.login.SignUpActivity"
+            android:theme="@style/FullScreen" />
+        <activity
+            android:name=".authentication.mvpAuth.views.login.SignInActivity"
+            android:theme="@style/FullScreen" />
         <activity
             android:name=".main.ui.events.filter.FilterActivity"
-            android:theme="@style/FullScreen"/>
+            android:theme="@style/FullScreen" />
         <activity
             android:name=".main.ui.subscribe.SubscribeActivity"
-            android:theme="@style/AppThemeWithActionBar"/>
+            android:theme="@style/AppThemeWithActionBar" />
         <activity
             android:name=".main.ui.events.event.EventActivity"
             android:theme="@style/FullScreenLight" />
@@ -33,7 +37,7 @@
             android:name=".authentication.LoginActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".introduction.IntroductionActivity"
+            android:name=".authentication.mvpAuth.views.introduction.IntroductionActivity"
             android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -43,13 +47,12 @@
         </activity>
         <activity
             android:name=".main.MainActivity"
-            android:theme="@style/FullScreen">
-        </activity>
-
+            android:theme="@style/FullScreen" />
 
         <uses-library
             android:name="org.apache.http.legacy"
             android:required="false" />
+
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
