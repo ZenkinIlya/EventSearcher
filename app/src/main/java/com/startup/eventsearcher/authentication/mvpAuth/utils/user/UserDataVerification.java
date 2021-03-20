@@ -4,11 +4,11 @@ import android.content.Context;
 
 import com.startup.eventsearcher.R;
 
-public class UserDataDataVerification implements IUserDataVerification {
+public class UserDataVerification implements IUserDataVerification {
     private boolean dataCorrect;
     private final Context context;
 
-    public UserDataDataVerification(Context context) {
+    public UserDataVerification(Context context) {
         this.context = context;
     }
 

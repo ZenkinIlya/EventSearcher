@@ -24,13 +24,10 @@ public class SignUpPresenter implements ISignUpPresenter{
     }
 
     //Проверка корректности данных
-    private boolean verificationData(String login, String email, String password, String confirmPassword){
+    private boolean verificationData(String email, String password, String confirmPassword){
         //Проверка корректности данных
         Log.d(TAG, "verificationData: Проверка корректности данных");
         iUserDataVerification.setDataCorrect(true);
-
-        String verificationLogin = iUserDataVerification.verificationLogin(login);
-        iSignUpView.onLoginError(verificationLogin);
 
         String verificationEmail = iUserDataVerification.verificationEmail(email);
         iSignUpView.onEmailError(verificationEmail);
@@ -73,7 +70,7 @@ public class SignUpPresenter implements ISignUpPresenter{
 
                     switch (typeViewOutputError){
                         case DEFAULT:{
-                            iSignUpView.onError(message);
+                            iSignUpView.onErrorFirebase(message);
                             return;
                         }
                         case EMAIL:{
@@ -88,13 +85,13 @@ public class SignUpPresenter implements ISignUpPresenter{
     }
 
     @Override
-    public void onRegistration(String login, String email, String password, String confirmPassword) {
+    public void onRegistration(String email, String password, String confirmPassword) {
         //Проверка корректности данных
-        if (verificationData(login, email, password, confirmPassword)){
+        if (verificationData(email, password, confirmPassword)){
             //Регистрация пользователя в Firebase
             createUserWithEmailAndPassword(email, password);
         }else {
-            iSignUpView.onError(null);
+            iSignUpView.onErrorVerification();
         }
     }
 }

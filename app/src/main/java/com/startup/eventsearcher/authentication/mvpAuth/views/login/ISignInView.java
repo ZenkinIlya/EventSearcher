@@ -4,6 +4,7 @@ public interface ISignInView {
     void onEmailError(String message);
     void onPasswordError(String message);
     void onSuccess();
-    void onError(String message);
+    void onErrorFirebase(String message);
+    void onErrorVerification();
     void isLogin(boolean isLogin);
 }

@@ -8,6 +8,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.startup.eventsearcher.databinding.FragmentProfileBinding;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 
@@ -35,6 +36,11 @@ public class ProfileFragment extends Fragment {
         bind = FragmentProfileBinding.inflate(inflater, container, false);
 
         fillFields();
+
+        bind.profileSignOut.setOnClickListener(view -> {
+            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
+            firebaseAuth.signOut();
+        });
 
         return bind.getRoot();
     }

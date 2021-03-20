@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.authentication.mvpAuth.presenters;
+package com.startup.eventsearcher.authentication.mvpAuth.presenters.userData;
 
 import android.util.Log;
 

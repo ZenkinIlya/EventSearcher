@@ -13,7 +13,9 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".authentication.mvpAuth.views.login.SignUpActivity"
+        <activity android:name=".authentication.mvpAuth.views.login.SetExtraUserDataActivity"></activity>
+        <activity
+            android:name=".authentication.mvpAuth.views.login.SignUpActivity"
             android:theme="@style/FullScreen" />
         <activity
             android:name=".authentication.mvpAuth.views.login.SignInActivity"

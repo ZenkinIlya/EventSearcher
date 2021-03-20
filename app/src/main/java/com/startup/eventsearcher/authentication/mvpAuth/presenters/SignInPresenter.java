@@ -16,12 +16,17 @@ public class SignInPresenter implements ISignInPresenter {
     ISignInView iSignInView;
     IUserDataVerification iUserDataVerification;
     FirebaseAuth firebaseAuth;
+    FirebaseUser firebaseUser;
 
     public SignInPresenter(ISignInView iSignInView, IUserDataVerification iUserDataVerification) {
         this.iSignInView = iSignInView;
         this.iUserDataVerification = iUserDataVerification;
 
         firebaseAuth = FirebaseAuth.getInstance();
+    }
+
+    public FirebaseUser getFirebaseUser() {
+        return firebaseUser;
     }
 
     //Проверка корректности данных
@@ -51,8 +56,8 @@ public class SignInPresenter implements ISignInPresenter {
                     if (task.isSuccessful()) {
                         // Авторизация прошла успешно
                         Log.i(TAG, "signInWithEmailAndPassword: success");
-                        FirebaseUser user = firebaseAuth.getCurrentUser();
-                        Log.d(TAG, "signInWithEmailAndPassword: firebaseUser email = " + user.getEmail());
+                        firebaseUser = firebaseAuth.getCurrentUser();
+                        Log.d(TAG, "signInWithEmailAndPassword: firebaseUser email = " + firebaseUser.getEmail());
                         iSignInView.onSuccess();
                     }
                 })
@@ -62,7 +67,7 @@ public class SignInPresenter implements ISignInPresenter {
 
                     switch (typeViewOutputError){
                         case DEFAULT:{
-                            iSignInView.onError(message);
+                            iSignInView.onErrorFirebase(message);
                             return;
                         }
                         case EMAIL:{
@@ -82,31 +87,22 @@ public class SignInPresenter implements ISignInPresenter {
         if (verificationData(email, password)){
             signInWithEmailAndPassword(email, password);
         }else {
-            iSignInView.onError(null);
+            iSignInView.onErrorVerification();
         }
     }
 
     @Override
     public void checkLogin() {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
-        if (currentUser != null){
+        firebaseUser = firebaseAuth.getCurrentUser();
+        if (firebaseUser != null){
             Log.d(TAG, "checkLogin: currentUser:");
-            Log.d(TAG, "checkLogin: DisplayName = " + currentUser.getDisplayName());
-            Log.d(TAG, "checkLogin: Email = " + currentUser.getEmail());
-            Log.d(TAG, "checkLogin: PhotoUrl = " + currentUser.getPhotoUrl());
-            Log.d(TAG, "checkLogin: isEmailVerified = " + currentUser.isEmailVerified());
-            Log.d(TAG, "checkLogin: Uid = " + currentUser.getUid());
+            Log.d(TAG, "checkLogin: DisplayName = " + firebaseUser.getDisplayName());
+            Log.d(TAG, "checkLogin: Email = " + firebaseUser.getEmail());
+            Log.d(TAG, "checkLogin: PhotoUrl = " + firebaseUser.getPhotoUrl());
+            Log.d(TAG, "checkLogin: isEmailVerified = " + firebaseUser.isEmailVerified());
+            Log.d(TAG, "checkLogin: Uid = " + firebaseUser.getUid());
             Log.i(TAG, "checkLogin: Пользователь авторизован");
 
-            for (UserInfo userInfo: currentUser.getProviderData()){
-                Log.d(TAG, "checkLogin: Provider:");
-                Log.d(TAG, "checkLogin: DisplayName = " + userInfo.getDisplayName());
-                Log.d(TAG, "checkLogin: Email = " + userInfo.getEmail());
-                Log.d(TAG, "checkLogin: PhotoUrl = " + userInfo.getPhotoUrl());
-                Log.d(TAG, "checkLogin: isEmailVerified = " + userInfo.isEmailVerified());
-                Log.d(TAG, "checkLogin: Uid = " + userInfo.getUid());
-                Log.d(TAG, "checkLogin: ProviderId = " + userInfo.getProviderId());
-            }
             iSignInView.isLogin(true);
         }else {
             Log.w(TAG, "checkLogin: Пользователь не авторизован");

@@ -87,5 +87,7 @@
     <string name="CreatorNotAddComment">Организатор не оставил комментарий</string>
     <string name="saveDataUser">Запомнить пользователя?</string>
     <string name="register">Зарегистрироваться</string>
+    <string name="loadPhoto">Загрузить фото</string>
+    <string name="Skip">Пропустить</string>
 
 </resources>

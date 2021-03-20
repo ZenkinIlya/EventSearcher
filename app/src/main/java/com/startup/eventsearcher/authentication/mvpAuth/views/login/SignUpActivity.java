@@ -6,7 +6,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.SignUpPresenter;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataDataVerification;
+import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
 import com.startup.eventsearcher.databinding.ActivitySignUpBinding;
 
 import java.util.Objects;
@@ -22,18 +22,16 @@ public class SignUpActivity extends AppCompatActivity implements ISignUpView {
         bind = ActivitySignUpBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        signUpPresenter = new SignUpPresenter(this, new UserDataDataVerification(this));
+        signUpPresenter = new SignUpPresenter(this, new UserDataVerification(this));
 
         componentListener();
     }
 
     private void componentListener() {
-        bind.signUpRegistration.setOnClickListener(view -> {
-            signUpPresenter.onRegistration(Objects.requireNonNull(bind.signUpLogin.getEditText()).getText().toString(),
-                    Objects.requireNonNull(bind.signUpEmail.getEditText()).getText().toString(),
-                    Objects.requireNonNull(bind.signUpPassword.getEditText()).getText().toString(),
-                    Objects.requireNonNull(bind.signUpConfirmPassword.getEditText()).getText().toString());
-        });
+        bind.signUpRegistration.setOnClickListener(view ->
+                signUpPresenter.onRegistration(Objects.requireNonNull(bind.signUpEmail.getEditText()).getText().toString(),
+                Objects.requireNonNull(bind.signUpPassword.getEditText()).getText().toString(),
+                Objects.requireNonNull(bind.signUpConfirmPassword.getEditText()).getText().toString()));
     }
 
     @Override
@@ -52,21 +50,18 @@ public class SignUpActivity extends AppCompatActivity implements ISignUpView {
     }
 
     @Override
-    public void onLoginError(String message) {
-        bind.signUpLogin.setError(message);
-    }
-
-    @Override
     public void onSuccess() {
         Toast.makeText(this, "Вы успешно зарегестрированы!", Toast.LENGTH_SHORT).show();
         finish();
     }
 
     @Override
-    public void onError(String message) {
-        //Данные пользователя корректны, но регистрация не удалась
-        if (message != null) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        }
+    public void onErrorFirebase(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onErrorVerification() {
+        //ничего не делаю, все ошибки уже выведены под email password passwordConfirm
     }
 }

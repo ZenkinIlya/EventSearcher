@@ -9,6 +9,7 @@
     tools:context=".main.ui.profile.ProfileFragment">
 
     <ImageButton
+        android:id="@+id/profile_sign_out"
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:scaleType="fitXY"

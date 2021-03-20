@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.authentication.mvpAuth.presenters;
+package com.startup.eventsearcher.authentication.mvpAuth.presenters.userData;
 
 import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.ICurrentUser;

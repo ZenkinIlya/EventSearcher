@@ -6,22 +6,20 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.startup.eventsearcher.authentication.mvpAuth.presenters.SaveUserDataPresenter;
+import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveUserDataPresenter;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataDataVerification;
+import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.SignInPresenter;
-import com.startup.eventsearcher.authentication.mvpAuth.presenters.GetUserDataPresenter;
 import com.startup.eventsearcher.databinding.ActivitySignInBinding;
 import com.startup.eventsearcher.main.MainActivity;
 
 import java.util.Objects;
 
-public class SignInActivity extends AppCompatActivity implements ISignInView, ISetUserDataView {
+public class SignInActivity extends AppCompatActivity implements ISignInView{
 
     private ActivitySignInBinding bind;
 
     private SignInPresenter signInPresenter;
-    private GetUserDataPresenter getUserDataPresenter;
     private SaveUserDataPresenter saveUserDataPresenter;
 
     @Override
@@ -32,16 +30,14 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
 
         /*Перед вызовом этого активити, в сплешЭкране проверяется был ли запомнит пользователь
         * ранее. Если был, то это активити пропускается и происходит вход по данным из sharedPreference*/
-
-        //TODO Нет необходимости идти в SharedPreference, email и password можно получить от прошлой активити (IntroductionActivity)
-
-        getUserDataPresenter = new GetUserDataPresenter(this, new CurrentUser(this));
-        //Получение данных раннее входившего пользователя из SharedPreference
-        getUserDataPresenter.onGetData();
+        String email = getIntent().getStringExtra("email");
+        String password = getIntent().getStringExtra("password");
+        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
+        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
 
         saveUserDataPresenter = new SaveUserDataPresenter(new CurrentUser(this));
 
-        signInPresenter = new SignInPresenter(this, new UserDataDataVerification(this));
+        signInPresenter = new SignInPresenter(this, new UserDataVerification(this));
         //Проверка авторизован ли пользователь
         signInPresenter.checkLogin();
 
@@ -58,16 +54,6 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
             Intent intent = new Intent(this, SignUpActivity.class);
             startActivity(intent);
         });
-    }
-
-    @Override
-    public void onSetEmail(String email) {
-        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
-    }
-
-    @Override
-    public void onSetPassword(String password) {
-        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
     }
 
     @Override
@@ -91,24 +77,36 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         //Сохранение данных пользователя
         saveUserDataPresenter.onSetData(saveData, "", email, password, "", "");
 
-        Intent intent = new Intent(this, MainActivity.class);
-        startActivity(intent);
+        exitFromActivity();
     }
 
     @Override
-    public void onError(String message) {
-        //1. Данные пользователя корректны, но аутентификация не удалась
-        //2. При не корректных данных прилетает null ( в этом случае toast не нужен)
-        if (message != null) {
-            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
-        }
+    public void onErrorFirebase(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onErrorVerification() {
+        //ничего не делаю, все ошибки уже выведены под email password
     }
 
     @Override
     public void isLogin(boolean isLogin) {
         if (isLogin){
-//            Intent intent = new Intent(this, MainActivity.class);
-//            startActivity(intent);
+            exitFromActivity();
+        }
+    }
+
+    private void exitFromActivity(){
+        //Если даный пользователь имеет логин и фото, то переходим в MainActivity
+        if (signInPresenter.getFirebaseUser().getDisplayName() != null &&
+                !signInPresenter.getFirebaseUser().getDisplayName().isEmpty() &&
+                signInPresenter.getFirebaseUser().getPhotoUrl() != null){
+            Intent intent = new Intent(this, MainActivity.class);
+            startActivity(intent);
+        }else {
+            Intent intent = new Intent(this, SetExtraUserDataActivity.class);
+            startActivity(intent);
         }
     }
 }

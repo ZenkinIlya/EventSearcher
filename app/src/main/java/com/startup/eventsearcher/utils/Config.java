@@ -14,4 +14,6 @@ public class Config {
     public static final int SHOW_EVENT = 3;
 
     public static final int SHOW_FILTER = 4;
+
+    public static final int LOAD_IMAGE = 5;
 }
