@@ -1,0 +1,47 @@
+{
+  "project_info": {
+    "project_number": "574172524314",
+    "project_id": "eventsearcher-296017",
+    "storage_bucket": "eventsearcher-296017.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:574172524314:android:7086f6cc53a58d7fe406a3",
+        "android_client_info": {
+          "package_name": "com.startup.eventsearcher"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "574172524314-ckm4psemgrno5g0lbfbhmeu6d76vfhrb.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.startup.eventsearcher",
+            "certificate_hash": "9834af28f4bc4cf280a28b9c247e47392bd34bac"
+          }
+        },
+        {
+          "client_id": "574172524314-6p2r7f5u5trilgb183pskoba4nbbqq4r.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDKGYbeNtN_WxoWXcFx-Q2MMpKrzUCV5Bs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "574172524314-6p2r7f5u5trilgb183pskoba4nbbqq4r.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
