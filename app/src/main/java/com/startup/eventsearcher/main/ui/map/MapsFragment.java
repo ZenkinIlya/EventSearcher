@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
@@ -80,6 +81,13 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
+        if (savedInstanceState != null){
+            LatLng savedLatLng = savedInstanceState.getParcelable("latLng");
+            float savedZoom = savedInstanceState.getFloat("zoom");
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(savedLatLng, savedZoom));
+        }
+
         Log.d(TAG, "onViewCreated()");
     }
 
@@ -98,6 +106,9 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
+        CameraPosition cameraPosition = map.getCameraPosition();
+        outState.putParcelable("latLng", cameraPosition.target);
+        outState.putFloat("zoom", cameraPosition.zoom);
         Log.d(TAG, "onSaveInstanceState():");
     }
 

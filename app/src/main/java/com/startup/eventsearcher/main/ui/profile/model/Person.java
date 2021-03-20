@@ -10,6 +10,8 @@ public class Person implements Serializable {
     private String surname;
     private String email;
 
+    public Person(){};
+
     public Person(String login, String password, String name, String surname, String email) {
         this.login = login;
         this.password = password;
@@ -36,6 +38,26 @@ public class Person implements Serializable {
 
     public String getEmail() {
         return email;
+    }
+
+    public void setLogin(String login) {
+        this.login = login;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     @Override

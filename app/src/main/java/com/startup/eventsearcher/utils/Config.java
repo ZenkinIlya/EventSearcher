@@ -1,7 +1,7 @@
 package com.startup.eventsearcher.utils;
 
 public class Config {
-    public static final int delay = 200;
+    public static final int delay = 500;
 
     public static final int ERROR_DIALOG_REQUEST = 9001;
     public static final int PERMISSIONS_REQUEST_ENABLE_GPS = 9003;
