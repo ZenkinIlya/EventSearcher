@@ -9,7 +9,7 @@
     <string name="registrationWithoutUnderline">Регистрация</string>
     <string name="lengthPassword">Введите от 4 до 10 символов</string>
     <string name="lengthLogin">Введите не менее 3 символов</string>
-    <string name="email">email</string>
+    <string name="email">Email</string>
     <string name="confirm">Подтвердить</string>
     <string name="areYouAlreadyRegistered">Вы уже зарегестрированны?</string>
     <string name="notValidEmail">Неверный формат email</string>
@@ -85,5 +85,7 @@
     <string name="TimeStartEvent">Начало в</string>
     <string name="AboutEvent">Об эвенте</string>
     <string name="CreatorNotAddComment">Организатор не оставил комментарий</string>
+    <string name="saveDataUser">Запомнить пользователя?</string>
+    <string name="register">Зарегистрироваться</string>
 
 </resources>
