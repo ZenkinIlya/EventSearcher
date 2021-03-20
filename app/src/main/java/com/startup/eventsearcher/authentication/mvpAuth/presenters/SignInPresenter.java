@@ -81,6 +81,8 @@ public class SignInPresenter implements ISignInPresenter {
         //Проверка корректности данных
         if (verificationData(email, password)){
             signInWithEmailAndPassword(email, password);
+        }else {
+            iSignInView.onError(null);
         }
     }
 

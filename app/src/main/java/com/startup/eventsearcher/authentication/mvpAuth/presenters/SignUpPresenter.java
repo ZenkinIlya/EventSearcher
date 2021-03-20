@@ -5,6 +5,7 @@ import android.util.Log;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.firebase.FirebaseErrorHandler;
+import com.startup.eventsearcher.authentication.mvpAuth.utils.firebase.TypeViewOutputError;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.IUserDataVerification;
 import com.startup.eventsearcher.authentication.mvpAuth.views.login.ISignUpView;
 
@@ -68,7 +69,21 @@ public class SignUpPresenter implements ISignUpPresenter{
                 })
                 .addOnFailureListener(e -> {
                     String message = FirebaseErrorHandler.errorHandler(e);
-                    iSignUpView.onError(message);
+                    TypeViewOutputError typeViewOutputError = FirebaseErrorHandler.getTypeViewOutputError();
+
+                    switch (typeViewOutputError){
+                        case DEFAULT:{
+                            iSignUpView.onError(message);
+                            return;
+                        }
+                        case EMAIL:{
+                            iSignUpView.onEmailError(message);
+                            return;
+                        }
+                        case PASSWORD:{
+                            iSignUpView.onPasswordError(message);
+                        }
+                    }
                 });
     }
 
@@ -78,6 +93,8 @@ public class SignUpPresenter implements ISignUpPresenter{
         if (verificationData(login, email, password, confirmPassword)){
             //Регистрация пользователя в Firebase
             createUserWithEmailAndPassword(email, password);
+        }else {
+            iSignUpView.onError(null);
         }
     }
 }

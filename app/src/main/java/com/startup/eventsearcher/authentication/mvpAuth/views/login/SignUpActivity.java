@@ -65,6 +65,8 @@ public class SignUpActivity extends AppCompatActivity implements ISignUpView {
     @Override
     public void onError(String message) {
         //Данные пользователя корректны, но регистрация не удалась
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if (message != null) {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
     }
 }

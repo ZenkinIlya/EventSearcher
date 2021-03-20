@@ -33,6 +33,8 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         /*Перед вызовом этого активити, в сплешЭкране проверяется был ли запомнит пользователь
         * ранее. Если был, то это активити пропускается и происходит вход по данным из sharedPreference*/
 
+        //TODO Нет необходимости идти в SharedPreference, email и password можно получить от прошлой активити (IntroductionActivity)
+
         getUserDataPresenter = new GetUserDataPresenter(this, new CurrentUser(this));
         //Получение данных раннее входившего пользователя из SharedPreference
         getUserDataPresenter.onGetData();
@@ -95,7 +97,11 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
 
     @Override
     public void onError(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        //1. Данные пользователя корректны, но аутентификация не удалась
+        //2. При не корректных данных прилетает null ( в этом случае toast не нужен)
+        if (message != null) {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

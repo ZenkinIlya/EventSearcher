@@ -82,7 +82,9 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
 
     @Override
     public void onError(String message) {
-        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        if (message != null) {
+            Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+        }
         Intent intent = new Intent(this, SignInActivity.class);
         startActivity(intent);
         finish();

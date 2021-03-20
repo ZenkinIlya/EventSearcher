@@ -2,6 +2,7 @@ package com.startup.eventsearcher.authentication.mvpAuth.utils.firebase;
 
 import android.util.Log;
 
+import com.google.firebase.FirebaseError;
 import com.google.firebase.FirebaseNetworkException;
 import com.google.firebase.auth.FirebaseAuthException;
 
@@ -28,18 +29,31 @@ public class FirebaseErrorHandler {
                     typeViewOutputError = TypeViewOutputError.EMAIL;
                     return "Пользователь не существует";
                 }
+                case "ERROR_EMAIL_ALREADY_IN_USE": {
+                    Log.w(TAG, "errorHandler: (" +errorCode+ ") Email уже используется другим аккаунтом. " +e.getLocalizedMessage());
+                    typeViewOutputError = TypeViewOutputError.EMAIL;
+                    return "Email уже используется другим аккаунтом";
+                }
+                case "ERROR_INVALID_EMAIL": {
+                    Log.w(TAG, "errorHandler: (" +errorCode+ ") Не верный формат Email. " +e.getLocalizedMessage());
+                    typeViewOutputError = TypeViewOutputError.EMAIL;
+                    return "Не верный формат Email";
+                }
+
                 case "ERROR_WRONG_PASSWORD": {
                     Log.w(TAG, "errorHandler: (" +errorCode+ ") Неверный пароль. " +e.getLocalizedMessage());
                     typeViewOutputError = TypeViewOutputError.PASSWORD;
                     return "Неверный пароль";
                 }
-                case "ERROR_NETWORK_REQUEST_FAILED": {
-                    Log.w(TAG, "errorHandler: (" +errorCode+ ") Ошибка запроса данных пользователя. " +e.getLocalizedMessage());
-                    return "Ошибка запроса данных пользователя";
+                case "ERROR_WEAK_PASSWORD": {
+                    Log.w(TAG, "errorHandler: (" +errorCode+ ") Введите не менее 6 символов. " +e.getLocalizedMessage());
+                    typeViewOutputError = TypeViewOutputError.PASSWORD;
+                    return "Введите не менее 6 символов";
                 }
+
                 default:{
-                    Log.w(TAG, "errorHandler: (" +errorCode+ ") Неизвестная ошибка аутентификации. " +e.getLocalizedMessage());
-                    return "Неизвестная ошибка аутентификации";
+                    Log.w(TAG, "errorHandler: (" +errorCode+ ") " +e.getLocalizedMessage());
+                    return errorCode;
                 }
             }
         }else {
