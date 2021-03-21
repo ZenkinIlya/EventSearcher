@@ -15,23 +15,30 @@ import java.util.Objects;
 public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
 
     private static final String TAG = "tgUpdateUserData";
-    private FirebaseAuth firebaseAuth;
-    private ISetExtraUserDataView iSetExtraUserDataView;
+    private final ISetExtraUserDataView iSetExtraUserDataView;
+    private final FirebaseAuth firebaseAuth;
+    private final FirebaseUser firebaseUser;
 
     public UpdateUserDataPresenter(ISetExtraUserDataView iSetExtraUserDataView) {
         this.iSetExtraUserDataView = iSetExtraUserDataView;
+
         firebaseAuth = FirebaseAuth.getInstance();
+        firebaseUser = firebaseAuth.getCurrentUser();
+    }
+
+    public FirebaseUser getFirebaseUser() {
+        return firebaseUser;
     }
 
     @Override
     public void updateDisplayNameAndPhoto(String displayName, Uri uriPhoto) {
-        FirebaseUser currentUser = firebaseAuth.getCurrentUser();
+
         UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
                 .setPhotoUri(uriPhoto)
                 .setDisplayName(displayName)
                 .build();
 
-        Objects.requireNonNull(currentUser).updateProfile(profileUpdates)
+        Objects.requireNonNull(firebaseUser).updateProfile(profileUpdates)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
                         // Авторизация прошла успешно

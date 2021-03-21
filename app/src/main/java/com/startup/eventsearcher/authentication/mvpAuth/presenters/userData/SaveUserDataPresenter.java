@@ -18,7 +18,7 @@ public class SaveUserDataPresenter implements ISaveUserDataPresenter {
 
 
     @Override
-    public void onSetData(boolean saveData, String uid, String email, String password, String login, Uri uriPhoto) {
+    public void onSetData(boolean saveData, String uid, String email, String password, String login, String uriPhoto) {
         User user = new User();
         Log.d(TAG, "onSetData: uid = " + uid +
                 ", email = " + email +

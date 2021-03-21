@@ -13,10 +13,10 @@ import com.startup.eventsearcher.authentication.mvpAuth.views.login.ISignInView;
 public class SignInPresenter implements ISignInPresenter {
 
     private static final String TAG = "tgSignInPresenter";
-    ISignInView iSignInView;
-    IUserDataVerification iUserDataVerification;
-    FirebaseAuth firebaseAuth;
-    FirebaseUser firebaseUser;
+    private final ISignInView iSignInView;
+    private final IUserDataVerification iUserDataVerification;
+    private final FirebaseAuth firebaseAuth;
+    private FirebaseUser firebaseUser;
 
     public SignInPresenter(ISignInView iSignInView, IUserDataVerification iUserDataVerification) {
         this.iSignInView = iSignInView;

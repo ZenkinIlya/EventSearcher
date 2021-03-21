@@ -34,7 +34,7 @@ public class GetUserDataPresenter implements IGetUserDataPresenter {
                     Log.d(TAG, "onGetData: Данные получены: " + user.toString());
                     iSetUserDataView.onSetEmail(user.getConfidentialUserData().getEmail());
                     iSetUserDataView.onSetPassword(user.getConfidentialUserData().getPassword());
-                    iSetUserDataView.onGetUserDataFromSharedPreferenceSuccess();
+                    iSetUserDataView.onGetUserDataFromSharedPreferenceSuccess(user);
                 });
     }
 }

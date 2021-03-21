@@ -2,12 +2,14 @@ package com.startup.eventsearcher.authentication.mvpAuth.views.introduction;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.SignInPresenter;
@@ -28,12 +30,13 @@ import com.startup.eventsearcher.main.MainActivity;
 * */
 public class IntroductionActivity extends AppCompatActivity implements ISetUserDataView, ISignInView {
 
+    private static final String TAG = "tgIntroductionActivity";
+
     ActivityIntroductionBinding bind;
 
     private GetUserDataPresenter getUserDataPresenter;
     private SignInPresenter signInPresenter;
-    private String email;
-    private String password;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,30 +52,16 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-
-    }
+    public void onSetEmail(String email) {}
 
     @Override
-    protected void onResume() {
-        //Запуск анимации
-        super.onResume();
-    }
+    public void onSetPassword(String password) {}
 
     @Override
-    public void onSetEmail(String email) {
-        this.email = email;
-    }
-
-    @Override
-    public void onSetPassword(String password) {
-        this.password = password;
-    }
-
-    @Override
-    public void onGetUserDataFromSharedPreferenceSuccess() {
-        signInPresenter.onLogin(email, password);
+    public void onGetUserDataFromSharedPreferenceSuccess(User user) {
+        this.user = user;
+        signInPresenter.onLogin(user.getConfidentialUserData().getEmail(),
+                user.getConfidentialUserData().getPassword());
     }
 
     @Override
@@ -109,12 +98,8 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
 
     @Override
     public void isLogin(boolean isLogin) {
-        if (isLogin){
-            exitFromActivityWithSuccessLogin();
-        }else {
-            //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
-            getUserDataPresenter.onGetData();
-        }
+        //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
+        getUserDataPresenter.onGetData();
     }
 
     private void exitFromActivityWithSuccessLogin(){
@@ -128,6 +113,8 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
             finish();
         }else {
             Intent intent = new Intent(this, SetExtraUserDataActivity.class);
+            intent.putExtra("user", user);
+            Log.d(TAG, "exitFromActivityWithSuccessLogin: user = " +user.toString());
             startActivity(intent);
             finish();
         }

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.Log;
 
 import com.google.gson.reflect.TypeToken;
+import com.startup.eventsearcher.authentication.mvpAuth.models.user.ConfidentialUserData;
 import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
 import com.startup.eventsearcher.utils.JsonHandler;
 
@@ -30,7 +31,7 @@ public class CurrentUser implements ICurrentUser {
                 type);
         if (currentUserFromJson == null){
             Log.w(TAG, "getCurrentUserFromJSON: Не удалось получить данные пользователя из SharedPreference");
-            currentUserFromJson = new User();
+            currentUserFromJson = new User(null, new ConfidentialUserData(null, null), null , null);
         }
         Log.d(TAG, "getCurrentUserFromJSON: User = " + Objects.requireNonNull(currentUserFromJson).toString());
         return currentUserFromJson;

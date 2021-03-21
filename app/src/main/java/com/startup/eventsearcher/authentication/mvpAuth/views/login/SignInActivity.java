@@ -2,10 +2,12 @@ package com.startup.eventsearcher.authentication.mvpAuth.views.login;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.GetUserDataPresenter;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveUserDataPresenter;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
@@ -18,11 +20,13 @@ import java.util.Objects;
 
 public class SignInActivity extends AppCompatActivity implements ISignInView, ISetUserDataView{
 
+    private static final String TAG = "tgSignInActivity";
     private ActivitySignInBinding bind;
 
     private SignInPresenter signInPresenter;
     private SaveUserDataPresenter saveUserDataPresenter;
     private GetUserDataPresenter getUserDataPresenter;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,8 +82,8 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
     }
 
     @Override
-    public void onGetUserDataFromSharedPreferenceSuccess() {
-        //Данные загружены
+    public void onGetUserDataFromSharedPreferenceSuccess(User user) {
+        this.user = user;
     }
 
     @Override
@@ -91,7 +95,12 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         String password = Objects.requireNonNull(bind.signInPassword.getEditText()).getText().toString();
 
         //Сохранение данных пользователя
-        saveUserDataPresenter.onSetData(saveData, "", email, password, "", "");
+        saveUserDataPresenter.onSetData(saveData,
+                signInPresenter.getFirebaseUser().getUid(),
+                email,
+                password,
+                signInPresenter.getFirebaseUser().getDisplayName(),
+                signInPresenter.getFirebaseUser().getPhotoUrl().toString());
 
         exitFromActivity();
     }
@@ -122,6 +131,8 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
             startActivity(intent);
         }else {
             Intent intent = new Intent(this, SetExtraUserDataActivity.class);
+            intent.putExtra("user", user);
+            Log.d(TAG, "exitFromActivity: user = " +user.toString());
             startActivity(intent);
         }
     }

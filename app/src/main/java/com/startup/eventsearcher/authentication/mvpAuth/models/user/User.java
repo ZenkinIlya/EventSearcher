@@ -10,11 +10,11 @@ public class User implements Serializable {
     private String uid;
     private ConfidentialUserData confidentialUserData;
     private String login;
-    private Uri uriPhoto;
+    private String uriPhoto;
 
     public User(){};
 
-    public User(String uid, ConfidentialUserData confidentialUserData, String login, Uri uriPhoto) {
+    public User(String uid, ConfidentialUserData confidentialUserData, String login, String uriPhoto) {
         this.uid = uid;
         this.confidentialUserData = confidentialUserData;
         this.login = login;
@@ -45,11 +45,11 @@ public class User implements Serializable {
         this.login = login;
     }
 
-    public Uri getUriPhoto() {
+    public String getUriPhoto() {
         return uriPhoto;
     }
 
-    public void setUriPhoto(Uri uriPhoto) {
+    public void setUriPhoto(String uriPhoto) {
         this.uriPhoto = uriPhoto;
     }
 
