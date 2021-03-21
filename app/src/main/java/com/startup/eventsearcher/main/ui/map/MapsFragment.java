@@ -106,10 +106,12 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        CameraPosition cameraPosition = map.getCameraPosition();
-        outState.putParcelable("latLng", cameraPosition.target);
-        outState.putFloat("zoom", cameraPosition.zoom);
         Log.d(TAG, "onSaveInstanceState():");
+
+        //TODO Не работает так как onSaveInstanceState вызывается несколько раз
+        /*CameraPosition cameraPosition = map.getCameraPosition();
+        outState.putParcelable("latLng", cameraPosition.target);
+        outState.putFloat("zoom", cameraPosition.zoom);*/
     }
 
     @Override
@@ -123,6 +125,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                 MapHandler.getLocationPermission(getContext());
             }
         }
+        Log.d(TAG, "onStart: end progressbar");
     }
 
     @Override

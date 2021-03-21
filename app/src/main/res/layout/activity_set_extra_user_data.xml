@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.2">
+        app:layout_constraintVertical_bias="0.4">
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/set_data_user_photo"
@@ -25,7 +25,6 @@
             android:layout_height="50dp"
             android:layout_marginEnd="10dp"
             android:src="@drawable/ic_profile"
-            android:layout_gravity="center"
             android:scaleType="centerCrop"
             app:civ_circle_background_color="@color/primaryDarkColor"/>
 
@@ -45,34 +44,34 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/set_data_user_load_photo"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         style="@style/RoundedCornerButton"
-        app:layout_constraintTop_toBottomOf="@id/set_data_user_data"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/set_data_user_accept"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
         android:text="@string/loadPhoto"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/set_data_user_accept"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         style="@style/RoundedCornerButton"
-        app:layout_constraintTop_toBottomOf="@id/set_data_user_load_photo"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/set_data_user_skip"
         android:text="@string/apply"/>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/set_data_user_skip"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
         style="@style/RoundedCornerButton"
-        app:layout_constraintTop_toBottomOf="@id/set_data_user_accept"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:text="@string/Skip"/>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/set_data_user_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:name="com.startup.eventsearcher.utils.LoadingFragment"
+        tools:layout="@layout/fragment_loading"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

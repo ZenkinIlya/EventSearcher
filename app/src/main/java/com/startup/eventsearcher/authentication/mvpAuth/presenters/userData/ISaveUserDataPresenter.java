@@ -1,6 +1,8 @@
 package com.startup.eventsearcher.authentication.mvpAuth.presenters.userData;
 
+import android.net.Uri;
+
 public interface ISaveUserDataPresenter {
-    void onSetData(boolean saveData, String login, String email, String password,
-                   String firstName, String secondName);
+    void onSetData(boolean saveData, String uid, String email, String password, String login,
+                   Uri uriPhoto);
 }

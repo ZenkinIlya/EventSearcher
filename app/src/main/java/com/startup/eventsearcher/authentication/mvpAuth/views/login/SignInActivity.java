@@ -6,6 +6,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.GetUserDataPresenter;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveUserDataPresenter;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
@@ -15,12 +16,13 @@ import com.startup.eventsearcher.main.MainActivity;
 
 import java.util.Objects;
 
-public class SignInActivity extends AppCompatActivity implements ISignInView{
+public class SignInActivity extends AppCompatActivity implements ISignInView, ISetUserDataView{
 
     private ActivitySignInBinding bind;
 
     private SignInPresenter signInPresenter;
     private SaveUserDataPresenter saveUserDataPresenter;
+    private GetUserDataPresenter getUserDataPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,12 +30,11 @@ public class SignInActivity extends AppCompatActivity implements ISignInView{
         bind = ActivitySignInBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        /*Перед вызовом этого активити, в сплешЭкране проверяется был ли запомнит пользователь
-        * ранее. Если был, то это активити пропускается и происходит вход по данным из sharedPreference*/
-        String email = getIntent().getStringExtra("email");
-        String password = getIntent().getStringExtra("password");
-        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
-        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
+        /*Необходима повторная загрузка данных из SharedPreference полсе IntroductionActivity,
+        * так как SignIn может вызваться после смены пользователя*/
+        getUserDataPresenter = new GetUserDataPresenter(this, new CurrentUser(this));
+        //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
+        getUserDataPresenter.onGetData();
 
         saveUserDataPresenter = new SaveUserDataPresenter(new CurrentUser(this));
 
@@ -67,8 +68,23 @@ public class SignInActivity extends AppCompatActivity implements ISignInView{
     }
 
     @Override
+    public void onSetEmail(String email) {
+        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
+    }
+
+    @Override
+    public void onSetPassword(String password) {
+        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
+    }
+
+    @Override
+    public void onGetUserDataFromSharedPreferenceSuccess() {
+        //Данные загружены
+    }
+
+    @Override
     public void onSuccess() {
-        //Метод вызывается в случае если данные пользователя корректны
+        //Метод вызывается в случае если данные пользователя корректны и аутентификация прошла успешно
 
         boolean saveData = bind.signInSaveData.isChecked();
         String email = Objects.requireNonNull(bind.signInEmail.getEditText()).getText().toString();

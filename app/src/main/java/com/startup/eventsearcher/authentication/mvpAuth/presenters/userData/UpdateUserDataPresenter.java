@@ -37,7 +37,7 @@ public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
                         // Авторизация прошла успешно
                         Log.i(TAG, "updateDisplayNameAndPhoto: success");
                         FirebaseUser user = firebaseAuth.getCurrentUser();
-                        Log.d(TAG, "updateDisplayNameAndPhoto: firebaseUser DisplayNam = " + user.getDisplayName() +
+                        Log.d(TAG, "updateDisplayNameAndPhoto: firebaseUser DisplayName = " + user.getDisplayName() +
                                 ", PhotoUrl = " + user.getPhotoUrl());
                         iSetExtraUserDataView.onSuccess();
                     }

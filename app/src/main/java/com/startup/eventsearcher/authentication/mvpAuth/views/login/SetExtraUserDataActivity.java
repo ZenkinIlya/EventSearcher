@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Toast;
 
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.UpdateUserDataPresenter;
@@ -41,6 +42,7 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
         });
 
         bind.setDataUserAccept.setOnClickListener(view -> {
+            bind.setDataUserLoading.setVisibility(View.VISIBLE);
             updateUserDataPresenter.updateDisplayNameAndPhoto(Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString(),
                     imageUri);
         });
@@ -61,6 +63,7 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
     @Override
     public void onSuccess() {
+        bind.setDataUserLoading.setVisibility(View.INVISIBLE);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -78,6 +81,7 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
     @Override
     public void onError(String message) {
+        bind.setDataUserLoading.setVisibility(View.INVISIBLE);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 

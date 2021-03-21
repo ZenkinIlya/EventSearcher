@@ -1,73 +1,65 @@
 package com.startup.eventsearcher.authentication.mvpAuth.models.user;
 
+import android.net.Uri;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 public class User implements Serializable {
+
+    private String uid;
+    private ConfidentialUserData confidentialUserData;
     private String login;
-    private String password;
-    private String name;
-    private String surname;
-    private String email;
+    private Uri uriPhoto;
 
     public User(){};
 
-    public User(String login, String password, String name, String surname, String email) {
+    public User(String uid, ConfidentialUserData confidentialUserData, String login, Uri uriPhoto) {
+        this.uid = uid;
+        this.confidentialUserData = confidentialUserData;
         this.login = login;
-        this.password = password;
-        this.name = name;
-        this.surname = surname;
-        this.email = email;
+        this.uriPhoto = uriPhoto;
+    }
+
+    public String getUid() {
+        return uid;
+    }
+
+    public void setUid(String uid) {
+        this.uid = uid;
+    }
+
+    public ConfidentialUserData getConfidentialUserData() {
+        return confidentialUserData;
+    }
+
+    public void setConfidentialUserData(ConfidentialUserData confidentialUserData) {
+        this.confidentialUserData = confidentialUserData;
     }
 
     public String getLogin() {
         return login;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getSurname() {
-        return surname;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
     public void setLogin(String login) {
         this.login = login;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public Uri getUriPhoto() {
+        return uriPhoto;
     }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setSurname(String surname) {
-        this.surname = surname;
-    }
-
-    public void setEmail(String email) {
-        this.email = email;
+    public void setUriPhoto(Uri uriPhoto) {
+        this.uriPhoto = uriPhoto;
     }
 
     @Override
     public String toString() {
         return "User{" +
-                "login='" + login + '\'' +
-                ", password='" + password + '\'' +
-                ", name='" + name + '\'' +
-                ", surname='" + surname + '\'' +
-                ", email='" + email + '\'' +
+                "uid='" + uid + '\'' +
+                ", confidentialUserData=" + confidentialUserData +
+                ", login='" + login + '\'' +
+                ", uriPhoto=" + uriPhoto +
                 '}';
     }
 
@@ -75,16 +67,15 @@ public class User implements Serializable {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        User person = (User) o;
-        return login.equals(person.login) &&
-                password.equals(person.password) &&
-                name.equals(person.name) &&
-                surname.equals(person.surname) &&
-                email.equals(person.email);
+        User user = (User) o;
+        return Objects.equals(uid, user.uid) &&
+                Objects.equals(confidentialUserData, user.confidentialUserData) &&
+                Objects.equals(login, user.login) &&
+                Objects.equals(uriPhoto, user.uriPhoto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(login, password, name, surname, email);
+        return Objects.hash(uid, confidentialUserData, login, uriPhoto);
     }
 }

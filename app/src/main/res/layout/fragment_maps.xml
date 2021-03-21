@@ -140,7 +140,7 @@
         android:id="@+id/map_progress_bar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="visible"
+        android:visibility="invisible"
         android:name="com.startup.eventsearcher.utils.LoadingFragment"
         tools:layout="@layout/fragment_loading"/>
 

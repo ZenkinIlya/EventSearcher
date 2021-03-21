@@ -19,9 +19,13 @@ import com.startup.eventsearcher.authentication.mvpAuth.views.login.SignInActivi
 import com.startup.eventsearcher.databinding.ActivityIntroductionBinding;
 import com.startup.eventsearcher.main.MainActivity;
 
-/*1. Получение данных пользователя из SharedPreference
-* 2. Проверка корректности данных и попытка входа пользователя
-* 3. При не удаче пользователь попадает в SignIn, в противном случае в Main*/
+/*1. Проверка аутентифицирован ли пользователь в Firebase checkLogin()
+* 2. Если пользователь аутентифицирован в Firebase то происходит проверка - имеет ли пользователь
+* логин и фото. Если да, то переходим в MainActivity, в противном случае в SetExtraUserDataActivity.
+* Если пользователь не аутентифицирован, то получаем данные из SharedPreference
+* 3. Запуск onLogin() - верификация данных и аутентификация
+* 3. При не удаче пользователь попадает в SignInActivity, в противном случае повтор п.2
+* */
 public class IntroductionActivity extends AppCompatActivity implements ISetUserDataView, ISignInView {
 
     ActivityIntroductionBinding bind;
@@ -38,19 +42,22 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
         setContentView(bind.getRoot());
 
         getUserDataPresenter = new GetUserDataPresenter(this, new CurrentUser(this));
-        //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
-        getUserDataPresenter.onGetData();
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         signInPresenter = new SignInPresenter(this, new UserDataVerification(this));
         signInPresenter.checkLogin();
+
     }
 
     @Override
-    public void onBackPressed() {
-        super.onBackPressed();
-        System.exit(0);
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onResume() {
+        //Запуск анимации
+        super.onResume();
     }
 
     @Override
@@ -64,11 +71,18 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
     }
 
     @Override
+    public void onGetUserDataFromSharedPreferenceSuccess() {
+        signInPresenter.onLogin(email, password);
+    }
+
+    @Override
     public void onEmailError(String message) {
+        //onErrorVerification
     }
 
     @Override
     public void onPasswordError(String message) {
+        //onErrorVerification
     }
 
     @Override
@@ -82,8 +96,6 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(this, SignInActivity.class);
-        intent.putExtra("email", email);
-        intent.putExtra("password", password);
         startActivity(intent);
         finish();
     }
@@ -91,8 +103,6 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
     @Override
     public void onErrorVerification() {
         Intent intent = new Intent(this, SignInActivity.class);
-        intent.putExtra("email", "");
-        intent.putExtra("password", "");
         startActivity(intent);
         finish();
     }
@@ -102,13 +112,13 @@ public class IntroductionActivity extends AppCompatActivity implements ISetUserD
         if (isLogin){
             exitFromActivityWithSuccessLogin();
         }else {
-            signInPresenter.onLogin(email, password);
+            //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
+            getUserDataPresenter.onGetData();
         }
     }
 
-
     private void exitFromActivityWithSuccessLogin(){
-        //Если даный пользователь имеет логин и фото, то переходим в MainActivity
+        //Если данный пользователь имеет логин и фото, то переходим в MainActivity
         if (signInPresenter.getFirebaseUser().getDisplayName() != null &&
                 !signInPresenter.getFirebaseUser().getDisplayName().isEmpty() &&
                 signInPresenter.getFirebaseUser().getPhotoUrl() != null){

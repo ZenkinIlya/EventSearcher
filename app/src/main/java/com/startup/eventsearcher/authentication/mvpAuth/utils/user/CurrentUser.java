@@ -32,8 +32,7 @@ public class CurrentUser implements ICurrentUser {
             Log.w(TAG, "getCurrentUserFromJSON: Не удалось получить данные пользователя из SharedPreference");
             currentUserFromJson = new User();
         }
-        Log.d(TAG, "getCurrentUserFromJSON " +context.getClass().getSimpleName()+
-                " : currentUser = " + Objects.requireNonNull(currentUserFromJson).toString());
+        Log.d(TAG, "getCurrentUserFromJSON: User = " + Objects.requireNonNull(currentUserFromJson).toString());
         return currentUserFromJson;
     }
 
@@ -44,7 +43,6 @@ public class CurrentUser implements ICurrentUser {
                 "CurrentUser",
                 "currentUserKey",
                 user);
-        Log.d(TAG, "saveCurrentUserToJSON " +context.getClass().getSimpleName()+
-                " : user = " + user.toString());
+        Log.d(TAG, "saveCurrentUserToJSON: User = " + user.toString());
     }
 }
