@@ -1,22 +1,18 @@
 package com.startup.eventsearcher.authentication.mvpAuth.models.user;
 
-import android.net.Uri;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class User implements Serializable {
 
     private String uid;
-    private ConfidentialUserData confidentialUserData;
     private String login;
     private String uriPhoto;
 
     public User(){};
 
-    public User(String uid, ConfidentialUserData confidentialUserData, String login, String uriPhoto) {
+    public User(String uid, String login, String uriPhoto) {
         this.uid = uid;
-        this.confidentialUserData = confidentialUserData;
         this.login = login;
         this.uriPhoto = uriPhoto;
     }
@@ -27,14 +23,6 @@ public class User implements Serializable {
 
     public void setUid(String uid) {
         this.uid = uid;
-    }
-
-    public ConfidentialUserData getConfidentialUserData() {
-        return confidentialUserData;
-    }
-
-    public void setConfidentialUserData(ConfidentialUserData confidentialUserData) {
-        this.confidentialUserData = confidentialUserData;
     }
 
     public String getLogin() {
@@ -57,7 +45,6 @@ public class User implements Serializable {
     public String toString() {
         return "User{" +
                 "uid='" + uid + '\'' +
-                ", confidentialUserData=" + confidentialUserData +
                 ", login='" + login + '\'' +
                 ", uriPhoto=" + uriPhoto +
                 '}';
@@ -69,13 +56,12 @@ public class User implements Serializable {
         if (o == null || getClass() != o.getClass()) return false;
         User user = (User) o;
         return Objects.equals(uid, user.uid) &&
-                Objects.equals(confidentialUserData, user.confidentialUserData) &&
                 Objects.equals(login, user.login) &&
                 Objects.equals(uriPhoto, user.uriPhoto);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(uid, confidentialUserData, login, uriPhoto);
+        return Objects.hash(uid, login, uriPhoto);
     }
 }

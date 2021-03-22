@@ -2,31 +2,30 @@ package com.startup.eventsearcher.authentication.mvpAuth.views.login;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
-import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.GetUserDataPresenter;
-import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveUserDataPresenter;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.SignInPresenter;
+import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.LoadConfidentialUserDataPresenter;
+import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveConfidentialUserDataPresenter;
+import com.startup.eventsearcher.authentication.mvpAuth.utils.user.ProviderConfidentialUserData;
+import com.startup.eventsearcher.authentication.mvpAuth.utils.user.UserDataVerification;
 import com.startup.eventsearcher.databinding.ActivitySignInBinding;
 import com.startup.eventsearcher.main.MainActivity;
 
 import java.util.Objects;
 
-public class SignInActivity extends AppCompatActivity implements ISignInView, ISetUserDataView{
+/*1. Получаем email и password из SharedPreference. */
 
-    private static final String TAG = "tgSignInActivity";
+public class SignInActivity extends AppCompatActivity implements ISignInView, ISetUserDataView {
+
+    private static final String TAG = "tgSignInAct";
     private ActivitySignInBinding bind;
 
     private SignInPresenter signInPresenter;
-    private SaveUserDataPresenter saveUserDataPresenter;
-    private GetUserDataPresenter getUserDataPresenter;
-    private User user;
+    private SaveConfidentialUserDataPresenter saveConfidentialUserDataPresenter;
+    private LoadConfidentialUserDataPresenter getConfidentialUserDataPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,27 +33,26 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         bind = ActivitySignInBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        /*Необходима повторная загрузка данных из SharedPreference полсе IntroductionActivity,
-        * так как SignIn может вызваться после смены пользователя*/
-        getUserDataPresenter = new GetUserDataPresenter(this, new CurrentUser(this));
-        //Получаем данные пользователя, которые были сохранены в SharedPreference ранее (email, password)
-        getUserDataPresenter.onGetData();
+        getConfidentialUserDataPresenter =
+                new LoadConfidentialUserDataPresenter(this, new ProviderConfidentialUserData(this));
+        //Получаем email и пароль из SharedPreference и заполняем поля
+        getConfidentialUserDataPresenter.onGetData();
 
-        saveUserDataPresenter = new SaveUserDataPresenter(new CurrentUser(this));
+        saveConfidentialUserDataPresenter = new SaveConfidentialUserDataPresenter(new ProviderConfidentialUserData(this));
 
         signInPresenter = new SignInPresenter(this, new UserDataVerification(this));
-        //Проверка авторизован ли пользователь
-        signInPresenter.checkLogin();
 
         componentListener();
     }
 
     private void componentListener() {
+        //Вход
         bind.signInToComeIn.setOnClickListener(view -> {
-            signInPresenter.onLogin(Objects.requireNonNull(bind.signInEmail.getEditText()).getText().toString(),
+            signInPresenter.isUserSignIn(Objects.requireNonNull(bind.signInEmail.getEditText()).getText().toString(),
                     Objects.requireNonNull(bind.signInPassword.getEditText()).getText().toString());
         });
 
+        //Регистрация
         bind.signInRegistration.setOnClickListener(view -> {
             Intent intent = new Intent(this, SignUpActivity.class);
             startActivity(intent);
@@ -72,21 +70,6 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
     }
 
     @Override
-    public void onSetEmail(String email) {
-        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
-    }
-
-    @Override
-    public void onSetPassword(String password) {
-        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
-    }
-
-    @Override
-    public void onGetUserDataFromSharedPreferenceSuccess(User user) {
-        this.user = user;
-    }
-
-    @Override
     public void onSuccess() {
         //Метод вызывается в случае если данные пользователя корректны и аутентификация прошла успешно
 
@@ -94,13 +77,8 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         String email = Objects.requireNonNull(bind.signInEmail.getEditText()).getText().toString();
         String password = Objects.requireNonNull(bind.signInPassword.getEditText()).getText().toString();
 
-        //Сохранение данных пользователя
-        saveUserDataPresenter.onSetData(saveData,
-                signInPresenter.getFirebaseUser().getUid(),
-                email,
-                password,
-                signInPresenter.getFirebaseUser().getDisplayName(),
-                signInPresenter.getFirebaseUser().getPhotoUrl().toString());
+        //Сохранение конфиденциальных данных пользователя
+        saveConfidentialUserDataPresenter.onSetData(saveData, email, password);
 
         exitFromActivity();
     }
@@ -111,29 +89,27 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
     }
 
     @Override
-    public void onErrorVerification() {
-        //ничего не делаю, все ошибки уже выведены под email password
+    public void onSetEmail(String email) {
+        Objects.requireNonNull(bind.signInEmail.getEditText()).setText(email);
     }
 
     @Override
-    public void isLogin(boolean isLogin) {
-        if (isLogin){
-            exitFromActivity();
-        }
+    public void onSetPassword(String password) {
+        Objects.requireNonNull(bind.signInPassword.getEditText()).setText(password);
     }
 
-    private void exitFromActivity(){
-        //Если даный пользователь имеет логин и фото, то переходим в MainActivity
-        if (signInPresenter.getFirebaseUser().getDisplayName() != null &&
-                !signInPresenter.getFirebaseUser().getDisplayName().isEmpty() &&
-                signInPresenter.getFirebaseUser().getPhotoUrl() != null){
+    @Override
+    public void onCheckUserHaveLoginAndPhoto(boolean userHaveLoginAndPhoto) {
+        if (userHaveLoginAndPhoto){
             Intent intent = new Intent(this, MainActivity.class);
             startActivity(intent);
         }else {
             Intent intent = new Intent(this, SetExtraUserDataActivity.class);
-            intent.putExtra("user", user);
-            Log.d(TAG, "exitFromActivity: user = " +user.toString());
             startActivity(intent);
         }
+    }
+
+    private void exitFromActivity(){
+        signInPresenter.doesUserHaveLoginAndPhoto();
     }
 }

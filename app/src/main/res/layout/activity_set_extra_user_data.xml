@@ -55,16 +55,8 @@
         style="@style/RoundedCornerButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/set_data_user_skip"
-        android:text="@string/apply"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/set_data_user_skip"
-        style="@style/RoundedCornerButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/Skip"/>
+        android:text="@string/apply"/>
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/set_data_user_loading"

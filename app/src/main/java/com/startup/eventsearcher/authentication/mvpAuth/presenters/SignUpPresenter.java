@@ -11,10 +11,10 @@ import com.startup.eventsearcher.authentication.mvpAuth.views.login.ISignUpView;
 
 public class SignUpPresenter implements ISignUpPresenter{
 
-    private static final String TAG = "tgSignUpPresenter";
-    private ISignUpView iSignUpView;
-    private IUserDataVerification iUserDataVerification;
-    private FirebaseAuth firebaseAuth;
+    private static final String TAG = "tgSignUpPres";
+    private final ISignUpView iSignUpView;
+    private final IUserDataVerification iUserDataVerification;
+    private final FirebaseAuth firebaseAuth;
 
     public SignUpPresenter(ISignUpView iSignUpView, IUserDataVerification iUserDataVerification) {
         this.iSignUpView = iSignUpView;
@@ -90,8 +90,6 @@ public class SignUpPresenter implements ISignUpPresenter{
         if (verificationData(email, password, confirmPassword)){
             //Регистрация пользователя в Firebase
             createUserWithEmailAndPassword(email, password);
-        }else {
-            iSignUpView.onErrorVerification();
         }
     }
 }

@@ -1,35 +1,28 @@
 package com.startup.eventsearcher.authentication.mvpAuth.views.login;
 
-import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
 
-import com.startup.eventsearcher.authentication.mvpAuth.models.user.User;
-import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.SaveUserDataPresenter;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.startup.eventsearcher.authentication.mvpAuth.presenters.userData.UpdateUserDataPresenter;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.user.CurrentUser;
 import com.startup.eventsearcher.databinding.ActivitySetExtraUserDataBinding;
 import com.startup.eventsearcher.main.MainActivity;
 import com.startup.eventsearcher.utils.Config;
 
-import java.io.Serializable;
 import java.util.Objects;
 
 public class SetExtraUserDataActivity extends AppCompatActivity implements ISetExtraUserDataView {
 
-    private static final String TAG = "tgSetExtraUserData";
+    private static final String TAG = "tgSetExtraUserDataAct";
     private ActivitySetExtraUserDataBinding bind;
 
     private UpdateUserDataPresenter updateUserDataPresenter;
-    private SaveUserDataPresenter saveUserDataPresenter;
     private Uri imageUri;
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,12 +30,7 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
         bind = ActivitySetExtraUserDataBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        user = (User) getIntent().getSerializableExtra("user");
-        Log.d(TAG, "onCreate: user = " +user.toString());
-
         updateUserDataPresenter = new UpdateUserDataPresenter(this);
-
-        saveUserDataPresenter = new SaveUserDataPresenter(new CurrentUser(this));
 
         componentListener();
     }
@@ -60,13 +48,11 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
         //Применить изменения
         bind.setDataUserAccept.setOnClickListener(view -> {
             bind.setDataUserLoading.setVisibility(View.VISIBLE);
-            updateUserDataPresenter.updateDisplayNameAndPhoto(Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString(),
-                    imageUri);
-        });
-
-        //Пропустить шаг установки логина и изображения
-        bind.setDataUserSkip.setOnClickListener(view -> {
-            updateUserDataPresenter.updateDisplayNameAndPhoto("no_name", null);
+            String displayName = Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString();
+            if (displayName.isEmpty()){
+                displayName = "no_name";
+            }
+            updateUserDataPresenter.updateDisplayNameAndPhoto(displayName, imageUri);
         });
     }
 
@@ -81,12 +67,6 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
     @Override
     public void onSuccess() {
-        saveUserDataPresenter.onSetData(true,
-                updateUserDataPresenter.getFirebaseUser().getUid(),
-                user.getConfidentialUserData().getEmail(),
-                user.getConfidentialUserData().getPassword(),
-                updateUserDataPresenter.getFirebaseUser().getDisplayName(),
-                updateUserDataPresenter.getFirebaseUser().getPhotoUrl().toString());
         bind.setDataUserLoading.setVisibility(View.INVISIBLE);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);

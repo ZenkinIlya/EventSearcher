@@ -59,9 +59,4 @@ public class SignUpActivity extends AppCompatActivity implements ISignUpView {
     public void onErrorFirebase(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
-
-    @Override
-    public void onErrorVerification() {
-        //ничего не делаю, все ошибки уже выведены под email password passwordConfirm
-    }
 }

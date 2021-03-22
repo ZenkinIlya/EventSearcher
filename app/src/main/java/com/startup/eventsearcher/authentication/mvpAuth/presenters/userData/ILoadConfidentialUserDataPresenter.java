@@ -1,5 +1,5 @@
 package com.startup.eventsearcher.authentication.mvpAuth.presenters.userData;
 
-public interface IGetUserDataPresenter {
+public interface ILoadConfidentialUserDataPresenter {
     void onGetData();
 }

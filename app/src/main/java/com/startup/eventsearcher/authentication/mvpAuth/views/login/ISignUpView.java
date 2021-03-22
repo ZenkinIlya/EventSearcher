@@ -6,5 +6,4 @@ public interface ISignUpView {
     void onConfirmPassword(String message);
     void onSuccess();
     void onErrorFirebase(String message);
-    void onErrorVerification();
 }

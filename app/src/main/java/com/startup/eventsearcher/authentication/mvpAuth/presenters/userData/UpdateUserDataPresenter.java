@@ -7,14 +7,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.UserProfileChangeRequest;
 import com.startup.eventsearcher.authentication.mvpAuth.utils.firebase.FirebaseErrorHandler;
-import com.startup.eventsearcher.authentication.mvpAuth.utils.firebase.TypeViewOutputError;
 import com.startup.eventsearcher.authentication.mvpAuth.views.login.ISetExtraUserDataView;
 
 import java.util.Objects;
 
 public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
 
-    private static final String TAG = "tgUpdateUserData";
+    private static final String TAG = "tgUpdateUserDataPres";
+
     private final ISetExtraUserDataView iSetExtraUserDataView;
     private final FirebaseAuth firebaseAuth;
     private final FirebaseUser firebaseUser;
@@ -24,10 +24,6 @@ public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
 
         firebaseAuth = FirebaseAuth.getInstance();
         firebaseUser = firebaseAuth.getCurrentUser();
-    }
-
-    public FirebaseUser getFirebaseUser() {
-        return firebaseUser;
     }
 
     @Override
