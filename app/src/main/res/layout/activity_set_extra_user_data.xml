@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    tools:context=".authentication.mvpAuth.views.login.SetExtraUserDataActivity">
+    tools:context=".authentication.views.login.SetExtraUserDataActivity">
 
     <LinearLayout
         android:id="@+id/set_data_user_data"

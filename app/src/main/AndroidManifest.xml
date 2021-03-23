@@ -13,12 +13,12 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".authentication.mvpAuth.views.login.SetExtraUserDataActivity"></activity>
+        <activity android:name=".authentication.views.login.SetExtraUserDataActivity"></activity>
         <activity
-            android:name=".authentication.mvpAuth.views.login.SignUpActivity"
+            android:name=".authentication.views.login.SignUpActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".authentication.mvpAuth.views.login.SignInActivity"
+            android:name=".authentication.views.login.SignInActivity"
             android:theme="@style/FullScreen" />
         <activity
             android:name=".main.ui.events.filter.FilterActivity"
@@ -36,10 +36,7 @@
             android:name=".utils.SuccessActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".authentication.LoginActivity"
-            android:theme="@style/FullScreen" />
-        <activity
-            android:name=".authentication.mvpAuth.views.introduction.IntroductionActivity"
+            android:name=".authentication.views.introduction.IntroductionActivity"
             android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

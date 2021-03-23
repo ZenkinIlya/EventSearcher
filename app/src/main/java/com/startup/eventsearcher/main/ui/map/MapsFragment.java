@@ -22,7 +22,6 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
@@ -40,7 +39,7 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class MapsFragment extends Fragment implements MapHandler.Callback{
+public class MapsFragment extends Fragment implements IMapHandler{
 
     private static final String TAG = "myMap";
 
@@ -48,17 +47,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
 
     private GoogleMap map;
     private boolean flgFirstEnterToMapFragment = true;
-
-
-    public static MapsFragment newInstance(String param1, String param2) {
-        Log.d(TAG, "newInstance:");
-        MapsFragment fragment = new MapsFragment();
-        Bundle args = new Bundle();
-        args.putString("ARG_PARAM1", param1);
-        args.putString("ARG_PARAM2", param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private MapHandler mapHandler;
 
     @Nullable
     @Override
@@ -69,7 +58,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
         bind = FragmentMapsBinding.inflate(inflater, container, false);
 
         bind.mapSearchView.setOnQueryTextListener(onQueryTextListenerSearchView);
-        MapHandler.registerMapHandlerCallBack(this);
+        mapHandler = new MapHandler(this);
 
         //TODO Получаем с сервера список эвентов
 
@@ -119,10 +108,10 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
         super.onStart();
         Log.d(TAG, "onStart()");
         if (checkMapServices()) {
-            if (MapHandler.isLocationPermissionGranted()) {
+            if (mapHandler.isLocationPermissionGranted()) {
                 initMap();
             } else {
-                MapHandler.getLocationPermission(getContext());
+                mapHandler.getLocationPermission(getContext());
             }
         }
         Log.d(TAG, "onStart: end progressbar");
@@ -166,16 +155,17 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     }
 
     private boolean checkMapServices() {
-        if (MapHandler.isServicesOK(getContext())) {
-            if (MapHandler.isMapsEnabled(requireContext())) {
+        if (mapHandler.isServicesOK(getContext())) {
+            if (mapHandler.isMapsEnabled(requireContext())) {
                 return true;
             }else {
-                MapHandler.buildAlertMessageNoGps(getContext());
+                mapHandler.buildAlertMessageNoGps(getContext());
             }
         }
         return false;
     }
 
+    //Ответ после PERMISSIONS_REQUEST_ENABLE_GPS, CREATE_EVENT и при выходе из просмотра эвента
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -185,12 +175,12 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                 switch (requestCode) {
                     case Config.PERMISSIONS_REQUEST_ENABLE_GPS: {
                         Log.d(TAG, "onActivityResult: PERMISSIONS_REQUEST_ENABLE_GPS");
-                        if (MapHandler.isLocationPermissionGranted()) {
+                        if (mapHandler.isLocationPermissionGranted()) {
                             Log.d(TAG, "onActivityResult: Доступ к геолокации предоставлен");
                             initMap();
                         } else {
                             Log.d(TAG, "onActivityResult: Доступ к геолокации НЕ предоставлен");
-                            MapHandler.getLocationPermission(getContext());
+                            mapHandler.getLocationPermission(getContext());
                         }
                         break;
                     }
@@ -221,6 +211,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
 
     //Добавление эвента / вызывать только после инициализаци map в onMapReady
     private void addPlace() {
+        //Нажатие на кнопку "Дбоавить эвент" - режим добавление эвента
         bind.mapFabShowMarker.setOnClickListener(view -> {
             if (bind.mapAddEventMarker.getVisibility() == View.INVISIBLE){
                 bind.mapAddEventMarker.setVisibility(View.VISIBLE);
@@ -237,10 +228,11 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
             }
         });
 
+        //Добавить эвент с координатой взятой с центра экрана
         bind.mapAddEvent.setOnClickListener(view -> {
             LatLng target = map.getCameraPosition().target;
             try {
-                Address address = MapHandler.getAddress(getContext(), target);
+                Address address = mapHandler.getAddress(getContext(), target);
                 Intent intent = new Intent(getContext(), EventCreatorActivity.class);
                 intent.putExtra("Address", address);
                 startActivityForResult(intent, Config.CREATE_EVENT);
@@ -252,16 +244,17 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
         });
     }
 
+    //Вызов после запроса доступа к геолокации
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         switch (requestCode) {
             case Config.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION: {
                 if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "onRequestPermissionsResult: Доступ к геолокации предоставлен");
-                    MapHandler.setLocationPermissionGranted(true);
+                    mapHandler.setLocationPermissionGranted(true);
                 } else {
                     Log.d(TAG, "onRequestPermissionsResult: Доступ к геолокации отклонен");
-                    MapHandler.setLocationPermissionGranted(false);
+                    mapHandler.setLocationPermissionGranted(false);
                 }
                 break;
             }
@@ -277,12 +270,14 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
         }
     }
 
+    //Переход в системные настройки для включения доступа локации
     @Override
     public void startActivity(Intent intent, int permissionsRequest) {
         Log.d(TAG, "startActivity: callback");
         startActivityForResult(intent, permissionsRequest);
     }
 
+    //Запрос разрешения на геолокацию
     @Override
     public void requestPermissionsHandler(String[] strings, int permissionsRequest) {
         Log.d(TAG, "requestPermissionsHandler: callback");
@@ -298,7 +293,6 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
         }
     }
 
-
     private final OnMapReadyCallback callback = new OnMapReadyCallback() {
         @Override
         public void onMapReady(GoogleMap googleMap) {
@@ -306,6 +300,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
                 map.clear();
             }
             map = googleMap;
+
             map.setOnMarkerClickListener(callbackMarkerClickListener);
             //Инициализация добавления места
             addPlace();
@@ -316,10 +311,10 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
             //Загрузка эвентов из json
             EventsList.getEventArrayListFromJSON(getContext());
             //Расставляем все эвент-маркеры на карте
-            MapHandler.setEventMarkerOnMap(map);
+            mapHandler.setEventMarkerOnMap(map);
             try {
-                if (MapHandler.isLocationPermissionGranted()) {
-                    MapHandler.getDeviceLocation(getContext());
+                if (mapHandler.isLocationPermissionGranted()) {
+                    mapHandler.getDeviceLocation(getContext());
                     Log.d(TAG, "OnMapReadyCallback: Показ интерфейса геолокации");
                     map.setMyLocationEnabled(true);
                     map.getUiSettings().setMyLocationButtonEnabled(false);
@@ -339,7 +334,7 @@ public class MapsFragment extends Fragment implements MapHandler.Callback{
     private void initUiMap() {
         bind.mapLocation.setOnClickListener(view -> {
             flgFirstEnterToMapFragment = true;  //при false локация устройства не будет показана
-            MapHandler.getDeviceLocation(getContext());
+            mapHandler.getDeviceLocation(getContext());
         });
 
         bind.mapZoomIn.setOnClickListener(view -> map.animateCamera(CameraUpdateFactory.zoomIn()));
