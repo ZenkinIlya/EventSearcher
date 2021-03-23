@@ -29,6 +29,7 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventsList;
+import com.startup.eventsearcher.main.ui.map.IMapHandler;
 import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
@@ -40,31 +41,24 @@ public class MapHandler {
 
     private static final String TAG = "MapHandler";
 
-    public interface Callback{
-        void initMap();
-        void startActivity(Intent intent, int permissionsRequest);
-        void requestPermissionsHandler(String[] strings, int permissionsRequest);
-        void returnDeviceLocation(LatLng latLng);
+    private IMapHandler iMapHandler;
+
+    public MapHandler(IMapHandler iMapHandler) {
+        this.iMapHandler = iMapHandler;
     }
 
-    static Callback callback;
+    private boolean locationPermissionGranted = false;
 
-    public static void registerMapHandlerCallBack(Callback callback){
-        MapHandler.callback = callback;
-    }
-
-    private static boolean locationPermissionGranted = false;
-
-    public static boolean isLocationPermissionGranted() {
+    public boolean isLocationPermissionGranted() {
         return locationPermissionGranted;
     }
 
-    public static void setLocationPermissionGranted(boolean locationPermissionGranted) {
-        MapHandler.locationPermissionGranted = locationPermissionGranted;
+    public void setLocationPermissionGranted(boolean locationPermissionGranted) {
+        this.locationPermissionGranted = locationPermissionGranted;
     }
 
     //Проверка доступны ли google services устройству
-    public static boolean isServicesOK(Context context) {
+    public boolean isServicesOK(Context context) {
         Log.d(TAG, "isServicesOK: Проверка доступны ли google services устройству");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);
@@ -84,7 +78,7 @@ public class MapHandler {
     }
 
     //Включена ли на устройстве геолокация
-    public static boolean isMapsEnabled(Context context) {
+    public boolean isMapsEnabled(Context context) {
         final LocationManager manager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
         if (!manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
             Log.d(TAG, "isMapsEnabled: На устройстве НЕ включена геолокация");
@@ -94,7 +88,7 @@ public class MapHandler {
     }
 
     //Диалоговое окно включения локации на устройстве
-    public static void buildAlertMessageNoGps(Context context) {
+    public void buildAlertMessageNoGps(Context context) {
         final AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setMessage("Для работы приложения необоходимо включить геолокацию, включить?")
                 .setNegativeButton("Нет, спасибо", new DialogInterface.OnClickListener() {
@@ -103,38 +97,38 @@ public class MapHandler {
                         В этом случае нет возможности работать с геолокацией пользователя,
                         но добавить эвент возможно*/
                         Log.d(TAG, "buildAlertMessageNoGps: Отказ о включении геолокации");
-                        callback.initMap();
+                        iMapHandler.initMap();
                     }
                 })
                 .setPositiveButton("Да", new DialogInterface.OnClickListener() {
                     public void onClick(@SuppressWarnings("unused") final DialogInterface dialog, @SuppressWarnings("unused") final int id) {
                         Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        callback.startActivity(enableGpsIntent, Config.PERMISSIONS_REQUEST_ENABLE_GPS);
+                        iMapHandler.startActivity(enableGpsIntent, Config.PERMISSIONS_REQUEST_ENABLE_GPS);
                     }
                 });
         final AlertDialog alert = builder.create();
         alert.show();
     }
 
-    public static void getLocationPermission(Context context) {
+    public void getLocationPermission(Context context) {
         //Проверка разрешения на геолокацию
         locationPermissionGranted = false;
         if (ActivityCompat.checkSelfPermission(context,
                 android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             //Если НЕТ разрешения, то спрашиваем разрешение
             Log.d(TAG, "getLocationPermission: Запрос разрешения геолокации");
-            callback.requestPermissionsHandler(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
+            iMapHandler.requestPermissionsHandler(new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION},
                     Config.PERMISSIONS_REQUEST_ACCESS_FINE_LOCATION);
         } else {
             //Если есть разрешение, то ставим флаг в true
             Log.d(TAG, "getLocationPermission: Доступ к геолокации был предоставлен ранее");
             locationPermissionGranted = true;
-            callback.initMap();
+            iMapHandler.initMap();
         }
     }
 
     //Получение адреса метки пользователя
-    public static Address getAddress(Context context, LatLng latLng) throws IOException {
+    public Address getAddress(Context context, LatLng latLng) throws IOException {
         Geocoder geocoder = new Geocoder(context, Locale.getDefault());
         List<Address> addresses = geocoder.getFromLocation(latLng.latitude, latLng.longitude, 1);
         Address addressObject = addresses.get(0);
@@ -148,7 +142,7 @@ public class MapHandler {
     }
 
     //Установка эвент-маркеров на карте
-    public static void setEventMarkerOnMap(GoogleMap map) {
+    public void setEventMarkerOnMap(GoogleMap map) {
         Log.d(TAG, "setEventMarkerOnMap: ");
         Log.d(TAG, "setEventMarkerOnMap: eventArrayList = " + EventsList.getEventArrayList().toString());
         for (Event event: EventsList.getEventArrayList()){
@@ -162,7 +156,7 @@ public class MapHandler {
         }
     }
 
-    public static void getDeviceLocation(Context context) {
+    public void getDeviceLocation(Context context) {
         FusedLocationProviderClient fusedLocationProviderClient = LocationServices.getFusedLocationProviderClient(context);
         try {
             Task<Location> location = fusedLocationProviderClient.getLastLocation();
@@ -176,7 +170,7 @@ public class MapHandler {
                             Log.d(TAG, "getDeviceLocation: Текущая геолокация определена");
                             LatLng latLng = new LatLng(currentLocation.getLatitude(),
                                     currentLocation.getLongitude());
-                            callback.returnDeviceLocation(latLng);
+                            iMapHandler.returnDeviceLocation(latLng);
                         } else {
                             Log.d(TAG, "getDeviceLocation: Текущая геолокация НЕ определена");
                             Toast.makeText(context, "Текущая геолокация не определена", Toast.LENGTH_LONG).show();
