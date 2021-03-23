@@ -21,16 +21,19 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentSetLocationEventBinding;
+import com.startup.eventsearcher.main.ui.map.IMapHandler;
 import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
 import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
 
-public class SetLocationEventFragment extends DialogFragment implements OnMapReadyCallback, MapHandler.Callback {
+public class SetLocationEventFragment extends DialogFragment implements OnMapReadyCallback, IMapHandler {
 
     private static final String TAG = "SetLocationEvent";
 
     private FragmentSetLocationEventBinding bind;
+
+    private MapHandler mapHandler;
 
     interface Callback{
         void returnAddress(Address address);
@@ -69,7 +72,7 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        MapHandler.registerMapHandlerCallBack(this);
+        mapHandler = new MapHandler(this);
 
         address = requireArguments().getParcelable("address");
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager()
@@ -87,7 +90,7 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
         bind.fragmentSetLocationApply.setOnClickListener(view -> {
             LatLng target = map.getCameraPosition().target;
             try {
-                Address address = MapHandler.getAddress(getContext(), target);
+                Address address = mapHandler.getAddress(getContext(), target);
                 callback.returnAddress(address);
             } catch (IOException e) {
                 Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
@@ -105,7 +108,7 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
         //Создание эвента без предварительного выбора адреса
         if (address == null){
             //Получаем геолокацию пользователя
-            MapHandler.getDeviceLocation(getContext());
+            mapHandler.getDeviceLocation(getContext());
         }else {
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             MarkerOptions markerOptions = new MarkerOptions();

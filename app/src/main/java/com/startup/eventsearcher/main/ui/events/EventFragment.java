@@ -51,21 +51,12 @@ import static android.app.Activity.RESULT_OK;
 
 public class EventFragment extends Fragment {
 
-    private static final String TAG = "myEventList";
+    private static final String TAG = "tgEventFragment";
 
     private FragmentEventListBinding bind;
 
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private static FragmentManager fragmentManager;
-
-    public static EventFragment newInstance(String param1, String param2) {
-        EventFragment fragment = new EventFragment();
-        Bundle args = new Bundle();
-        args.putString("ARG_PARAM1", param1);
-        args.putString("ARG_PARAM2", param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -109,7 +100,7 @@ public class EventFragment extends Fragment {
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-        Log.d(TAG, "onAttach() :" +this);
+        Log.d(TAG, "onAttach() :");
     }
 
     @Override
@@ -152,19 +143,19 @@ public class EventFragment extends Fragment {
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "onDestroyView()");
+        Log.w(TAG, "onDestroyView()");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy()");
+        Log.w(TAG, "onDestroy()");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG, "onDetach()");
+        Log.w(TAG, "onDetach()");
     }
 
     @Override

@@ -6,37 +6,26 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentTransaction;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityMainBinding;
-import com.startup.eventsearcher.main.ui.events.EventFragment;
-import com.startup.eventsearcher.main.ui.map.MapsFragment;
-import com.startup.eventsearcher.main.ui.profile.ProfileFragment;
-import com.startup.eventsearcher.main.ui.subscribe.SubscribeFragment;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String TAG = "myMain";
+    private static final String TAG = "tgMainAct";
 
     private ActivityMainBinding bind;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        Design.setStatusBarGradient(this);
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        bind.mainBottomNavView.setOnNavigationItemSelectedListener(navigationItemSelectedListener);
-        openFragment(MapsFragment.newInstance("", ""));
-
         if (savedInstanceState == null){
-//            setupButtonNavigationBar();
+            setupButtonNavigationBar();
         }
     }
 
@@ -91,38 +80,16 @@ public class MainActivity extends AppCompatActivity {
         alertDialog.show();
     }
 
-    BottomNavigationView.OnNavigationItemSelectedListener navigationItemSelectedListener =
-            item -> {
-                switch (item.getItemId()) {
-                    case R.id.nav_item_map:
-                        openFragment(MapsFragment.newInstance("", ""));
-                        return true;
-                    case R.id.nav_item_events:
-                        openFragment(EventFragment.newInstance("", ""));
-                        return true;
-                    case R.id.nav_item_favorite:
-                        openFragment(SubscribeFragment.newInstance("", ""));
-                        return true;
-                    case R.id.nav_item_profile:
-                        openFragment(ProfileFragment.newInstance("", ""));
-                        return true;
-                }
-                return false;
-            };
-
-    public void openFragment(Fragment fragment) {
-        FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
-        transaction.replace(bind.mainFragmentContainer.getId(), fragment);
-        transaction.addToBackStack(null);
-        transaction.commit();
-    }
-
     private void setupButtonNavigationBar() {
         NavHostFragment navHostFragment = (NavHostFragment) getSupportFragmentManager().findFragmentById(bind.mainFragmentContainer.getId());
         if (navHostFragment != null) {
             final NavController navController = navHostFragment.getNavController();
+
             bind.mainBottomNavView.setOnNavigationItemSelectedListener(item -> {
+                //Отмечаем иконку на панели
                 bind.mainBottomNavView.getMenu().findItem(item.getItemId()).setChecked(true);
+                //Очистка бекстека
+                navController.popBackStack();
                 switch (item.getItemId()){
                     case R.id.nav_item_map:
                         navController.navigate(R.id.mapsFragment);
@@ -145,6 +112,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onRestoreInstanceState(@NonNull Bundle savedInstanceState) {
         super.onRestoreInstanceState(savedInstanceState);
-//        setupButtonNavigationBar();
+        setupButtonNavigationBar();
     }
 }

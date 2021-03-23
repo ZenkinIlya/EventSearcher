@@ -10,12 +10,10 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.App;
-import com.startup.eventsearcher.authentication.connectionToServer.test.TestRequester;
 import com.startup.eventsearcher.databinding.ActivityEventCreatorBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
@@ -152,10 +150,6 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
                 Thread threadRequestToServer = new Thread(() -> {
                     try {
                         //TODO Отправка на сервер нового эвента в отдельном потоке
-                        TestRequester.testRequest();
-/*                                        SignInMessage signInMessage = new SignInMessage(
-                                    String.valueOf(editTextLogin.getText()), String.valueOf(editTextPassword.getText()));
-                            answerServer = AuthenticationRequester.signInRequest(signInMessage);*/
 
                         Thread.sleep(Config.delay);
                     } catch (InterruptedException e) {
@@ -173,11 +167,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
 
                 setVisibleProgressBar(View.INVISIBLE);
 
-                errorServer = TestRequester.getErrorServerHandler();
-                //Если сервер не ответил или ответил ошибкой
-                if (errorServer.getCode() != 200) {
-                    handler.post(() -> Toast.makeText(view.getContext(), errorServer.getDescription(), Toast.LENGTH_LONG).show());
-                }else {
+
                     //Получаем загаловок
                     String header = Objects.requireNonNull(bind.eventCreatorHeader.getEditText()).getText().toString();
 
@@ -225,7 +215,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
                     intent.putExtra("Event", event);
                     setResult(RESULT_OK, intent);
                     finish();
-                }
+
             });
             threadSendEventToServer.start();
         });

@@ -22,6 +22,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
@@ -41,7 +42,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class MapsFragment extends Fragment implements IMapHandler{
 
-    private static final String TAG = "myMap";
+    private static final String TAG = "tgMapsFragment";
 
     private FragmentMapsBinding bind;
 
@@ -98,9 +99,9 @@ public class MapsFragment extends Fragment implements IMapHandler{
         Log.d(TAG, "onSaveInstanceState():");
 
         //TODO Не работает так как onSaveInstanceState вызывается несколько раз
-        /*CameraPosition cameraPosition = map.getCameraPosition();
+        CameraPosition cameraPosition = map.getCameraPosition();
         outState.putParcelable("latLng", cameraPosition.target);
-        outState.putFloat("zoom", cameraPosition.zoom);*/
+        outState.putFloat("zoom", cameraPosition.zoom);
     }
 
     @Override
@@ -114,7 +115,7 @@ public class MapsFragment extends Fragment implements IMapHandler{
                 mapHandler.getLocationPermission(getContext());
             }
         }
-        Log.d(TAG, "onStart: end progressbar");
+        Log.d(TAG, "onStart(): end progressbar");
     }
 
     @Override
@@ -139,19 +140,19 @@ public class MapsFragment extends Fragment implements IMapHandler{
     @Override
     public void onDestroyView() {
         super.onDestroyView();
-        Log.d(TAG, "onDestroyView()");
+        Log.w(TAG, "onDestroyView()");
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        Log.d(TAG, "onDestroy()");
+        Log.w(TAG, "onDestroy()");
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        Log.d(TAG, "onDetach()");
+        Log.w(TAG, "onDetach()");
     }
 
     private boolean checkMapServices() {

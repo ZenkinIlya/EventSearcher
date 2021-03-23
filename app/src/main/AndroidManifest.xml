@@ -13,7 +13,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".authentication.views.login.SetExtraUserDataActivity"></activity>
+        <activity android:name=".authentication.views.login.SetExtraUserDataActivity"
+            android:theme="@style/FullScreen" />
         <activity
             android:name=".authentication.views.login.SignUpActivity"
             android:theme="@style/FullScreen" />
@@ -38,15 +39,17 @@
         <activity
             android:name=".authentication.views.introduction.IntroductionActivity"
             android:theme="@style/FullScreen">
+        </activity>
+        <activity
+            android:name=".main.MainActivity"
+            android:theme="@style/FullScreen">
+
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name=".main.MainActivity"
-            android:theme="@style/FullScreen" />
 
         <uses-library
             android:name="org.apache.http.legacy"

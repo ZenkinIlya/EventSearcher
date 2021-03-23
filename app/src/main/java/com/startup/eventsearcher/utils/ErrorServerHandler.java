@@ -13,6 +13,8 @@ public class ErrorServerHandler {
         Log.d(tag, "Code = " + code + " Description: " + description);
     }
 
+
+
     public int getCode() {
         return code;
     }
