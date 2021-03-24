@@ -5,8 +5,6 @@ import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,8 +21,6 @@ import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
-import com.startup.eventsearcher.utils.Config;
-import com.startup.eventsearcher.utils.ErrorServerHandler;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -35,9 +31,6 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
     private static final String TAG = "myEventCreator";
 
     private ActivityEventCreatorBinding bind;
-
-    private static ErrorServerHandler errorServer;
-    private Handler handler;
 
     private final ArrayList<Category> categoryArrayList = new ArrayList<>();
     private CategoryAdapter categoryAdapter;
@@ -61,7 +54,6 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Создание эвента");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        handler = new Handler(Looper.getMainLooper());
 
         address = getIntent().getParcelableExtra("Address");
 
@@ -76,13 +68,16 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             fillAddress(address);
         }
 
-/*        MaterialTimePicker build = new MaterialTimePicker.Builder()
+        //TODO Новенький Material Time Picker. Сделать Data Picker. Убрать AM/PM
+/*
+        MaterialTimePicker build = new MaterialTimePicker.Builder()
                 .setTimeFormat(TimeFormat.CLOCK_12H)
                 .setHour(12)
                 .setMinute(10)
                 .build();
         build.show(getSupportFragmentManager(), "tag");
-        build.addOnPositiveButtonClickListener(view -> Toast.makeText(this, "qwerty", Toast.LENGTH_SHORT).show());*/
+        build.addOnPositiveButtonClickListener(view -> Toast.makeText(this, "qwerty", Toast.LENGTH_SHORT).show());
+*/
 
         // Get Current Date
         calendar = Calendar.getInstance();
@@ -108,8 +103,8 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             setLocationEventFragment.show(getSupportFragmentManager(), "fragment_set_location_event");
         });
 
+        //Изменение даты проведения эвента
         Objects.requireNonNull(bind.eventCreatorStartDate.getEditText()).setOnClickListener(view -> {
-
             DatePickerDialog.OnDateSetListener dateSetListener = (view12, year, monthOfYear, dayOfMonth) -> {
                 String date = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
                 bind.eventCreatorStartDate.getEditText().setText(date);
@@ -117,108 +112,92 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
                 lastSelectedMonth = monthOfYear;
                 lastSelectedDayOfMonth = dayOfMonth;
             };
-
             DatePickerDialog datePickerDialog = new DatePickerDialog(view.getContext(),
                     android.R.style.Theme_DeviceDefault_Dialog,
                     dateSetListener, lastSelectedYear, lastSelectedMonth, lastSelectedDayOfMonth);
             datePickerDialog.show();
         });
 
+        //Изменение времени начала проведения эвента
         Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).setOnClickListener(view -> {
             if(lastSelectedHour == -1)  {
                 lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
                 lastSelectedMinute = calendar.get(Calendar.MINUTE);
             }
-
             TimePickerDialog.OnTimeSetListener timeSetListener = (view1, hourOfDay, minute) -> {
                 String time = hourOfDay + ":" + minute;
                 bind.eventCreatorStartTime.getEditText().setText(time);
                 lastSelectedHour = hourOfDay;
                 lastSelectedMinute = minute;
             };
-
             TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
                     android.R.style.Theme_DeviceDefault_Dialog,
                     timeSetListener, lastSelectedHour, lastSelectedMinute, true);
             timePickerDialog.show();
         });
 
+        //Подтвердить создание эвента
         bind.eventCreatorAcceptBtn.setOnClickListener(view -> {
             setVisibleProgressBar(View.VISIBLE);
-            Thread threadSendEventToServer = new Thread(() -> {
-                //Поток, отвечающий за связь с сервером
-                Thread threadRequestToServer = new Thread(() -> {
-                    try {
-                        //TODO Отправка на сервер нового эвента в отдельном потоке
 
-                        Thread.sleep(Config.delay);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                });
+            //Формирование эвента
+            event = createEvent();
 
-                threadRequestToServer.start();
-                try {
-                    //ожидание завершения потока связи с сервером
-                    threadRequestToServer.join();
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+            //TODO Добавление эвента в Cloud FireStore
+            
+            //Добавляем в общий список эвентов
+            EventsList.addEvent(event);
 
-                setVisibleProgressBar(View.INVISIBLE);
+            //Сохранение списка эвентов в JSON
+            //Сохранение необходимо выполнить тут, так как onStop Срабатывает после initMap
+            EventsList.saveEventArrayListInJSON(view.getContext());
 
+            setVisibleProgressBar(View.INVISIBLE);
 
-                    //Получаем загаловок
-                    String header = Objects.requireNonNull(bind.eventCreatorHeader.getEditText()).getText().toString();
-
-                    //Получаем категорию
-                    int posCurrentCategory = bind.eventCreatorCategory.getCurrentItem();
-                    String category = App.getCategoryArrayList().get(posCurrentCategory).getCategoryName();
-
-                    //Получаю адрес и координаты местонахождения
-                    EventAddress eventAddress = new EventAddress(
-                            Objects.requireNonNull(bind.eventCreatorLocation.getEditText()).getText().toString(),
-                            address.getLocality(), //city
-                            address.getThoroughfare(),  //street
-                            address.getSubThoroughfare(), //house
-                            address.getLatitude(),
-                            address.getLongitude());
-
-                    //Получеам дату начала
-                    String startDate = bind.eventCreatorStartDate.getEditText().getText().toString();
-
-                    //Получаем время начала
-                    String startTime = Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).getText().toString();
-
-                    //получаем создателя эвента
-                    Person personCreator = CurrentPerson.getPerson();
-
-                    //Получаем комментарий
-                    String comment = Objects.requireNonNull(bind.eventCreatorComment.getEditText()).getText().toString();
-
-                    //Ининциализация списка подписчиков
-                    ArrayList<Subscriber> subscribers = new ArrayList<>();
-                    subscribers.add(new Subscriber(personCreator, new ExtraDate(startTime, "")));
-
-                    event = new Event(header, category, eventAddress, startDate, startTime,
-                            CurrentPerson.getPerson(), subscribers, comment);
-
-                    //Добавляем в общий список эвентов
-                    EventsList.addEvent(event);
-
-                    //Сохранение списка эвентов в JSON
-                    //Сохранение необходимо выполнить тут, так как onStop Срабатывает после initMap
-                    EventsList.saveEventArrayListInJSON(view.getContext());
-
-                    Log.d(TAG, "bind.eventCreatorAcceptBtn: event = " +event.toString());
-                    Intent intent = new Intent();
-                    intent.putExtra("Event", event);
-                    setResult(RESULT_OK, intent);
-                    finish();
-
-            });
-            threadSendEventToServer.start();
+            Log.d(TAG, "bind.eventCreatorAcceptBtn: event = " +event.toString());
+            Intent intent = new Intent();
+            intent.putExtra("Event", event);
+            setResult(RESULT_OK, intent);
+            finish();
         });
+    }
+
+    private Event createEvent(){
+        //Получаем загаловок
+        String header = Objects.requireNonNull(bind.eventCreatorHeader.getEditText()).getText().toString();
+
+        //Получаем категорию
+        int posCurrentCategory = bind.eventCreatorCategory.getCurrentItem();
+        String category = App.getCategoryArrayList().get(posCurrentCategory).getCategoryName();
+
+        //Получаю адрес и координаты местонахождения
+        EventAddress eventAddress = new EventAddress(
+                Objects.requireNonNull(bind.eventCreatorLocation.getEditText()).getText().toString(),
+                address.getLocality(), //city
+                address.getThoroughfare(),  //street
+                address.getSubThoroughfare(), //house
+                address.getLatitude(),
+                address.getLongitude());
+
+        //Получеам дату начала
+        String startDate = bind.eventCreatorStartDate.getEditText().getText().toString();
+
+        //Получаем время начала
+        String startTime = Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).getText().toString();
+
+        //получаем создателя эвента
+        Person personCreator = CurrentPerson.getPerson();
+
+        //Получаем комментарий
+        String comment = Objects.requireNonNull(bind.eventCreatorComment.getEditText()).getText().toString();
+
+        //Ининциализация списка подписчиков
+        ArrayList<Subscriber> subscribers = new ArrayList<>();
+        subscribers.add(new Subscriber(personCreator, new ExtraDate(startTime, "")));
+
+
+        return new Event(header, category, eventAddress, startDate, startTime,
+                CurrentPerson.getPerson(), subscribers, comment);
     }
 
     public void setVisibleProgressBar(int visible) {
