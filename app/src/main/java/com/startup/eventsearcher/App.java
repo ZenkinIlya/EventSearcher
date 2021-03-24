@@ -14,6 +14,8 @@ import java.util.ArrayList;
 
 public class App extends Application {
 
+
+    
     public static ArrayList<Category> categoryArrayList = new ArrayList<>();
 
     public static ArrayList<Category> getCategoryArrayList() {
