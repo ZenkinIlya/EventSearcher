@@ -13,8 +13,6 @@ import com.startup.eventsearcher.main.ui.profile.model.Person;
 import java.util.ArrayList;
 
 public class App extends Application {
-
-
     
     public static ArrayList<Category> categoryArrayList = new ArrayList<>();
 
