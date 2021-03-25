@@ -8,9 +8,11 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.databinding.ActivityEventCreatorBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
@@ -143,8 +145,9 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             //Формирование эвента
             event = createEvent();
 
-            //TODO Добавление эвента в Cloud FireStore
-            
+            //Добавление эвента в Cloud FireStore (полностью весь объект)
+            saveEvent();
+
             //Добавляем в общий список эвентов
             EventsList.addEvent(event);
 
@@ -160,6 +163,21 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             setResult(RESULT_OK, intent);
             finish();
         });
+    }
+
+    private void saveEvent() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("events")
+                .add(event)
+                .addOnSuccessListener(documentReference -> {
+                    Toast.makeText(EventCreatorActivity.this, "Event saved in FireStore", Toast.LENGTH_SHORT).show();
+                    Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(EventCreatorActivity.this, e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Log.w(TAG, "Error adding document", e);
+                });
     }
 
     private Event createEvent(){

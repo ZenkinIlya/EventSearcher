@@ -17,7 +17,6 @@ public class JsonHandler {
         SharedPreferences sharedPreferences = context.getSharedPreferences(preferenceFileName, 0);
         SharedPreferences.Editor sharedPreferencesEditor = sharedPreferences.edit();
         final Gson gson = new GsonBuilder()
-                .excludeFieldsWithoutExposeAnnotation()
                 .setPrettyPrinting()
                 .create();
         String serializedObject = gson.toJson(object);

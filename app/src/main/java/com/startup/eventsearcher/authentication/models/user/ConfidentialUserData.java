@@ -1,15 +1,11 @@
 package com.startup.eventsearcher.authentication.models.user;
 
-import com.google.gson.annotations.Expose;
-
 import java.io.Serializable;
 import java.util.Objects;
 
 public class ConfidentialUserData implements Serializable {
 
-    @Expose(serialize = false)
     private String email;
-    @Expose(serialize = false)
     private String password;
 
     public ConfidentialUserData(String email, String password) {
