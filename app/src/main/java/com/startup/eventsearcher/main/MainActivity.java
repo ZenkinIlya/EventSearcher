@@ -9,6 +9,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityMainBinding;
 
@@ -17,12 +18,15 @@ public class MainActivity extends AppCompatActivity {
     private static final String TAG = "tgMainAct";
 
     private ActivityMainBinding bind;
+    private FirebaseAnalytics firebaseAnalytics;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         bind = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
 
         if (savedInstanceState == null){
             setupButtonNavigationBar();
