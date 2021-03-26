@@ -12,13 +12,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.databinding.ActivityEventCreatorBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventAddress;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
@@ -28,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.Callback{
+public class EventCreatorActivity extends AppCompatActivity implements ISetLocationEvent{
 
     private static final String TAG = "myEventCreator";
 
@@ -148,27 +146,17 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             //Добавление эвента в Cloud FireStore (полностью весь объект)
             saveEvent();
 
-            //Добавляем в общий список эвентов
-            EventsList.addEvent(event);
-
-            //Сохранение списка эвентов в JSON
-            //Сохранение необходимо выполнить тут, так как onStop Срабатывает после initMap
-            EventsList.saveEventArrayListInJSON(view.getContext());
-
             setVisibleProgressBar(View.INVISIBLE);
 
             Log.d(TAG, "bind.eventCreatorAcceptBtn: event = " +event.toString());
             Intent intent = new Intent();
-            intent.putExtra("Event", event);
             setResult(RESULT_OK, intent);
             finish();
         });
     }
 
     private void saveEvent() {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        db.collection("events")
+        App.db.collection("events")
                 .add(event)
                 .addOnSuccessListener(documentReference -> {
                     Toast.makeText(EventCreatorActivity.this, "Event saved in FireStore", Toast.LENGTH_SHORT).show();
@@ -234,6 +222,6 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
     @Override
     public void returnAddress(Address address) {
         this.address = address;
-        fillAddress(address);
+        fillAddress(this.address);
     }
 }

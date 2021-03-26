@@ -24,8 +24,6 @@ import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityEventBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
-import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
@@ -82,30 +80,11 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
         switch (resultCode){
             case RESULT_OK:{
                 switch (requestCode) {
                     case Config.SUBSCRIBE: {
-                        int indexOfEvent = data.getIntExtra("index", 0);
-                        String time = data.getStringExtra("time");
-                        String comment = data.getStringExtra("comment");
-                        Log.d(TAG, "onActivityResult: index = " + indexOfEvent +
-                                "; time = " + time + "; comment = " + comment);
-
-                        //По индексу ищем эвент и добавляем туда пользователя-подписчика
-                        Subscriber subscriber = new Subscriber(CurrentPerson.getPerson(),
-                                new ExtraDate(time, comment));
-                        EventsList.getEventArrayList().get(indexOfEvent).getSubscribers().add(subscriber);
-                        //Обновляем текущий эвент
-                        event.getSubscribers().add(subscriber);
-                        //Сохраняем список эвентов в JSON
-                        EventsList.saveEventArrayListInJSON(this);
-
-                        fillFields();
-                        personRecyclerViewAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onActivityResult: EventList = " + EventsList.getEventArrayList().toString());
-                        Log.d(TAG, "onActivityResult: Пользователь подписался");
+                        Log.d(TAG, "onActivityResult: (RESULT_OK, SUBSCRIBE) Пользователь подписался/отписался");
                         break;
                     }
                 }
@@ -114,8 +93,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
             case RESULT_CANCELED:{
                 switch (requestCode){
                     case Config.SUBSCRIBE:{
-                        personRecyclerViewAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onActivityResult: Пользователь отменил этап подписки");
+                        Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SUBSCRIBE) Пользователь отменил этап подписки");
                         break;
                     }
                 }
@@ -147,21 +125,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
                 intent.putExtra("Event", event);
                 startActivityForResult(intent, Config.SUBSCRIBE);
             }else {
-                //Убрать сабскрайбера в эвенте глобального списка
-                for (Event eventIterate: EventsList.getEventArrayList()){
-                    if (eventIterate.equals(event)){
-                        eventIterate.getSubscribers().remove(subscriber);
-                        break;
-                    }
-                }
-                //Получаем позицию пользователя в списке
-                int index = event.getSubscribers().indexOf(subscriber);
-                event.getSubscribers().remove(subscriber);
-                //Сохраняем список эвентов в JSON
-                EventsList.saveEventArrayListInJSON(view.getContext());
-
-                fillFields();  //Убираем сердечко
-                personRecyclerViewAdapter.notifyItemRemoved(index);
+                //TODO Убрать сабскрайбера в эвенте глобального списка
             }
         });
     }

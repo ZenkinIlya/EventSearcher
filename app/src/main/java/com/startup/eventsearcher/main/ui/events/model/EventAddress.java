@@ -7,12 +7,15 @@ import java.util.Objects;
 
 public class EventAddress implements Serializable {
 
-    private final String address;
-    private final String city;
-    private final String street;
-    private final String house;
-    private final Double latitude;
-    private final Double longitude;
+    private String address;
+    private String city;
+    private String street;
+    private String house;
+    private Double latitude;
+    private Double longitude;
+
+    public EventAddress() {
+    }
 
     public EventAddress(String address, String city, String street, String house, Double latitude, Double longitude) {
         this.address = address;

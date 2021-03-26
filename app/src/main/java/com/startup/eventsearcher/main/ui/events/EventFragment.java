@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jakewharton.rxbinding4.appcompat.RxSearchView;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentEventListBinding;
@@ -26,14 +28,10 @@ import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
 import com.startup.eventsearcher.main.ui.events.filter.FilterActivity;
 import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
-import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
-import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.Config;
 
+import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
@@ -57,6 +55,7 @@ public class EventFragment extends Fragment {
 
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private static FragmentManager fragmentManager;
+    private ArrayList<Event> eventArrayList = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -77,7 +76,7 @@ public class EventFragment extends Fragment {
         eventRecyclerViewAdapter = new EventRecyclerViewAdapter(
                 this,
                 bind.eventList,
-                EventsList.getEventArrayListFromJSON(getContext()),
+                eventArrayList,
                 bind.eventListGone);
         bind.eventList.setAdapter(eventRecyclerViewAdapter);
 
@@ -119,6 +118,20 @@ public class EventFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        eventArrayList.clear();
+        db.collection("Events").addSnapshotListener((value, error) -> {
+            if (error != null){
+                Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }else if (value != null) {
+                for (QueryDocumentSnapshot documentSnapshot: value){
+                    Event event = documentSnapshot.toObject(Event.class);
+                    eventArrayList.add(event);
+                }
+            }
+        });
     }
 
     @Override
@@ -137,7 +150,6 @@ public class EventFragment extends Fragment {
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        EventsList.saveEventArrayListInJSON(getContext());
     }
 
     @Override
@@ -161,37 +173,20 @@ public class EventFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
         switch (resultCode){
             case RESULT_OK:{
                 switch (requestCode) {
                     case Config.SUBSCRIBE:{
-                        int indexOfEvent = Objects.requireNonNull(data).getIntExtra("index", 0);
-                        String time = data.getStringExtra("time");
-                        String comment = data.getStringExtra("comment");
-
-                        //По индексу ищем эвент и добавляем туда пользователя
-                        EventsList.getEventArrayList().get(indexOfEvent).getSubscribers().add(new Subscriber(CurrentPerson.getPerson(),
-                                new ExtraDate(time, comment)));
-
-                        //В адаптере два разных списка, но находящийся в них элементы одни и те же объекты,
-                        //поэтому изменение объекта одного списка отражается на изменении объекта другого списка
-                        eventRecyclerViewAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onActivityResult: Пользователь подписался");
+                        Log.d(TAG, "onActivityResult: (RESULT_OK, SUBSCRIBE) Пользователь подписался");
                         break;
                     }
                     case Config.CREATE_EVENT:{
-                        //При создании нового эвента он помещается только в один список, являющийся
-                        //основным списокм на все приложния, а фильтрованный список не изменяется
-                        //поэтому в фильтрованный список необходимо добавить созданный эвент либо
-                        //пересобрать фильтрованный список
-                        eventRecyclerViewAdapter.resetFilterList();
-                        eventRecyclerViewAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onActivityResult: Пользователь создал эвент из меню");
+                        Log.d(TAG, "onActivityResult: (RESULT_OK, CREATE_EVENT) Пользователь создал эвент из меню");
                         break;
                     }
                     case Config.SHOW_FILTER:{
                         eventRecyclerViewAdapter.filter();
+                        Log.d(TAG, "onActivityResult: (RESULT_OK, SHOW_FILTER) Фильтр применился");
                         break;
                     }
                 }

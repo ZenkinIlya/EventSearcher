@@ -7,14 +7,16 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.databinding.FragmentSubscribeBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.Config;
@@ -32,6 +34,7 @@ public class SubscribeFragment extends Fragment {
 
     private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
     private final ArrayList<Event> subscribeEvents = new ArrayList<>();
+    private ArrayList<Event> eventArrayList = new ArrayList<>();
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -43,11 +46,7 @@ public class SubscribeFragment extends Fragment {
                              Bundle savedInstanceState) {
         bind = FragmentSubscribeBinding.inflate(inflater, container, false);
 
-        //TODO Получаем с сервера список эвентов
-
-        EventsList.getEventArrayListFromJSON(getContext());
-
-        getSubscribeEvents(EventsList.getEventArrayList());
+        getSubscribeEvents(eventArrayList);
 
         subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
                 this,
@@ -87,6 +86,20 @@ public class SubscribeFragment extends Fragment {
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        eventArrayList.clear();
+        db.collection("Events").addSnapshotListener((value, error) -> {
+            if (error != null){
+                Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }else if (value != null) {
+                for (QueryDocumentSnapshot documentSnapshot: value){
+                    Event event = documentSnapshot.toObject(Event.class);
+                    eventArrayList.add(event);
+                }
+                subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
@@ -105,7 +118,6 @@ public class SubscribeFragment extends Fragment {
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        EventsList.saveEventArrayListInJSON(getContext());
     }
 
     @Override
@@ -129,7 +141,6 @@ public class SubscribeFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "onActivityResult(): requestCode=" + requestCode + " resultCode=" + resultCode);
         switch (resultCode){
             case RESULT_OK:{
                 break;
@@ -137,9 +148,7 @@ public class SubscribeFragment extends Fragment {
             case RESULT_CANCELED:{
                 switch (requestCode){
                     case Config.SHOW_EVENT:{
-                        getSubscribeEvents(EventsList.getEventArrayList());
-                        subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
-                        Log.d(TAG, "onActivityResult: Пользователь вышел из подробного просмотра эвента");
+                        Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SHOW_EVENT) Пользователь вышел из подробного просмотра эвента");
                         break;
                     }
                 }

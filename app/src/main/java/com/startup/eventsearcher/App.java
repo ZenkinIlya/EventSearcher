@@ -4,9 +4,8 @@ import android.app.Application;
 import android.content.res.TypedArray;
 import android.util.Log;
 
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.startup.eventsearcher.main.ui.events.model.Category;
-import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 
@@ -15,6 +14,7 @@ import java.util.ArrayList;
 public class App extends Application {
     
     public static ArrayList<Category> categoryArrayList = new ArrayList<>();
+    public static FirebaseFirestore db;
 
     public static ArrayList<Category> getCategoryArrayList() {
         return categoryArrayList;
@@ -23,6 +23,8 @@ public class App extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+
+        db = FirebaseFirestore.getInstance();
 
         //Создание пользователя
         CurrentPerson.setPerson(new Person(
@@ -34,16 +36,6 @@ public class App extends Application {
         ));
 
         initArrayListCategory();
-        initArrayListEvent();
-    }
-
-    private void initArrayListEvent() {
-        //Считывание эвентов из SharedPreference
-        ArrayList<Event> eventArrayListFromJSON = EventsList.getEventArrayListFromJSON(this);
-        if (eventArrayListFromJSON == null){
-            //Сохранение эвентов (пустого списка) в SharedPreference
-            EventsList.saveEventArrayListInJSON(this);
-        }
     }
 
     private void initArrayListCategory() {

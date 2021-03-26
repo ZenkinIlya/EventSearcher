@@ -7,8 +7,10 @@ import java.util.Objects;
 
 public class ExtraDate implements Serializable {
 
-    private final String arrivalTime;
-    private final String comment;
+    private String arrivalTime;
+    private String comment;
+
+    public ExtraDate(){}
 
     public ExtraDate(String arrivalTime, String comment) {
         this.arrivalTime = arrivalTime;

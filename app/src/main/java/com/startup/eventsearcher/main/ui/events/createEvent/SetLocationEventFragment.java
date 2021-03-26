@@ -21,29 +21,23 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentSetLocationEventBinding;
-import com.startup.eventsearcher.main.ui.map.IMapHandler;
+import com.startup.eventsearcher.main.ui.map.utils.IMapHandler;
+import com.startup.eventsearcher.main.ui.map.utils.IPermissionMapProvider;
 import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
+import com.startup.eventsearcher.main.ui.map.utils.PermissionMapProvider;
 import com.startup.eventsearcher.utils.Config;
 
 import java.io.IOException;
 
-public class SetLocationEventFragment extends DialogFragment implements OnMapReadyCallback, IMapHandler {
+public class SetLocationEventFragment extends DialogFragment implements IMapHandler, IPermissionMapProvider {
 
-    private static final String TAG = "SetLocationEvent";
+    private static final String TAG = "tgSetLocationEventFrag";
 
     private FragmentSetLocationEventBinding bind;
 
     private MapHandler mapHandler;
-
-    interface Callback{
-        void returnAddress(Address address);
-    }
-
-    static SetLocationEventFragment.Callback callback;
-
-    public static void registerSetLocationEventFragmentCallback(Callback callback){
-        SetLocationEventFragment.callback = callback;
-    }
+    private PermissionMapProvider permissionMapProvider;
+    private static ISetLocationEvent iSetLocationEvent;
 
     private GoogleMap map;
     private Address address;
@@ -62,6 +56,10 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
         return fragment;
     }
 
+    public static void registerSetLocationEventFragmentCallback(ISetLocationEvent input) {
+        iSetLocationEvent = input;
+    }
+
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -72,18 +70,63 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+
         mapHandler = new MapHandler(this);
+        permissionMapProvider = new PermissionMapProvider(this, getContext());
 
         address = requireArguments().getParcelable("address");
+
+        componentListener();
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        permissionMapProvider.getPermissions();
+    }
+
+    @Override
+    public void onEndGetPermissions() {
+        initMap();
+    }
+
+    @Override
+    public void onRequestLocationPermissions(String[] strings, int permissionsRequestAccessFineLocation) {
+
+    }
+
+    @Override
+    public void onStartDeviceSettingsActivity(Intent enableGpsIntent, int permissionsRequestEnableGps) {
+
+    }
+
+    public void initMap() {
+        Log.d(TAG, "initMap: ");
         SupportMapFragment supportMapFragment = (SupportMapFragment) getChildFragmentManager()
                 .findFragmentById(R.id.fragment_set_location_event_map);
         if (supportMapFragment != null) {
-            supportMapFragment.getMapAsync(this);
+            supportMapFragment.getMapAsync(callback);
         }
-
-        componentListener();
-
     }
+
+    private final OnMapReadyCallback callback = new OnMapReadyCallback() {
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            map = googleMap;
+
+            //Создание эвента без предварительного выбора адреса
+            if (address == null){
+                //Получаем геолокацию пользователя
+                mapHandler.getDeviceLocation(getContext());
+            }else {
+                LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+                MarkerOptions markerOptions = new MarkerOptions();
+                markerOptions.position(latLng);
+                map.addMarker(markerOptions);
+                map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
+            }
+        }
+    };
 
     private void componentListener() {
 
@@ -91,7 +134,8 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
             LatLng target = map.getCameraPosition().target;
             try {
                 Address address = mapHandler.getAddress(getContext(), target);
-                callback.returnAddress(address);
+                //Возврат адресса в вызвавшую активность/фрагмент
+                iSetLocationEvent.returnAddress(address);
             } catch (IOException e) {
                 Toast.makeText(getContext(), "Не удалось получить адрес геопозиции. " +
                         "Ошибка: " +e.getMessage(), Toast.LENGTH_SHORT).show();
@@ -99,39 +143,6 @@ public class SetLocationEventFragment extends DialogFragment implements OnMapRea
             }
             dismiss();
         });
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-
-        //Создание эвента без предварительного выбора адреса
-        if (address == null){
-            //Получаем геолокацию пользователя
-            mapHandler.getDeviceLocation(getContext());
-        }else {
-            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            map.addMarker(markerOptions);
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
-        }
-
-    }
-
-    @Override
-    public void initMap() {
-
-    }
-
-    @Override
-    public void startActivity(Intent intent, int permissionsRequest) {
-
-    }
-
-    @Override
-    public void requestPermissionsHandler(String[] strings, int permissionsRequest) {
-
     }
 
     @Override

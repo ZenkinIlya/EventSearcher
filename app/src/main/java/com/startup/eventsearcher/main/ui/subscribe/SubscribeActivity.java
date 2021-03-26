@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.databinding.ActivitySubscribeBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
 
 import java.util.Calendar;
 import java.util.Objects;
@@ -43,14 +42,9 @@ public class SubscribeActivity extends AppCompatActivity {
 
         bind.subscribeBtnSubscribe.setOnClickListener(view -> {
             Intent intent = new Intent();
-            //Получаем индекс выбранного эвента в списке
-            int indexOfEvent = EventsList.getEventArrayList().indexOf(event);
 
             //TODO Отправка запрооса на сервер о подписке
 
-            intent.putExtra("index", indexOfEvent);
-            intent.putExtra("time", Objects.requireNonNull(bind.subscribeStartTime.getEditText()).getText().toString());
-            intent.putExtra("comment", Objects.requireNonNull(bind.subscribeComment.getEditText()).getText().toString());
             setResult(RESULT_OK, intent);
             finish();
         });

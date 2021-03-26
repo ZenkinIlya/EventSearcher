@@ -9,8 +9,10 @@ import java.util.Objects;
 
 public class Subscriber implements Serializable {
 
-    private final Person person;
-    private final ExtraDate extraDate;
+    private Person person;
+    private ExtraDate extraDate;
+
+    public Subscriber(){}
 
     public Subscriber(Person person, ExtraDate extraDate) {
         this.person = person;

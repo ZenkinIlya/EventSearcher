@@ -5,12 +5,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.ArrayAdapter;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.databinding.ActivityFilterBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
-import com.startup.eventsearcher.main.ui.events.model.EventsList;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,6 +28,7 @@ public class FilterActivity extends AppCompatActivity {
 
     private ActivityFilterBinding bind;
 
+    private ArrayList<Event> eventArrayList = new ArrayList<>();
     private final Set<String> arrayListCities = new HashSet<>();
     private Filter filter;
 
@@ -46,13 +49,31 @@ public class FilterActivity extends AppCompatActivity {
         componentListener();
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        eventArrayList.clear();
+        db.collection("Events").addSnapshotListener((value, error) -> {
+            if (error != null){
+                Toast.makeText(this, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
+            }else if (value != null) {
+                for (QueryDocumentSnapshot documentSnapshot: value){
+                    Event event = documentSnapshot.toObject(Event.class);
+                    eventArrayList.add(event);
+                }
+            }
+        });
+    }
+
     private void setCity() {
         bind.eventListFiltersCitySpinner.setText(filter.getCity());
     }
 
     //Инициализация выпадающего списка с городами
     private void initCity() {
-        for (Event event: EventsList.getEventArrayList()){
+        for (Event event: eventArrayList){
             arrayListCities.add(event.getEventAddress().getCity());
         }
         bind.eventListFiltersCitySpinner.setAdapter(new ArrayAdapter<>(this,

@@ -1,7 +1,6 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
-import androidx.annotation.NonNull;
-
+import com.google.firebase.firestore.Exclude;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 
 import java.io.Serializable;
@@ -15,14 +14,19 @@ import java.util.Objects;
 
 public class Event implements Serializable {
 
-    private final String header;
-    private final String category;
-    private final EventAddress eventAddress;
-    private final String startDate;
-    private final String startTime;
-    private final Person personCreator;
-    private final ArrayList<Subscriber> subscribers;
-    private final String comment;
+    private String id;
+
+    private String header;
+    private String category;
+    private EventAddress eventAddress;
+    private String startDate;
+    private String startTime;
+    private Person personCreator;
+    private ArrayList<Subscriber> subscribers;
+    private String comment;
+
+    public Event() {
+    }
 
     public Event(String header, String category, EventAddress eventAddress, String startDate, String startTime,
                  Person personCreator, ArrayList<Subscriber> subscribers, String comment) {
@@ -34,6 +38,16 @@ public class Event implements Serializable {
         this.personCreator = personCreator;
         this.subscribers = subscribers;
         this.comment = comment;
+    }
+
+    @Exclude
+    public String getId() {
+        return id;
+    }
+
+
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getHeader() {
@@ -68,11 +82,11 @@ public class Event implements Serializable {
         return comment;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "Event{" +
-                "header='" + header + '\'' +
+                "id='" + id + '\'' +
+                ", header='" + header + '\'' +
                 ", category='" + category + '\'' +
                 ", eventAddress=" + eventAddress +
                 ", startDate='" + startDate + '\'' +
@@ -88,7 +102,8 @@ public class Event implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Event event = (Event) o;
-        return Objects.equals(header, event.header) &&
+        return Objects.equals(id, event.id) &&
+                Objects.equals(header, event.header) &&
                 Objects.equals(category, event.category) &&
                 Objects.equals(eventAddress, event.eventAddress) &&
                 Objects.equals(startDate, event.startDate) &&
@@ -100,7 +115,7 @@ public class Event implements Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(header, category, eventAddress, startDate, startTime, personCreator, subscribers, comment);
+        return Objects.hash(id, header, category, eventAddress, startDate, startTime, personCreator, subscribers, comment);
     }
 
     public String getDateFormatDay(SimpleDateFormat simpleDateFormat) {
