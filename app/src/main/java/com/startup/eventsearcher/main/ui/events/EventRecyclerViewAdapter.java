@@ -26,11 +26,10 @@ import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.DateParser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
@@ -75,16 +74,14 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         Event event = listEventsFilter.get(position);
 
         holder.eventTitle.setText(event.getHeader());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        holder.eventDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
-        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        holder.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+        holder.eventDateNumber.setText(DateParser.getDateFormatDay(event.getDate()));
+        holder.eventDateMonth.setText(DateParser.getDateFormatMonth(event.getDate()));
 
         holder.eventAddress.setText(event.getEventAddress().getAddress());
 
         int countPeople = event.getSubscribers().size();
         holder.eventCountPeople.setText(String.valueOf(countPeople));
-        holder.eventTime.setText(event.getStartTime());
+        holder.eventTime.setText(DateParser.getDateFormatTime(event.getDate()));
 
         int resourceId = getResourceIdImage(event);
         holder.eventImage.setImageResource(resourceId);
@@ -175,7 +172,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                                 (filter.getCity().isEmpty() || filter.getCity().toLowerCase().equals(event.getEventAddress().getCity().toLowerCase())) &&
                                 ((filter.getEndCountMembers() == -1 && filter.getStartCountMembers() <= countMembers) ||
                                         (filter.getStartCountMembers() <= countMembers && countMembers <= filter.getEndCountMembers())) &&
-                                (searchDate.isEmpty() || event.getStartDate().equals(searchDate));
+                                (searchDate.isEmpty() || DateParser.getDateFormatDate(event.getDate()).equals(searchDate));
                     })
                     .collect(Collectors.toList());
         }

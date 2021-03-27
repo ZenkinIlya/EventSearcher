@@ -28,9 +28,8 @@ import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.DateParser;
 
-import java.text.SimpleDateFormat;
-import java.util.Locale;
 import java.util.Objects;
 
 /*Активити отображения эвента
@@ -134,16 +133,14 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
     private void fillFields() {
         bind.eventHeader.setText(event.getHeader());
 
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        bind.eventDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
-        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        bind.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+        bind.eventDateNumber.setText(DateParser.getDateFormatDay(event.getDate()));
+        bind.eventDateMonth.setText(DateParser.getDateFormatMonth(event.getDate()));
 
         bind.eventTextViewCreator.setText(event.getPersonCreator().getLogin());
 
         bind.eventAddress.setText(event.getEventAddress().getAddress());
         bind.eventCountPeople.setText(String.valueOf(event.getSubscribers().size()));
-        bind.eventTime.setText(event.getStartTime());
+        bind.eventTime.setText(DateParser.getDateFormatTime(event.getDate()));
 
         setImageSubscribe();
 

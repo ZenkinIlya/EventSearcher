@@ -22,10 +22,9 @@ import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.DateParser;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Locale;
 
 public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<SubscribeEventsRecyclerViewAdapter.ViewHolder> {
 
@@ -66,16 +65,14 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
         Event event = subscribeEventsArrayList.get(position);
 
         holder.eventTitle.setText(event.getHeader());
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        holder.eventDateNumber.setText(event.getDateFormatDay(simpleDateFormat));
-        SimpleDateFormat simpleDateFormatMonth = new SimpleDateFormat("dd.MM.yyyy", Locale.getDefault());
-        holder.eventDateMonth.setText(event.getDateFormatMonth(simpleDateFormatMonth));
+        holder.eventDateNumber.setText(DateParser.getDateFormatDay(event.getDate()));
+        holder.eventDateMonth.setText(DateParser.getDateFormatMonth(event.getDate()));
 
         holder.eventAddress.setText(event.getEventAddress().getAddress());
 
         int countPeople = event.getSubscribers().size();
         holder.eventCountPeople.setText(String.valueOf(countPeople));
-        holder.eventTime.setText(event.getStartTime());
+        holder.eventTime.setText(DateParser.getDateFormatTime(event.getDate()));
 
         int resourceId = getResourceIdImage(event);
         holder.eventImage.setImageResource(resourceId);

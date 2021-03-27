@@ -1,23 +1,22 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
-import androidx.annotation.NonNull;
-
 import java.io.Serializable;
+import java.util.Date;
 import java.util.Objects;
 
 public class ExtraDate implements Serializable {
 
-    private String arrivalTime;
+    private Date arrivalTime;
     private String comment;
 
     public ExtraDate(){}
 
-    public ExtraDate(String arrivalTime, String comment) {
+    public ExtraDate(Date arrivalTime, String comment) {
         this.arrivalTime = arrivalTime;
         this.comment = comment;
     }
 
-    public String getArrivalTime() {
+    public Date getArrivalTime() {
         return arrivalTime;
     }
 
@@ -25,11 +24,10 @@ public class ExtraDate implements Serializable {
         return comment;
     }
 
-    @NonNull
     @Override
     public String toString() {
         return "ExtraDate{" +
-                "arrivalTime='" + arrivalTime + '\'' +
+                "arrivalTime=" + arrivalTime +
                 ", comment='" + comment + '\'' +
                 '}';
     }
@@ -39,8 +37,8 @@ public class ExtraDate implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         ExtraDate extraDate = (ExtraDate) o;
-        return arrivalTime.equals(extraDate.arrivalTime) &&
-                comment.equals(extraDate.comment);
+        return Objects.equals(arrivalTime, extraDate.arrivalTime) &&
+                Objects.equals(comment, extraDate.comment);
     }
 
     @Override

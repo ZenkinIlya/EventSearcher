@@ -10,14 +10,17 @@ import android.widget.Toast;
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.Task;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.utils.DateParser;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
@@ -46,17 +49,35 @@ public class MapHandler {
         return addressObject;
     }
 
+    //Создание MarkerOptions на основе даты проведения эвента
+    private MarkerOptions getMarkerOptions(Date date, Date dateNow, LatLng latLng){
+        MarkerOptions markerOptions = new MarkerOptions();
+        markerOptions.position(latLng);
+        if (date.after(dateNow)){
+            Log.i(TAG, "getMarkerOptions: Эвенту еще предстоит состояться");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE));
+        }else if (date.after(DateParser.getDateWithMinusHours(dateNow, 2))){
+            Log.i(TAG, "getMarkerOptions: Эвент начался в течении последних 2 часов");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN));
+        }else if (date.after(DateParser.getDateWithMinusHours(dateNow, 12))){
+            Log.i(TAG, "getMarkerOptions: Эвент начался в течении последних 10 - 12 часов");
+            markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+        }else {
+            Log.i(TAG, "getMarkerOptions: Эвент давно прошел");
+        }
+        return markerOptions;
+    }
+
     //Установка эвент-маркеров на карте
     public void setEventMarkerOnMap(GoogleMap map, ArrayList<Event> eventArrayList) {
+        Date dateNow =new Date();
         Log.d(TAG, "setEventMarkerOnMap: Установка эвент-маркеров на карте");
-        Log.d(TAG, "setEventMarkerOnMap: eventArrayList = " + eventArrayList.toString());
         for (Event event: eventArrayList){
+            Log.d(TAG, "setEventMarkerOnMap: event = " + event.toString());
             LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
                     event.getEventAddress().getLongitude());
-            MarkerOptions markerOptions = new MarkerOptions();
-            markerOptions.position(latLng);
-            markerOptions.title(event.getHeader());
-            Marker marker = map.addMarker(markerOptions);
+
+            Marker marker = map.addMarker(getMarkerOptions(event.getDate(), dateNow, latLng));
             marker.setTag(event);
         }
     }

@@ -21,9 +21,11 @@ import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
+import com.startup.eventsearcher.utils.DateParser;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.Objects;
 
 public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.ISetLocationEvent{
@@ -185,9 +187,10 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
 
         //Получеам дату начала
         String startDate = bind.eventCreatorStartDate.getEditText().getText().toString();
-
         //Получаем время начала
         String startTime = Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).getText().toString();
+        //Преобразуем дату и время в формат Date
+        Date date = DateParser.parseDate(startDate, startTime);
 
         //получаем создателя эвента
         Person personCreator = CurrentPerson.getPerson();
@@ -197,10 +200,10 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
 
         //Ининциализация списка подписчиков
         ArrayList<Subscriber> subscribers = new ArrayList<>();
-        subscribers.add(new Subscriber(personCreator, new ExtraDate(startTime, "")));
+        subscribers.add(new Subscriber(personCreator, new ExtraDate(date, "")));
 
 
-        return new Event(header, category, eventAddress, startDate, startTime,
+        return new Event(header, category, eventAddress, date,
                 CurrentPerson.getPerson(), subscribers, comment);
     }
 

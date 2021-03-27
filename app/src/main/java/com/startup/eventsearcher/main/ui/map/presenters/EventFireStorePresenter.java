@@ -7,8 +7,10 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.views.IFireStoreView;
+import com.startup.eventsearcher.utils.DateParser;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EventFireStorePresenter implements IEventFireStorePresenter{
 
@@ -25,6 +27,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
     public void startEventsListener() {
 
         listenerRegistration = App.db.collection("events")
+                .whereGreaterThanOrEqualTo("date", DateParser.getDateWithMinusHours(new Date(), 12))
                 .addSnapshotListener((value, error) -> {
 
                     if (error != null){
