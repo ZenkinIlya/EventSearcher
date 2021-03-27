@@ -22,14 +22,12 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.firebase.firestore.DocumentChange;
-import com.google.firebase.firestore.ListenerRegistration;
-import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
 import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
 import com.startup.eventsearcher.main.ui.map.utils.IMapHandler;
 import com.startup.eventsearcher.main.ui.map.utils.IPermissionMapProvider;
 import com.startup.eventsearcher.main.ui.map.utils.MapHandler;
@@ -44,7 +42,7 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class MapsFragment extends Fragment implements IMapHandler, IPermissionMapProvider {
+public class MapsFragment extends Fragment implements IMapHandler, IPermissionMapProvider, IFireStoreView {
 
     private static final String TAG = "tgMapsFragment";
 
@@ -52,11 +50,11 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
 
     private MapHandler mapHandler;
     private PermissionMapProvider permissionMapProvider;
+    private EventFireStorePresenter eventFireStorePresenter;
 
     private GoogleMap map;
     private boolean flgFirstEnterToMapFragment = true;
     private final ArrayList<Event> eventArrayList = new ArrayList<>();
-    private ListenerRegistration listenerRegistration;
 
     @Nullable
     @Override
@@ -70,6 +68,8 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         mapHandler = new MapHandler(this);
         permissionMapProvider = new PermissionMapProvider(this, getContext());
 
+        eventFireStorePresenter = new EventFireStorePresenter(this);
+
         return bind.getRoot();
     }
 
@@ -79,88 +79,24 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         Log.d(TAG, "onStart()");
 
         permissionMapProvider.getPermissions();
-
-/*        App.db.collection("events").get()
-                .addOnSuccessListener(queryDocumentSnapshots -> {
-                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
-                        Event event = documentSnapshot.toObject(Event.class);
-                        eventArrayList.add(event);
-                    }
-                    Log.d(TAG, "onStart: Эвенты загружены");
-                })
-                .addOnFailureListener(e -> {
-                    Log.e(TAG, "onStart: " +e.getLocalizedMessage());
-                });*/
-
-        eventArrayList.clear();
-        listenerRegistration = App.db.collection("events").addSnapshotListener((value, error) -> {
-
-            if (error != null){
-                Log.e(TAG, "onStart: " + error.getLocalizedMessage());
-            }else if (value != null) {
-                //Перебираю все изменения во всей коллекции
-                for (DocumentChange documentChange: value.getDocumentChanges()){
-                    //Получаю id документа который был изменен/удален/добавлен
-                    String id = documentChange.getDocument().getId();
-                    Log.d(TAG, "onStart: id эвента с изменениями = " +id);
-
-                    switch (documentChange.getType()) {
-                        case ADDED:
-                            Event addedEvent = documentChange.getDocument().toObject(Event.class);
-                            addedEvent.setId(id);
-                            eventArrayList.add(addedEvent);
-                            Log.d(TAG, "onStart: эвент добавлен");
-                            break;
-                        case MODIFIED:
-                            //Ищу эвент с таким же id  у себя в списке и обновляю его
-                            for (Event event: eventArrayList){
-                                if (event.getId().equals(id)){
-                                    //Получаю индекс эвента в списке
-                                    int index = eventArrayList.indexOf(event);
-                                    //Заменяю эвент списка на новый-обновленный
-                                    Event modifyEvent = documentChange.getDocument().toObject(Event.class);
-                                    modifyEvent.setId(id);
-                                    eventArrayList.set(index, modifyEvent);
-                                    Log.d(TAG, "onStart: эвент обновлен");
-                                    break;
-                                }
-                            }
-                            break;
-                        case REMOVED:
-                            for (Event event: eventArrayList){
-                                if (event.getId().equals(id)){
-                                    eventArrayList.remove(event);
-                                    break;
-                                }
-                            }
-                            Log.d(TAG, "onStart: эвент изъят");
-                            break;
-                    }
-                }
-
-                Log.i(TAG, "onStart: eventArrayList = " +eventArrayList.toString());
-
-/*                for (QueryDocumentSnapshot documentSnapshot: value){
-                    Log.d(TAG, "onStart: id = " + documentSnapshot.getId());
-                    Event event = documentSnapshot.toObject(Event.class);
-                    Log.d(TAG, "onStart: event = " + event.toString());
-                    eventArrayList.add(event);
-                }*/
-                //Расставляем все эвент-маркеры на карте
-                if (map != null){
-                    mapHandler.setEventMarkerOnMap(map, eventArrayList);
-                }
-            }
-        });
+        eventFireStorePresenter.startEventsListener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        listenerRegistration.remove();
+        eventFireStorePresenter.endEventsListener();
     }
 
+    @Override
+    public void onGetEvents(ArrayList<Event> eventArrayList) {
+        this.eventArrayList.clear();
+        this.eventArrayList.addAll(eventArrayList);
+        if (map != null){
+            mapHandler.setEventMarkerOnMap(map, eventArrayList);
+        }
+    }
 
     /********************PermissionMapProviderCallbacks************************/
     @Override

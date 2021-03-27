@@ -72,7 +72,7 @@ public class PermissionMapProvider {
     }
 
     //Проверка доступны ли google services устройству
-    private boolean isGoogleApiAvailable() {
+    public boolean isGoogleApiAvailable() {
         Log.d(TAG, "isGoogleApiAvailable: Проверка доступны ли google services устройству");
 
         int available = GoogleApiAvailability.getInstance().isGooglePlayServicesAvailable(context);

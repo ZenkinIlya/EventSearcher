@@ -26,7 +26,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Objects;
 
-public class EventCreatorActivity extends AppCompatActivity implements ISetLocationEvent{
+public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.ISetLocationEvent{
 
     private static final String TAG = "myEventCreator";
 
@@ -49,8 +49,6 @@ public class EventCreatorActivity extends AppCompatActivity implements ISetLocat
         super.onCreate(savedInstanceState);
         bind = ActivityEventCreatorBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
-
-        SetLocationEventFragment.registerSetLocationEventFragmentCallback(this);
 
         Objects.requireNonNull(getSupportActionBar()).setTitle("Создание эвента");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

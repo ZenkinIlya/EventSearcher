@@ -19,8 +19,10 @@ public class Event implements Serializable {
     private String header;
     private String category;
     private EventAddress eventAddress;
+
     private String startDate;
     private String startTime;
+
     private Person personCreator;
     private ArrayList<Subscriber> subscribers;
     private String comment;
