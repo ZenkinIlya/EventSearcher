@@ -1,6 +1,5 @@
 package com.startup.eventsearcher.main.ui.events.filter;
 
-import android.app.DatePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -13,24 +12,26 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.databinding.ActivityFilterBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class FilterActivity extends AppCompatActivity {
+public class FilterActivity extends AppCompatActivity implements IDateTimeMaterialPicker {
 
     private static final String TAG = "myFilter";
 
     private ActivityFilterBinding bind;
 
-    private ArrayList<Event> eventArrayList = new ArrayList<>();
+    private final ArrayList<Event> eventArrayList = new ArrayList<>();
     private final Set<String> arrayListCities = new HashSet<>();
     private Filter filter;
+    private DateTimeMaterialPicker dateTimeMaterialPicker;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,8 @@ public class FilterActivity extends AppCompatActivity {
 
         filter = FilterHandler.getFilterFromJSON(this);
         Log.d(TAG, "onCreate: filter = " + filter.toString());
+
+        dateTimeMaterialPicker = new DateTimeMaterialPicker(this, getSupportFragmentManager());
 
         setCity();
         initCity();
@@ -96,16 +99,7 @@ public class FilterActivity extends AppCompatActivity {
     }
 
     private void setDate() {
-        String date;
-        if (filter.getLastSelectedDayOfMonth() == 0 && filter.getLastSelectedMonth() == 0 &&
-                filter.getLastSelectedYear() == 0){
-            date = "";
-        }else {
-            date = filter.getLastSelectedDayOfMonth() + "." +
-                    (filter.getLastSelectedMonth() + 1) +"." +
-                    filter.getLastSelectedYear();
-        }
-        Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText()).setText(date);
+        Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText()).setText(filter.getDate());
     }
 
     //Сброс фильтра
@@ -113,9 +107,7 @@ public class FilterActivity extends AppCompatActivity {
         filter.setCity("");
         filter.setStartCountMembers(0);
         filter.setEndCountMembers(-1);
-        filter.setLastSelectedDayOfMonth(0);
-        filter.setLastSelectedMonth(0);
-        filter.setLastSelectedYear(0);
+        filter.setDate("");
 
         setCity();
         setCountMembers();
@@ -156,29 +148,18 @@ public class FilterActivity extends AppCompatActivity {
         });
 
         //Выбор даты
-        Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText()).setOnClickListener(view -> {
+        Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText())
+                .setOnClickListener(view -> dateTimeMaterialPicker.getMaterialDatePicker());
+    }
 
-            DatePickerDialog.OnDateSetListener dateSetListener = (view1, year, monthOfYear, dayOfMonth) -> {
-                String date = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
-                bind.eventListFiltersStartDate.getEditText().setText(date);
-                filter.setLastSelectedYear(year);
-                filter.setLastSelectedMonth(monthOfYear);
-                filter.setLastSelectedDayOfMonth(dayOfMonth);
-            };
+    @Override
+    public void onGetDate(String date) {
+        Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText()).setText(date);
+        filter.setDate(date);
+    }
 
-            int year = filter.getLastSelectedYear();
-            int month = filter.getLastSelectedMonth();
-            int dayOfMonth = filter.getLastSelectedDayOfMonth();
-            if (bind.eventListFiltersStartDate.getEditText().getText().toString().equals("")){
-                Calendar calendar = Calendar.getInstance();
-                year = calendar.get(Calendar.YEAR);
-                month = calendar.get(Calendar.MONTH);
-                dayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
-            }
-            DatePickerDialog datePickerDialog = new DatePickerDialog(view.getContext(),
-                    android.R.style.Theme_DeviceDefault_Dialog,
-                    dateSetListener, year, month, dayOfMonth);
-            datePickerDialog.show();
-        });
+    @Override
+    public void onGetTime(String time) {
+
     }
 }

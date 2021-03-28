@@ -153,15 +153,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
                 "; searchText = " +searchText +
                 "; arrayListCategory = " + arrayListCategory.toString());
 
-        String searchDate;
-        if (filter.getLastSelectedDayOfMonth() == 0 && filter.getLastSelectedMonth() == 0 &&
-                filter.getLastSelectedYear() == 0) {
-            searchDate = "";
-        } else {
-            searchDate = filter.getLastSelectedDayOfMonth() + "." +
-                    (filter.getLastSelectedMonth() + 1) + "." +
-                    filter.getLastSelectedYear();
-        }
+        String searchDate = filter.getDate();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
             listEventsFilter = listEvents.stream()

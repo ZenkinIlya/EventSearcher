@@ -1,7 +1,5 @@
 package com.startup.eventsearcher.main.ui.events.filter;
 
-import androidx.annotation.NonNull;
-
 public class Filter {
 
     //при сбросе: ""
@@ -13,18 +11,13 @@ public class Filter {
     private int endCountMembers;
 
     //при сбросе: ""
-    private int lastSelectedYear;
-    private int lastSelectedMonth;
-    private int lastSelectedDayOfMonth;
+    private String date;
 
-    public Filter(String city, int startCountMembers, int endCountMembers,
-                  int lastSelectedYear, int lastSelectedMonth, int lastSelectedDayOfMonth) {
+    public Filter(String city, int startCountMembers, int endCountMembers, String date) {
         this.city = city;
         this.startCountMembers = startCountMembers;
         this.endCountMembers = endCountMembers;
-        this.lastSelectedYear = lastSelectedYear;
-        this.lastSelectedMonth = lastSelectedMonth;
-        this.lastSelectedDayOfMonth = lastSelectedDayOfMonth;
+        this.date = date;
     }
 
     public String getCity() {
@@ -51,40 +44,21 @@ public class Filter {
         this.endCountMembers = endCountMembers;
     }
 
-    public int getLastSelectedYear() {
-        return lastSelectedYear;
+    public String getDate() {
+        return date;
     }
 
-    public void setLastSelectedYear(int lastSelectedYear) {
-        this.lastSelectedYear = lastSelectedYear;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public int getLastSelectedMonth() {
-        return lastSelectedMonth;
-    }
-
-    public void setLastSelectedMonth(int lastSelectedMonth) {
-        this.lastSelectedMonth = lastSelectedMonth;
-    }
-
-    public int getLastSelectedDayOfMonth() {
-        return lastSelectedDayOfMonth;
-    }
-
-    public void setLastSelectedDayOfMonth(int lastSelectedDayOfMonth) {
-        this.lastSelectedDayOfMonth = lastSelectedDayOfMonth;
-    }
-
-    @NonNull
     @Override
     public String toString() {
         return "Filter{" +
                 "city='" + city + '\'' +
                 ", startCountMembers=" + startCountMembers +
                 ", endCountMembers=" + endCountMembers +
-                ", lastSelectedYear=" + lastSelectedYear +
-                ", lastSelectedMonth=" + lastSelectedMonth +
-                ", lastSelectedDayOfMonth=" + lastSelectedDayOfMonth +
+                ", date='" + date + '\'' +
                 '}';
     }
 }

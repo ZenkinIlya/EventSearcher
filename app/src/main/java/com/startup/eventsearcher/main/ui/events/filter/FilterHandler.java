@@ -47,9 +47,7 @@ public class FilterHandler {
         filter = new Filter("",
                 0,
                 -1,
-                0,
-                0,
-                0);
+                "");
 
         setSearchText("");
         setArrayListCategory(new ArrayList<>());

@@ -1,7 +1,5 @@
 package com.startup.eventsearcher.main.ui.events.createEvent;
 
-import android.app.DatePickerDialog;
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.location.Address;
 import android.os.Bundle;
@@ -22,13 +20,15 @@ import com.startup.eventsearcher.main.ui.events.model.Subscriber;
 import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.DateParser;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
 
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
 
-public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.ISetLocationEvent{
+public class EventCreatorActivity extends AppCompatActivity implements SetLocationEventFragment.ISetLocationEvent,
+        IDateTimeMaterialPicker {
 
     private static final String TAG = "myEventCreator";
 
@@ -38,13 +38,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
     private CategoryAdapter categoryAdapter;
     private Event event;
     private Address address;
-
-    private Calendar calendar;
-    private int lastSelectedYear;
-    private int lastSelectedMonth;
-    private int lastSelectedDayOfMonth;
-    private int lastSelectedHour = -1;
-    private int lastSelectedMinute = -1;
+    private DateTimeMaterialPicker dateTimeMaterialPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,22 +62,8 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
             fillAddress(address);
         }
 
-        //TODO Новенький Material Time Picker. Сделать Data Picker. Убрать AM/PM
-/*
-        MaterialTimePicker build = new MaterialTimePicker.Builder()
-                .setTimeFormat(TimeFormat.CLOCK_12H)
-                .setHour(12)
-                .setMinute(10)
-                .build();
-        build.show(getSupportFragmentManager(), "tag");
-        build.addOnPositiveButtonClickListener(view -> Toast.makeText(this, "qwerty", Toast.LENGTH_SHORT).show());
-*/
-
-        // Get Current Date
-        calendar = Calendar.getInstance();
-        lastSelectedYear = calendar.get(Calendar.YEAR);
-        lastSelectedMonth = calendar.get(Calendar.MONTH);
-        lastSelectedDayOfMonth = calendar.get(Calendar.DAY_OF_MONTH);
+        dateTimeMaterialPicker = new DateTimeMaterialPicker(this,
+                getSupportFragmentManager());
     }
 
     private void fillAddress(Address address){
@@ -104,37 +84,14 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
         });
 
         //Изменение даты проведения эвента
-        Objects.requireNonNull(bind.eventCreatorStartDate.getEditText()).setOnClickListener(view -> {
-            DatePickerDialog.OnDateSetListener dateSetListener = (view12, year, monthOfYear, dayOfMonth) -> {
-                String date = dayOfMonth + "." + (monthOfYear + 1) + "." + year;
-                bind.eventCreatorStartDate.getEditText().setText(date);
-                lastSelectedYear = year;
-                lastSelectedMonth = monthOfYear;
-                lastSelectedDayOfMonth = dayOfMonth;
-            };
-            DatePickerDialog datePickerDialog = new DatePickerDialog(view.getContext(),
-                    android.R.style.Theme_DeviceDefault_Dialog,
-                    dateSetListener, lastSelectedYear, lastSelectedMonth, lastSelectedDayOfMonth);
-            datePickerDialog.show();
-        });
+        //Результат возвращается в onGetDate(String date);
+        Objects.requireNonNull(bind.eventCreatorStartDate.getEditText())
+                .setOnClickListener(view -> dateTimeMaterialPicker.getMaterialDatePicker());
 
         //Изменение времени начала проведения эвента
-        Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).setOnClickListener(view -> {
-            if(lastSelectedHour == -1)  {
-                lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
-                lastSelectedMinute = calendar.get(Calendar.MINUTE);
-            }
-            TimePickerDialog.OnTimeSetListener timeSetListener = (view1, hourOfDay, minute) -> {
-                String time = hourOfDay + ":" + minute;
-                bind.eventCreatorStartTime.getEditText().setText(time);
-                lastSelectedHour = hourOfDay;
-                lastSelectedMinute = minute;
-            };
-            TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
-                    android.R.style.Theme_DeviceDefault_Dialog,
-                    timeSetListener, lastSelectedHour, lastSelectedMinute, true);
-            timePickerDialog.show();
-        });
+        //Результат возвращается в onGetTime(String time);
+        Objects.requireNonNull(bind.eventCreatorStartTime.getEditText())
+                .setOnClickListener(view -> dateTimeMaterialPicker.getMaterialTimePicker());
 
         //Подтвердить создание эвента
         bind.eventCreatorAcceptBtn.setOnClickListener(view -> {
@@ -186,7 +143,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
                 address.getLongitude());
 
         //Получеам дату начала
-        String startDate = bind.eventCreatorStartDate.getEditText().getText().toString();
+        String startDate = Objects.requireNonNull(bind.eventCreatorStartDate.getEditText()).getText().toString();
         //Получаем время начала
         String startTime = Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).getText().toString();
         //Преобразуем дату и время в формат Date
@@ -224,5 +181,15 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
     public void returnAddress(Address address) {
         this.address = address;
         fillAddress(this.address);
+    }
+
+    @Override
+    public void onGetDate(String date) {
+        Objects.requireNonNull(bind.eventCreatorStartDate.getEditText()).setText(date);
+    }
+
+    @Override
+    public void onGetTime(String time) {
+        Objects.requireNonNull(bind.eventCreatorStartTime.getEditText()).setText(time);
     }
 }

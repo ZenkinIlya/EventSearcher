@@ -1,6 +1,5 @@
 package com.startup.eventsearcher.main.ui.subscribe;
 
-import android.app.TimePickerDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -10,18 +9,17 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.databinding.ActivitySubscribeBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
+import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
 
-import java.util.Calendar;
 import java.util.Objects;
 
-public class SubscribeActivity extends AppCompatActivity {
+public class SubscribeActivity extends AppCompatActivity implements IDateTimeMaterialPicker {
 
     private ActivitySubscribeBinding bind;
 
     private Event event;
-    private Calendar calendar;
-    private int lastSelectedHour = -1;
-    private int lastSelectedMinute = -1;
+    private DateTimeMaterialPicker dateTimeMaterialPicker;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,8 +30,9 @@ public class SubscribeActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setTitle("Подписаться");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        dateTimeMaterialPicker = new DateTimeMaterialPicker(this, getSupportFragmentManager());
+
         event = (Event) getIntent().getSerializableExtra("Event");
-        calendar = Calendar.getInstance();
 
         componentsListener();
     }
@@ -42,31 +41,12 @@ public class SubscribeActivity extends AppCompatActivity {
 
         bind.subscribeBtnSubscribe.setOnClickListener(view -> {
             Intent intent = new Intent();
-
-            //TODO Отправка запрооса на сервер о подписке
-
             setResult(RESULT_OK, intent);
             finish();
         });
 
-        Objects.requireNonNull(bind.subscribeStartTime.getEditText()).setOnClickListener(view -> {
-            if(lastSelectedHour == -1)  {
-                lastSelectedHour = calendar.get(Calendar.HOUR_OF_DAY);
-                lastSelectedMinute = calendar.get(Calendar.MINUTE);
-            }
-
-            TimePickerDialog.OnTimeSetListener timeSetListener = (view1, hourOfDay, minute) -> {
-                String time = hourOfDay + ":" + minute;
-                bind.subscribeStartTime.getEditText().setText(time);
-                lastSelectedHour = hourOfDay;
-                lastSelectedMinute = minute;
-            };
-
-            TimePickerDialog timePickerDialog = new TimePickerDialog(view.getContext(),
-                    android.R.style.Theme_DeviceDefault_Dialog,
-                    timeSetListener, lastSelectedHour, lastSelectedMinute, true);
-            timePickerDialog.show();
-        });
+        Objects.requireNonNull(bind.subscribeStartTime.getEditText())
+                .setOnClickListener(view -> dateTimeMaterialPicker.getMaterialTimePicker());
     }
 
     @Override
@@ -79,5 +59,15 @@ public class SubscribeActivity extends AppCompatActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onGetDate(String date) {
+
+    }
+
+    @Override
+    public void onGetTime(String time) {
+        Objects.requireNonNull(bind.subscribeStartTime.getEditText()).setText(time);
     }
 }

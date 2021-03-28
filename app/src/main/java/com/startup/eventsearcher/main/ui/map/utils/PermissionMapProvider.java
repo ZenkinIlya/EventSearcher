@@ -9,11 +9,11 @@ import android.location.LocationManager;
 import android.util.Log;
 import android.widget.Toast;
 
-import androidx.appcompat.app.AlertDialog;
 import androidx.core.app.ActivityCompat;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.startup.eventsearcher.utils.Config;
 
 public class PermissionMapProvider {
@@ -121,8 +121,8 @@ public class PermissionMapProvider {
 
     //Диалоговое окно включения локации на устройстве
     private void buildAlertDialogTurnOnLocation() {
-        final AlertDialog.Builder builder = new AlertDialog.Builder(context);
-        builder.setMessage("Для работы приложения рекомендуется включить геолокацию, включить?")
+        new MaterialAlertDialogBuilder(context)
+                .setMessage("Для работы приложения рекомендуется включить геолокацию, включить?")
                 .setNegativeButton("Нет, спасибо", (dialog, id) -> {
                     /*Отказ о включении геолокации.
                     В этом случае нет возможности работать с геолокацией пользователя,
@@ -134,8 +134,7 @@ public class PermissionMapProvider {
                     Intent enableGpsIntent = new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS);
                     iPermissionMapProvider.onStartDeviceSettingsActivity(enableGpsIntent, Config.PERMISSIONS_REQUEST_ENABLE_GPS);
                     Log.d(TAG, "buildAlertDialogTurnOnLocation: Пользователь перешел в настройки для включения геолокации");
-                });
-        final AlertDialog alert = builder.create();
-        alert.show();
+                })
+                .show();
     }
 }

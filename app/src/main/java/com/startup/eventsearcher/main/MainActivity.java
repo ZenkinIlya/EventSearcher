@@ -4,11 +4,11 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.fragment.NavHostFragment;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.analytics.FirebaseAnalytics;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.ActivityMainBinding;
@@ -65,23 +65,19 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Вы действительно хотите выйти из аккаунта?");
-        builder.setCancelable(true);
-
-        builder.setPositiveButton(
-                "Да",
-                (dialog, id) -> {
-                    dialog.cancel();
-                    finish();
-                });
-
-        builder.setNegativeButton(
-                "Нет",
-                (dialog, id) -> dialog.cancel());
-
-        AlertDialog alertDialog = builder.create();
-        alertDialog.show();
+        new MaterialAlertDialogBuilder(this)
+                .setMessage("Вы действительно хотите выйти из аккаунта?")
+                .setCancelable(true)
+                .setPositiveButton(
+                        "Да",
+                        (dialog, id) -> {
+                            dialog.cancel();
+                            finish();
+                        })
+                .setNegativeButton(
+                        "Нет",
+                        (dialog, id) -> dialog.cancel())
+                .show();
     }
 
     private void setupButtonNavigationBar() {
