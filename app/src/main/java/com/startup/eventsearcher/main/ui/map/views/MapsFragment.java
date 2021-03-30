@@ -26,6 +26,7 @@ import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
 import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.main.ui.map.utils.FilterEvents;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
 import com.startup.eventsearcher.main.ui.map.utils.IMapHandler;
@@ -42,7 +43,8 @@ import java.util.Objects;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class MapsFragment extends Fragment implements IMapHandler, IPermissionMapProvider, IFireStoreView {
+public class MapsFragment extends Fragment implements IMapHandler, IPermissionMapProvider,
+        IFireStoreView {
 
     private static final String TAG = "tgMapsFragment";
 
@@ -54,7 +56,8 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
 
     private GoogleMap map;
     private boolean flgFirstEnterToMapFragment = true;
-    private final ArrayList<Event> eventArrayList = new ArrayList<>();
+    private ArrayList<Event> eventArrayList = new ArrayList<>();
+    private ArrayList<Event> filteredEventArrayList = new ArrayList<>();
 
     @Nullable
     @Override
@@ -79,22 +82,26 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         Log.d(TAG, "onStart()");
 
         permissionMapProvider.getPermissions();
-        eventFireStorePresenter.startEventsListener();
+        eventFireStorePresenter.startEventAddListener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        eventFireStorePresenter.endEventsListener();
+        eventFireStorePresenter.endRegistrationListener();
     }
 
     @Override
     public void onGetEvents(ArrayList<Event> eventArrayList) {
-        this.eventArrayList.clear();
-        this.eventArrayList.addAll(eventArrayList);
+        Log.d(TAG, "onGetEvents: ");
         if (map != null){
-            mapHandler.setEventMarkerOnMap(map, eventArrayList);
+            this.eventArrayList = eventArrayList;
+            filteredEventArrayList = FilterEvents.filterEventsByStartTime(this.eventArrayList,
+                    bind.mapChipFutureEvents.isChecked(),
+                    bind.mapChipStartsEvents.isChecked(),
+                    bind.mapChipStartsEventsRecently.isChecked());
+            mapHandler.setEventMarkerOnMap(map, filteredEventArrayList);
         }
     }
 
@@ -183,8 +190,13 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
             map.setOnMarkerClickListener(callbackMarkerClickListener);
             //Инициализация добавления места, определение локации, зум
             initializeListeners();
+            //Фильтрация
+            filteredEventArrayList = FilterEvents.filterEventsByStartTime(eventArrayList,
+                    bind.mapChipFutureEvents.isChecked(),
+                    bind.mapChipStartsEvents.isChecked(),
+                    bind.mapChipStartsEventsRecently.isChecked());
             //Расставляем все эвент-маркеры на карте
-            mapHandler.setEventMarkerOnMap(map, eventArrayList);
+            mapHandler.setEventMarkerOnMap(map, filteredEventArrayList);
             //Установка отступа для элементов GoogleMap
             map.setPadding(0, 90, 0, 0);
             try {
@@ -209,9 +221,9 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
     private void setBtnAddEventInvisible(){
         bind.mapAddEventMarker.setVisibility(View.INVISIBLE);
         bind.mapAddEvent.setVisibility(View.GONE);
-        bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_add_location));
+        bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_add_location));
         bind.mapFabShowMarker.setBackgroundTintList(ColorStateList.valueOf(
-                ContextCompat.getColor(getContext(), R.color.primaryColor)));
+                ContextCompat.getColor(requireContext(), R.color.primaryColor)));
     }
 
     private void initializeListeners() {
@@ -220,9 +232,9 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
             if (bind.mapAddEventMarker.getVisibility() == View.INVISIBLE){
                 bind.mapAddEventMarker.setVisibility(View.VISIBLE);
                 bind.mapAddEvent.setVisibility(View.VISIBLE);
-                bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(getContext(), R.drawable.ic_remove));
+                bind.mapFabShowMarker.setImageDrawable(ContextCompat.getDrawable(requireContext(), R.drawable.ic_remove));
                 bind.mapFabShowMarker.setBackgroundTintList(ColorStateList.valueOf(
-                        ContextCompat.getColor(getContext(), R.color.warning)));
+                        ContextCompat.getColor(requireContext(), R.color.warning)));
             }else{
                 setBtnAddEventInvisible();
             }
@@ -251,6 +263,24 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         bind.mapZoomIn.setOnClickListener(view -> map.animateCamera(CameraUpdateFactory.zoomIn()));
 
         bind.mapZoomOut.setOnClickListener(view -> map.animateCamera(CameraUpdateFactory.zoomOut()));
+
+        //Chips
+        bind.mapChipFutureEvents.setOnCheckedChangeListener(
+                (compoundButton, isChecked) -> generalChipCheckedChangeListener());
+        bind.mapChipStartsEvents.setOnCheckedChangeListener(
+                (compoundButton, isChecked) -> generalChipCheckedChangeListener());
+        bind.mapChipStartsEventsRecently.setOnCheckedChangeListener(
+                (compoundButton, isChecked) -> generalChipCheckedChangeListener());
+    }
+
+    //Фильтр по времени и расстановка маркеров
+    private void generalChipCheckedChangeListener(){
+        filteredEventArrayList = FilterEvents.filterEventsByStartTime(eventArrayList,
+                bind.mapChipFutureEvents.isChecked(),
+                bind.mapChipStartsEvents.isChecked(),
+                bind.mapChipStartsEventsRecently.isChecked());
+        //Расставляем эвент-маркеры на карте
+        mapHandler.setEventMarkerOnMap(map, filteredEventArrayList);
     }
 
     @Override

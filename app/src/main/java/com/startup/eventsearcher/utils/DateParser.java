@@ -1,7 +1,5 @@
 package com.startup.eventsearcher.utils;
 
-import android.util.Log;
-
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -44,14 +42,10 @@ public class DateParser {
     }
 
     public static Date getDateWithMinusHours(Date date, int hours){
-        Log.d(TAG, "getDateWithMinusHours: date = " + date.toString());
-
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(date);
         calendar.add(Calendar.HOUR, -hours);
         Date returnDate = calendar.getTime();
-
-        Log.d(TAG, "getDateWithMinusHours: returnDate = " + returnDate.toString());
         return returnDate;
     }
 }

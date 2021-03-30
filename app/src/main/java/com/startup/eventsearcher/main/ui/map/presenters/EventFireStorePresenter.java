@@ -24,27 +24,29 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
     }
 
     @Override
-    public void startEventsListener() {
+    public void startAllEventChangesListener() {
+        //Необходимо при инициализации слушателя очищать список
+        eventArrayList.clear();
 
         listenerRegistration = App.db.collection("events")
                 .whereGreaterThanOrEqualTo("date", DateParser.getDateWithMinusHours(new Date(), 12))
                 .addSnapshotListener((value, error) -> {
 
                     if (error != null){
-                        Log.e(TAG, "startEventsListener: " + error.getLocalizedMessage());
+                        Log.e(TAG, "startAllEventChangesListener: " + error.getLocalizedMessage());
                     }else if (value != null) {
                         //Перебираю все изменения во всей коллекции
                         for (DocumentChange documentChange: value.getDocumentChanges()){
                             //Получаю id документа который был изменен/удален/добавлен
                             String id = documentChange.getDocument().getId();
-                            Log.d(TAG, "startEventsListener: id эвента с изменениями = " +id);
+                            Log.d(TAG, "startAllEventChangesListener: id эвента с изменениями = " +id);
 
                             switch (documentChange.getType()) {
                                 case ADDED:
                                     Event addedEvent = documentChange.getDocument().toObject(Event.class);
                                     addedEvent.setId(id);
                                     eventArrayList.add(addedEvent);
-                                    Log.d(TAG, "startEventsListener: эвент добавлен");
+                                    Log.d(TAG, "startAllEventChangesListener: эвент добавлен");
                                     break;
                                 case MODIFIED:
                                     //Ищу эвент с таким же id  у себя в списке и обновляю его
@@ -56,7 +58,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                                             Event modifyEvent = documentChange.getDocument().toObject(Event.class);
                                             modifyEvent.setId(id);
                                             eventArrayList.set(index, modifyEvent);
-                                            Log.d(TAG, "startEventsListener: эвент обновлен");
+                                            Log.d(TAG, "startAllEventChangesListener: эвент обновлен");
                                             break;
                                         }
                                     }
@@ -68,21 +70,72 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                                             break;
                                         }
                                     }
-                                    Log.d(TAG, "startEventsListener: эвент изъят");
+                                    Log.d(TAG, "startAllEventChangesListener: эвент изъят");
+                                    break;
+                            }
+                        }
+                        ArrayList<String> idStringArrayList = new ArrayList<>();
+                        for (Event event: eventArrayList){
+                            idStringArrayList.add(event.getId());
+                        }
+                        Log.i(TAG, "startAllEventChangesListener: id eventArrayList = " + idStringArrayList.toString());
+                        iFireStoreView.onGetEvents(eventArrayList);
+                    }
+        });
+    }
+
+    @Override
+    public void startEventAddListener() {
+        Log.d(TAG, "startEventAddListener()");
+
+        //Необходимо при инициализации слушателя очищать список
+        eventArrayList.clear();
+
+        //Слушатель на добавление эвентов
+        listenerRegistration = App.db.collection("events")
+                .whereGreaterThanOrEqualTo("date", DateParser.getDateWithMinusHours(new Date(), 12))
+                .addSnapshotListener((value, error) -> {
+
+                    if (error != null) {
+                        Log.e(TAG, "startEventAddListener: " + error.getLocalizedMessage());
+                    } else if (value != null) {
+                        //Перебираю все изменения во всей коллекции
+                        for (DocumentChange documentChange : value.getDocumentChanges()) {
+
+                            //Получаю id документа который был добавлен/удален
+                            String id = documentChange.getDocument().getId();
+                            Log.d(TAG, "startEventAddListener: id добавленного эвента = " + id);
+                            switch (documentChange.getType()) {
+                                case ADDED:
+                                    Event addedEvent = documentChange.getDocument().toObject(Event.class);
+                                    addedEvent.setId(id);
+                                    eventArrayList.add(addedEvent);
+                                    Log.d(TAG, "startAllEventChangesListener: эвент добавлен");
+                                    break;
+                                case REMOVED:
+                                    for (Event event: eventArrayList){
+                                        if (event.getId().equals(id)){
+                                            eventArrayList.remove(event);
+                                            break;
+                                        }
+                                    }
+                                    Log.d(TAG, "startAllEventChangesListener: эвент изъят");
                                     break;
                             }
                         }
 
-                        Log.i(TAG, "startEventsListener: eventArrayList = " +eventArrayList.toString());
-
+                        ArrayList<String> idStringArrayList = new ArrayList<>();
+                        for (Event event: eventArrayList){
+                            idStringArrayList.add(event.getId());
+                        }
+                        Log.i(TAG, "startEventAddListener: id eventArrayList = " + idStringArrayList.toString());
                         iFireStoreView.onGetEvents(eventArrayList);
                     }
-        });
-
+                });
     }
 
     @Override
-    public void endEventsListener() {
+    public void endRegistrationListener() {
         listenerRegistration.remove();
     }
 }

@@ -1,6 +1,5 @@
 package com.startup.eventsearcher.main.ui.events;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -18,8 +17,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.jakewharton.rxbinding4.appcompat.RxSearchView;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentEventListBinding;
@@ -28,6 +25,8 @@ import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
 import com.startup.eventsearcher.main.ui.events.filter.FilterActivity;
 import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
+import com.startup.eventsearcher.main.ui.map.views.IFireStoreView;
 import com.startup.eventsearcher.utils.Config;
 
 import java.util.ArrayList;
@@ -47,15 +46,15 @@ import static android.app.Activity.RESULT_OK;
  * он прошел упешно, то из окна подписки возвращаются параметры: index, startTime, comment. Затем
  * идет обновление глобального списка эвентов и обновление адаптера*/
 
-public class EventFragment extends Fragment {
+public class EventFragment extends Fragment implements IFireStoreView {
 
-    private static final String TAG = "tgEventFragment";
+    private static final String TAG = "tgEventFrag";
 
     private FragmentEventListBinding bind;
 
     private EventRecyclerViewAdapter eventRecyclerViewAdapter;
     private static FragmentManager fragmentManager;
-    private ArrayList<Event> eventArrayList = new ArrayList<>();
+    private EventFireStorePresenter eventFireStorePresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -71,14 +70,7 @@ public class EventFragment extends Fragment {
         ((AppCompatActivity) requireActivity()).setSupportActionBar(bind.eventListToolbar);
         setHasOptionsMenu(true);
 
-        //TODO Получаем с сервера список эвентов
-
-        eventRecyclerViewAdapter = new EventRecyclerViewAdapter(
-                this,
-                bind.eventList,
-                eventArrayList,
-                bind.eventListGone);
-        bind.eventList.setAdapter(eventRecyclerViewAdapter);
+        eventFireStorePresenter = new EventFireStorePresenter(this);
 
         TagRecyclerViewAdapter tagRecyclerViewAdapter = new TagRecyclerViewAdapter(
                 Arrays.asList(requireContext().getResources().getStringArray(R.array.category)),
@@ -91,83 +83,26 @@ public class EventFragment extends Fragment {
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "onViewCreated():");
-    }
-
-    @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "onAttach() :");
-    }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated()");
-    }
-
-    @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState():");
-    }
-
-    @Override
     public void onStart() {
         super.onStart();
         Log.d(TAG, "onStart()");
-
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        eventArrayList.clear();
-        db.collection("Events").addSnapshotListener((value, error) -> {
-            if (error != null){
-                Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }else if (value != null) {
-                for (QueryDocumentSnapshot documentSnapshot: value){
-                    Event event = documentSnapshot.toObject(Event.class);
-                    eventArrayList.add(event);
-                }
-            }
-        });
+        eventFireStorePresenter.startEventAddListener();
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume()");
-    }
-
-    @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause()");
+    public void onGetEvents(ArrayList<Event> eventArrayList) {
+        eventRecyclerViewAdapter = new EventRecyclerViewAdapter(
+                this,
+                bind.eventList,
+                eventArrayList,
+                bind.eventListGone);
+        bind.eventList.setAdapter(eventRecyclerViewAdapter);
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        Log.d(TAG, "onStop()");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.w(TAG, "onDestroyView()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.w(TAG, "onDestroy()");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.w(TAG, "onDetach()");
+        eventFireStorePresenter.endRegistrationListener();
     }
 
     @Override

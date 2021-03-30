@@ -14,15 +14,54 @@
         android:layout_height="match_parent"/>
 
     <androidx.appcompat.widget.SearchView
+        android:id="@+id/map_search_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/map_search_view"
         app:queryHint="Поиск..."
         app:iconifiedByDefault="false"
         app:queryBackground="@null"
-        android:layout_margin="10dp"
+        android:layout_marginHorizontal="10dp"
+        android:layout_marginTop="10dp"
         android:elevation="5dp"
         android:background="@drawable/bg_round_corners"/>
+
+    <HorizontalScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/map_search_view"
+        android:layout_marginHorizontal="10dp"
+        android:scrollbars="none">
+        <com.google.android.material.chip.ChipGroup
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:singleLine="true">
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/map_chip_future_events"
+                style="@style/CustomChipStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Скоро начнутся"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/map_chip_starts_events"
+                style="@style/CustomChipStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Недавно начались"/>
+
+            <com.google.android.material.chip.Chip
+                android:id="@+id/map_chip_starts_events_recently"
+                style="@style/CustomChipStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:checked="false"
+                android:text="Начались более 2 часов назад"/>
+
+        </com.google.android.material.chip.ChipGroup>
+    </HorizontalScrollView>
 
     <ImageView
         android:id="@+id/map_add_event_marker"

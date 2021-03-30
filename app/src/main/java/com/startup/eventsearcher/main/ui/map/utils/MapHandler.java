@@ -51,6 +51,7 @@ public class MapHandler {
 
     //Создание MarkerOptions на основе даты проведения эвента
     private MarkerOptions getMarkerOptions(Date date, Date dateNow, LatLng latLng){
+        Log.d(TAG, "getMarkerOptions: event.getDate() = " +date.toString());
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         if (date.after(dateNow)){
@@ -71,9 +72,9 @@ public class MapHandler {
     //Установка эвент-маркеров на карте
     public void setEventMarkerOnMap(GoogleMap map, ArrayList<Event> eventArrayList) {
         Date dateNow =new Date();
+        map.clear();
         Log.d(TAG, "setEventMarkerOnMap: Установка эвент-маркеров на карте");
         for (Event event: eventArrayList){
-            Log.d(TAG, "setEventMarkerOnMap: event = " + event.toString());
             LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
                     event.getEventAddress().getLongitude());
 
