@@ -99,17 +99,17 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
     }
 
     @Override
-    public void onCheckUserHaveLoginAndPhoto(boolean userHaveLoginAndPhoto) {
-        if (userHaveLoginAndPhoto){
-            Intent intent = new Intent(this, MainActivity.class);
-            startActivity(intent);
+    public void onCheckUserHasLogin(boolean userHasLogin) {
+        Intent intent;
+        if (userHasLogin){
+            intent = new Intent(this, MainActivity.class);
         }else {
-            Intent intent = new Intent(this, SetExtraUserDataActivity.class);
-            startActivity(intent);
+            intent = new Intent(this, SetExtraUserDataActivity.class);
         }
+        startActivity(intent);
     }
 
     private void exitFromActivity(){
-        signInPresenter.doesUserHaveLoginAndPhoto();
+        signInPresenter.doesUserHaveLogin();
     }
 }

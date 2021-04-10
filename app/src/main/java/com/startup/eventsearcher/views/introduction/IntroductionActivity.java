@@ -42,7 +42,7 @@ public class IntroductionActivity extends AppCompatActivity implements IIntroduc
     public void onCheckLoginInFirebase(boolean loginInFirebase) {
         if (loginInFirebase){
             Toast.makeText(this, "Аутентификация успешна", Toast.LENGTH_SHORT).show();
-            introductionPresenter.doesUserHaveLoginAndPhoto();
+            introductionPresenter.doesUserHaveLogin();
         }else {
             Intent intent = new Intent(this, SignInActivity.class);
             startActivity(intent);
@@ -51,9 +51,9 @@ public class IntroductionActivity extends AppCompatActivity implements IIntroduc
     }
 
     @Override
-    public void onCheckUserHaveLoginAndPhoto(boolean userHaveLoginAndPhoto) {
+    public void onCheckUserHasLogin(boolean userHasLogin) {
         Intent intent;
-        if (userHaveLoginAndPhoto){
+        if (userHasLogin){
             intent = new Intent(this, MainActivity.class);
         }else {
             intent = new Intent(this, SetExtraUserDataActivity.class);

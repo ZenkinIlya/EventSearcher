@@ -25,10 +25,6 @@ public class SignInPresenter implements ISignInPresenter {
         firebaseUser = firebaseAuth.getCurrentUser();
     }
 
-    public FirebaseUser getFirebaseUser() {
-        return firebaseUser;
-    }
-
     //Проверка корректности данных
     private boolean verificationData(String email, String password){
         Log.d(TAG, "verificationData: Проверка корректности данных");
@@ -90,15 +86,14 @@ public class SignInPresenter implements ISignInPresenter {
     }
 
     @Override
-    public void doesUserHaveLoginAndPhoto() {
+    public void doesUserHaveLogin() {
         if (firebaseUser.getDisplayName() != null &&
-                !firebaseUser.getDisplayName().isEmpty() &&
-                firebaseUser.getPhotoUrl() != null){
-            Log.i(TAG, "doesUserHaveLoginAndPhoto: Пользователь имеет логин и фото");
-            iSignInView.onCheckUserHaveLoginAndPhoto(true);
+                !firebaseUser.getDisplayName().isEmpty()){
+            Log.i(TAG, "doesUserHaveLoginAndPhoto: Пользователь имеет логин");
+            iSignInView.onCheckUserHasLogin(true);
         }else {
-            Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин и фото");
-            iSignInView.onCheckUserHaveLoginAndPhoto(false);
+            Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин");
+            iSignInView.onCheckUserHasLogin(false);
         }
     }
 }

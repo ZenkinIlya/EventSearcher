@@ -35,15 +35,14 @@ public class IntroductionPresenter implements IIntroductionPresenter{
     }
 
     @Override
-    public void doesUserHaveLoginAndPhoto() {
+    public void doesUserHaveLogin() {
         if (firebaseUser.getDisplayName() != null &&
-                !firebaseUser.getDisplayName().isEmpty() &&
-                firebaseUser.getPhotoUrl() != null){
-            Log.i(TAG, "doesUserHaveLoginAndPhoto: Пользователь имеет логин и фото");
-            iIntroductionView.onCheckUserHaveLoginAndPhoto(true);
+                !firebaseUser.getDisplayName().isEmpty()){
+            Log.i(TAG, "doesUserHaveLogin: Пользователь имеет логин");
+            iIntroductionView.onCheckUserHasLogin(true);
         }else {
-            Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин и фото");
-            iIntroductionView.onCheckUserHaveLoginAndPhoto(false);
+            Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин");
+            iIntroductionView.onCheckUserHasLogin(false);
         }
     }
 }

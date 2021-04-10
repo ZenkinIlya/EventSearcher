@@ -6,13 +6,14 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="20dp"
-    tools:context=".views.login.SetExtraUserDataActivity">
+    tools:context=".views.login.SetExtraUserDataActivity"
+    android:fitsSystemWindows="true">
 
     <LinearLayout
         android:id="@+id/set_data_user_data"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
+        android:orientation="vertical"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -21,9 +22,10 @@
 
         <de.hdodenhof.circleimageview.CircleImageView
             android:id="@+id/set_data_user_photo"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
-            android:layout_marginEnd="10dp"
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:layout_marginBottom="10dp"
+            android:layout_gravity="center"
             android:src="@drawable/ic_profile"
             android:scaleType="centerCrop"
             app:civ_circle_background_color="@color/primaryDarkColor"/>

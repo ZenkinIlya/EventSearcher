@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.presenters.userData.UpdateUserDataPresenter;
 import com.startup.eventsearcher.databinding.ActivitySetExtraUserDataBinding;
+import com.startup.eventsearcher.utils.user.UserDataVerification;
 import com.startup.eventsearcher.views.main.MainActivity;
 import com.startup.eventsearcher.utils.Config;
 
@@ -30,7 +31,8 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
         bind = ActivitySetExtraUserDataBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        updateUserDataPresenter = new UpdateUserDataPresenter(this);
+        updateUserDataPresenter = new UpdateUserDataPresenter(this,
+                new UserDataVerification(this));
 
         componentListener();
     }
@@ -47,7 +49,6 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
         //Применить изменения
         bind.setDataUserAccept.setOnClickListener(view -> {
-            bind.setDataUserLoading.setVisibility(View.VISIBLE);
             String displayName = Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString();
             if (displayName.isEmpty()){
                 displayName = "no_name";
@@ -67,7 +68,6 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
     @Override
     public void onSuccess() {
-        bind.setDataUserLoading.setVisibility(View.INVISIBLE);
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
@@ -84,10 +84,21 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
     }
 
     @Override
+    public void onErrorLogin(String message) {
+        bind.setDataUserLogin.setError(message);
+    }
+
+    @Override
     public void onError(String message) {
-        bind.setDataUserLoading.setVisibility(View.INVISIBLE);
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-
+    @Override
+    public void showLoading(boolean show) {
+        if (show){
+            bind.setDataUserLoading.setVisibility(View.VISIBLE);
+        }else {
+            bind.setDataUserLoading.setVisibility(View.INVISIBLE);
+        }
+    }
 }

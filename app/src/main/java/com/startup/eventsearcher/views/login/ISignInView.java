@@ -5,5 +5,5 @@ public interface ISignInView {
     void onPasswordError(String message);
     void onSuccess();
     void onErrorFirebase(String message);
-    void onCheckUserHaveLoginAndPhoto(boolean userHaveLoginAndPhoto);
+    void onCheckUserHasLogin(boolean userHasLogin);
 }
