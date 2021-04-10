@@ -6,7 +6,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/primaryColor"
-    tools:context=".main.ui.profile.ProfileFragment">
+    tools:context=".views.profile.ProfileFragment">
 
     <ImageButton
         android:id="@+id/profile_sign_out"

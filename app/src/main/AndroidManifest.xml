@@ -14,31 +14,28 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".authentication.views.login.SetExtraUserDataActivity"
+        <activity android:name=".views.login.SetExtraUserDataActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".authentication.views.login.SignUpActivity"
+            android:name=".views.login.SignUpActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".authentication.views.login.SignInActivity"
+            android:name=".views.login.SignInActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".main.ui.events.filter.FilterActivity"
+            android:name=".views.events.filter.FilterActivity"
             android:theme="@style/FullScreen" />
         <activity
-            android:name=".main.ui.subscribe.SubscribeActivity"
+            android:name=".views.subscribe.SubscribeActivity"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
-            android:name=".main.ui.events.event.EventActivity"
+            android:name=".views.events.event.EventActivity"
             android:theme="@style/FullScreenLight" />
         <activity
-            android:name=".main.ui.events.createEvent.EventCreatorActivity"
+            android:name=".views.events.createEvent.EventCreatorActivity"
             android:theme="@style/AppThemeWithActionBar" />
         <activity
-            android:name=".utils.SuccessActivity"
-            android:theme="@style/FullScreen" />
-        <activity
-            android:name=".authentication.views.introduction.IntroductionActivity"
+            android:name=".views.introduction.IntroductionActivity"
             android:theme="@style/FullScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -47,7 +44,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".main.MainActivity"
+            android:name=".views.main.MainActivity"
             android:theme="@style/FullScreen">
         </activity>
 

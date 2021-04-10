@@ -5,7 +5,7 @@ import android.content.res.TypedArray;
 import android.util.Log;
 
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.startup.eventsearcher.main.ui.events.model.Category;
+import com.startup.eventsearcher.models.event.Category;
 
 import java.util.ArrayList;
 

@@ -60,7 +60,7 @@
                     android:orientation="horizontal"
                     android:scrollbars="none"
                     app:layoutManager="LinearLayoutManager"
-                    tools:context=".main.ui.events.EventsListFragment"
+                    tools:context=".views.events.EventsListFragment"
                     tools:listitem="@layout/tag_item_list" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -141,7 +141,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="LinearLayoutManager"
-                tools:context=".main.ui.events.EventsListFragment"
+                tools:context=".views.events.EventsListFragment"
                 tools:listitem="@layout/event_item_list" />
 
         </LinearLayout>

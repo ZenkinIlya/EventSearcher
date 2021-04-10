@@ -24,10 +24,10 @@ public class JsonHandler {
         sharedPreferencesEditor.apply();
     }
 
-    public static <GenericClass> GenericClass getSavedObjectFromPreference(Context context,
-                                                                           String preferenceFileName,
-                                                                           String preferenceKey,
-                                                                           Type classType) {
+    public static <GenericClass> GenericClass getObjectFromSharedPreference(Context context,
+                                                                            String preferenceFileName,
+                                                                            String preferenceKey,
+                                                                            Type classType) {
         SharedPreferences sharedPreferences = context.getSharedPreferences(preferenceFileName, 0);
         if (sharedPreferences.contains(preferenceKey)) {
             final Gson gson = new Gson();
