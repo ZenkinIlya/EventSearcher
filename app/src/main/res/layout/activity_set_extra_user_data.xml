@@ -5,67 +5,72 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="20dp"
     tools:context=".views.login.SetExtraUserDataActivity"
     android:fitsSystemWindows="true">
 
-    <LinearLayout
-        android:id="@+id/set_data_user_data"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintVertical_bias="0.4">
-
-        <de.hdodenhof.circleimageview.CircleImageView
-            android:id="@+id/set_data_user_photo"
-            android:layout_width="150dp"
-            android:layout_height="150dp"
-            android:layout_marginBottom="10dp"
-            android:layout_gravity="center"
-            android:src="@drawable/ic_profile"
-            android:scaleType="centerCrop"
-            app:civ_circle_background_color="@color/primaryDarkColor"/>
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/set_data_user_login"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:errorEnabled="true"
-            android:hint="@string/login">
-            <com.google.android.material.textfield.TextInputEditText
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="text"/>
-        </com.google.android.material.textfield.TextInputLayout>
-    </LinearLayout>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/set_data_user_load_photo"
-        style="@style/RoundedCornerButton"
-        app:layout_constraintBottom_toTopOf="@id/set_data_user_accept"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:text="@string/loadPhoto"/>
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/set_data_user_accept"
-        style="@style/RoundedCornerButton"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="@string/apply"/>
-
-    <androidx.fragment.app.FragmentContainerView
-        android:id="@+id/set_data_user_loading"
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:visibility="invisible"
-        android:name="com.startup.eventsearcher.utils.LoadingFragment"
-        tools:layout="@layout/fragment_loading"/>
+        android:padding="20dp">
 
+        <LinearLayout
+            android:id="@+id/set_data_user_data"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintVertical_bias="0.4">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/set_data_user_photo"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_marginBottom="10dp"
+                android:layout_gravity="center"
+                android:src="@drawable/ic_profile"
+                android:scaleType="centerCrop"
+                app:civ_circle_background_color="@color/primaryDarkColor"/>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/set_data_user_login"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                app:errorEnabled="true"
+                android:hint="@string/login">
+                <com.google.android.material.textfield.TextInputEditText
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:inputType="text"/>
+            </com.google.android.material.textfield.TextInputLayout>
+        </LinearLayout>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/set_data_user_load_photo"
+            style="@style/RoundedCornerButton"
+            app:layout_constraintBottom_toTopOf="@id/set_data_user_accept"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:text="@string/loadPhoto"/>
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/set_data_user_accept"
+            style="@style/RoundedCornerButton"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:text="@string/apply"/>
+
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/set_data_user_loading"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="invisible"
+            android:name="com.startup.eventsearcher.views.common.LoadingFragment"
+            tools:layout="@layout/fragment_loading"/>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

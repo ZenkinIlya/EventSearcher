@@ -89,7 +89,7 @@ public class SignInPresenter implements ISignInPresenter {
     public void doesUserHaveLogin() {
         if (firebaseUser.getDisplayName() != null &&
                 !firebaseUser.getDisplayName().isEmpty()){
-            Log.i(TAG, "doesUserHaveLoginAndPhoto: Пользователь имеет логин");
+            Log.i(TAG, "doesUserHaveLoginAndPhoto: Пользователь имеет логин: " +firebaseUser.getDisplayName());
             iSignInView.onCheckUserHasLogin(true);
         }else {
             Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин");

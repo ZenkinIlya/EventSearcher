@@ -9,11 +9,11 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.startup.eventsearcher.presenters.userData.UpdateUserDataPresenter;
 import com.startup.eventsearcher.databinding.ActivitySetExtraUserDataBinding;
+import com.startup.eventsearcher.presenters.userData.UpdateUserDataPresenter;
+import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.user.UserDataVerification;
 import com.startup.eventsearcher.views.main.MainActivity;
-import com.startup.eventsearcher.utils.Config;
 
 import java.util.Objects;
 
@@ -49,11 +49,7 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
         //Применить изменения
         bind.setDataUserAccept.setOnClickListener(view -> {
-            String displayName = Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString();
-            if (displayName.isEmpty()){
-                displayName = "no_name";
-            }
-            updateUserDataPresenter.updateDisplayNameAndPhoto(displayName, imageUri);
+            updateUserDataPresenter.savePhotoInStorage(imageUri);
         });
     }
 
@@ -67,10 +63,16 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
     }
 
     @Override
-    public void onSuccess() {
+    public void onUpdateLoginAndPhoto() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
+    }
+
+    @Override
+    public void onSavePhotoInStorage() {
+        String displayName = Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString();
+        updateUserDataPresenter.updateDisplayNameAndPhoto(displayName, imageUri);
     }
 
     @Override

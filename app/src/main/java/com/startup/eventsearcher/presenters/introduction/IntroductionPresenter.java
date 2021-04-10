@@ -38,7 +38,7 @@ public class IntroductionPresenter implements IIntroductionPresenter{
     public void doesUserHaveLogin() {
         if (firebaseUser.getDisplayName() != null &&
                 !firebaseUser.getDisplayName().isEmpty()){
-            Log.i(TAG, "doesUserHaveLogin: Пользователь имеет логин");
+            Log.i(TAG, "doesUserHaveLogin: Пользователь имеет логин: " +firebaseUser.getDisplayName());
             iIntroductionView.onCheckUserHasLogin(true);
         }else {
             Log.w(TAG, "doesUserHaveLoginAndPhoto: Пользователь не имеет логин");
