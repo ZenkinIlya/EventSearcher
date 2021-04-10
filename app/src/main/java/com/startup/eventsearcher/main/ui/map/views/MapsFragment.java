@@ -26,7 +26,7 @@ import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
 import com.startup.eventsearcher.main.ui.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.main.ui.events.event.EventActivity;
-import com.startup.eventsearcher.main.ui.map.utils.FilterEvents;
+import com.startup.eventsearcher.main.ui.map.utils.EventsFilter;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
 import com.startup.eventsearcher.main.ui.map.utils.IMapHandler;
@@ -97,12 +97,22 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         Log.d(TAG, "onGetEvents: ");
         if (map != null){
             this.eventArrayList = eventArrayList;
-            filteredEventArrayList = FilterEvents.filterEventsByStartTime(this.eventArrayList,
+            filteredEventArrayList = EventsFilter.filterEventsByStartTime(this.eventArrayList,
                     bind.mapChipFutureEvents.isChecked(),
                     bind.mapChipStartsEvents.isChecked(),
                     bind.mapChipStartsEventsRecently.isChecked());
             mapHandler.setEventMarkerOnMap(map, filteredEventArrayList);
         }
+    }
+
+    @Override
+    public void showLoading(boolean show) {
+
+    }
+
+    @Override
+    public void onGetError(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     /********************PermissionMapProviderCallbacks************************/
@@ -191,7 +201,7 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
             //Инициализация добавления места, определение локации, зум
             initializeListeners();
             //Фильтрация
-            filteredEventArrayList = FilterEvents.filterEventsByStartTime(eventArrayList,
+            filteredEventArrayList = EventsFilter.filterEventsByStartTime(eventArrayList,
                     bind.mapChipFutureEvents.isChecked(),
                     bind.mapChipStartsEvents.isChecked(),
                     bind.mapChipStartsEventsRecently.isChecked());
@@ -275,7 +285,7 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
 
     //Фильтр по времени и расстановка маркеров
     private void generalChipCheckedChangeListener(){
-        filteredEventArrayList = FilterEvents.filterEventsByStartTime(eventArrayList,
+        filteredEventArrayList = EventsFilter.filterEventsByStartTime(eventArrayList,
                 bind.mapChipFutureEvents.isChecked(),
                 bind.mapChipStartsEvents.isChecked(),
                 bind.mapChipStartsEventsRecently.isChecked());

@@ -1,7 +1,7 @@
 package com.startup.eventsearcher.main.ui.events.model;
 
 import com.google.firebase.firestore.Exclude;
-import com.startup.eventsearcher.main.ui.profile.model.Person;
+import com.startup.eventsearcher.authentication.models.user.User;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ public class Event implements Serializable {
     private String category;
     private EventAddress eventAddress;
     private Date date;
-    private Person personCreator;
+    private User user;
     private ArrayList<Subscriber> subscribers;
     private String comment;
 
@@ -24,12 +24,12 @@ public class Event implements Serializable {
     }
 
     public Event(String header, String category, EventAddress eventAddress,
-                 Date date, Person personCreator, ArrayList<Subscriber> subscribers, String comment) {
+                 Date date, User user, ArrayList<Subscriber> subscribers, String comment) {
         this.header = header;
         this.category = category;
         this.eventAddress = eventAddress;
         this.date = date;
-        this.personCreator = personCreator;
+        this.user = user;
         this.subscribers = subscribers;
         this.comment = comment;
     }
@@ -59,8 +59,8 @@ public class Event implements Serializable {
         return date;
     }
 
-    public Person getPersonCreator() {
-        return personCreator;
+    public User getUser() {
+        return user;
     }
 
     public ArrayList<Subscriber> getSubscribers() {
@@ -79,7 +79,7 @@ public class Event implements Serializable {
                 ", category='" + category + '\'' +
                 ", eventAddress=" + eventAddress +
                 ", date=" + date +
-                ", personCreator=" + personCreator +
+                ", user=" + user +
                 ", subscribers=" + subscribers +
                 ", comment='" + comment + '\'' +
                 '}';
@@ -95,14 +95,14 @@ public class Event implements Serializable {
                 Objects.equals(category, event.category) &&
                 Objects.equals(eventAddress, event.eventAddress) &&
                 Objects.equals(date, event.date) &&
-                Objects.equals(personCreator, event.personCreator) &&
+                Objects.equals(user, event.user) &&
                 Objects.equals(subscribers, event.subscribers) &&
                 Objects.equals(comment, event.comment);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, header, category, eventAddress, date, personCreator, subscribers, comment);
+        return Objects.hash(id, header, category, eventAddress, date, user, subscribers, comment);
     }
 
 }

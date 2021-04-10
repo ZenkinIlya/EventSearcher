@@ -11,14 +11,14 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.App;
+import com.startup.eventsearcher.authentication.models.user.User;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.ActivityEventCreatorBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.EventAddress;
 import com.startup.eventsearcher.main.ui.events.model.ExtraDate;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
-import com.startup.eventsearcher.main.ui.profile.model.Person;
 import com.startup.eventsearcher.utils.DateParser;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
@@ -150,18 +150,16 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
         Date date = DateParser.parseDate(startDate, startTime);
 
         //получаем создателя эвента
-        Person personCreator = CurrentPerson.getPerson();
+        User user = FirebaseAuthUserGetter.getUserFromFirebaseAuth();
 
         //Получаем комментарий
         String comment = Objects.requireNonNull(bind.eventCreatorComment.getEditText()).getText().toString();
 
         //Ининциализация списка подписчиков
         ArrayList<Subscriber> subscribers = new ArrayList<>();
-        subscribers.add(new Subscriber(personCreator, new ExtraDate(date, "")));
+        subscribers.add(new Subscriber(user, new ExtraDate(date, "")));
 
-
-        return new Event(header, category, eventAddress, date,
-                CurrentPerson.getPerson(), subscribers, comment);
+        return new Event(header, category, eventAddress, date, user, subscribers, comment);
     }
 
     public void setVisibleProgressBar(int visible) {

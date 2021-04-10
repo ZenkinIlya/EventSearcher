@@ -13,8 +13,8 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.utils.DateParser;
 
 import java.util.ArrayList;
@@ -47,10 +47,10 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        if (CurrentPerson.getPerson().equals(subscribers.get(position).getPerson())){
+        if (FirebaseAuthUserGetter.getUserFromFirebaseAuth().equals(subscribers.get(position).getUser())){
             holder.personCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.backgroundCurrentUser));
         }
-        holder.personLogin.setText(subscribers.get(position).getPerson().getLogin());
+        holder.personLogin.setText(subscribers.get(position).getUser().getLogin());
         holder.personArrivalTime.setText(DateParser.getDateFormatTime(subscribers.get(position).getExtraDate().getArrivalTime()));
         holder.personComment.setText(subscribers.get(position).getExtraDate().getComment());
     }

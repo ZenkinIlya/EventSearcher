@@ -6,7 +6,7 @@ import com.startup.eventsearcher.utils.DateParser;
 import java.util.ArrayList;
 import java.util.Date;
 
-public class FilterEvents {
+public class EventsFilter {
 
     public static ArrayList<Event> filterEventsByStartTime(ArrayList<Event> eventArrayList, boolean mapChipFutureEventsChecked,
                                                     boolean mapChipStartsEventsChecked, boolean mapChipStartsEventsRecentlyChecked){

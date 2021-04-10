@@ -6,8 +6,6 @@ import android.util.Log;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.startup.eventsearcher.main.ui.events.model.Category;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
-import com.startup.eventsearcher.main.ui.profile.model.Person;
 
 import java.util.ArrayList;
 
@@ -25,16 +23,6 @@ public class App extends Application {
         super.onCreate();
 
         db = FirebaseFirestore.getInstance();
-
-        //Создание пользователя
-        CurrentPerson.setPerson(new Person(
-                "qwerty",
-                "123456",
-                "Harry",
-                "Potter",
-                "JacqueFresco@mail.ru"
-        ));
-
         initArrayListCategory();
     }
 

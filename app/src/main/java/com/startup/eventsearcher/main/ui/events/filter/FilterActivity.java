@@ -8,10 +8,10 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.databinding.ActivityFilterBinding;
 import com.startup.eventsearcher.main.ui.events.model.Event;
+import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
+import com.startup.eventsearcher.main.ui.map.views.IFireStoreView;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
 
@@ -22,16 +22,18 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class FilterActivity extends AppCompatActivity implements IDateTimeMaterialPicker {
+public class FilterActivity extends AppCompatActivity implements IDateTimeMaterialPicker, IFireStoreView {
 
     private static final String TAG = "myFilter";
 
     private ActivityFilterBinding bind;
 
-    private final ArrayList<Event> eventArrayList = new ArrayList<>();
+    private ArrayList<Event> eventArrayList = new ArrayList<>();
     private final Set<String> arrayListCities = new HashSet<>();
     private Filter filter;
     private DateTimeMaterialPicker dateTimeMaterialPicker;
+
+    private EventFireStorePresenter eventFireStorePresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,10 +44,11 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
         filter = FilterHandler.getFilterFromJSON(this);
         Log.d(TAG, "onCreate: filter = " + filter.toString());
 
+        eventFireStorePresenter = new EventFireStorePresenter(this);
+
         dateTimeMaterialPicker = new DateTimeMaterialPicker(this, getSupportFragmentManager());
 
         setCity();
-        initCity();
         setCountMembers();
         setDate();
 
@@ -55,26 +58,30 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
     @Override
     protected void onStart() {
         super.onStart();
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        eventFireStorePresenter.getAllEventsFromFireBase();
+    }
 
-        eventArrayList.clear();
-        db.collection("Events").addSnapshotListener((value, error) -> {
-            if (error != null){
-                Toast.makeText(this, error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }else if (value != null) {
-                for (QueryDocumentSnapshot documentSnapshot: value){
-                    Event event = documentSnapshot.toObject(Event.class);
-                    eventArrayList.add(event);
-                }
-            }
-        });
+    @Override
+    public void onGetEvents(ArrayList<Event> eventArrayList) {
+        this.eventArrayList = eventArrayList;
+        initCity();
+    }
+
+    @Override
+    public void onGetError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showLoading(boolean show) {
+
     }
 
     private void setCity() {
         bind.eventListFiltersCitySpinner.setText(filter.getCity());
     }
-
     //Инициализация выпадающего списка с городами
+
     private void initCity() {
         for (Event event: eventArrayList){
             arrayListCities.add(event.getEventAddress().getCity());
@@ -82,8 +89,8 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
         bind.eventListFiltersCitySpinner.setAdapter(new ArrayAdapter<>(this,
                 android.R.layout.simple_dropdown_item_1line, new ArrayList<>(arrayListCities)));
     }
-
     //Инициализация слайдера и показателей
+
     private void setCountMembers() {
         int endCount;
         if (filter.getEndCountMembers() == -1){
@@ -101,8 +108,8 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
     private void setDate() {
         Objects.requireNonNull(bind.eventListFiltersStartDate.getEditText()).setText(filter.getDate());
     }
-
     //Сброс фильтра
+
     private void resetFilter() {
         filter.setCity("");
         filter.setStartCountMembers(0);

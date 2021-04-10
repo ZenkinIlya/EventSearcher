@@ -89,5 +89,6 @@
     <string name="register">Зарегистрироваться</string>
     <string name="loadPhoto">Загрузить фото</string>
     <string name="Skip">Пропустить</string>
+    <string name="Phone">Телефон</string>
 
 </resources>

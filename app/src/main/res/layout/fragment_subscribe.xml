@@ -7,13 +7,19 @@
     android:layout_height="match_parent"
     tools:context=".main.ui.subscribe.SubscribeFragment">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/subscribe_event_list"
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/subscribe_event_list_swipe_refresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        app:layoutManager="LinearLayoutManager"
-        tools:context=".main.ui.events.SubscribeFragment"
-        tools:listitem="@layout/event_item_list" />
+        android:layout_height="match_parent">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/subscribe_event_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            app:layoutManager="LinearLayoutManager"
+            tools:context=".main.ui.events.SubscribeFragment"
+            tools:listitem="@layout/event_item_list" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <TextView
         android:id="@+id/subscribe_event_list_gone"

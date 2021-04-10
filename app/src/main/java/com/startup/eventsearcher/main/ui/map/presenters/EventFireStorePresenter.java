@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.firebase.firestore.DocumentChange;
 import com.google.firebase.firestore.ListenerRegistration;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.map.views.IFireStoreView;
@@ -34,6 +35,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
 
                     if (error != null){
                         Log.e(TAG, "startAllEventChangesListener: " + error.getLocalizedMessage());
+                        iFireStoreView.onGetError(error.getLocalizedMessage());
                     }else if (value != null) {
                         //Перебираю все изменения во всей коллекции
                         for (DocumentChange documentChange: value.getDocumentChanges()){
@@ -98,6 +100,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
 
                     if (error != null) {
                         Log.e(TAG, "startEventAddListener: " + error.getLocalizedMessage());
+                        iFireStoreView.onGetError(error.getLocalizedMessage());
                     } else if (value != null) {
                         //Перебираю все изменения во всей коллекции
                         for (DocumentChange documentChange : value.getDocumentChanges()) {
@@ -131,6 +134,35 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                         Log.i(TAG, "startEventAddListener: id eventArrayList = " + idStringArrayList.toString());
                         iFireStoreView.onGetEvents(eventArrayList);
                     }
+                });
+    }
+
+    @Override
+    public void getAllEventsFromFireBase() {
+        Log.d(TAG, "getAllEventsFromFireBase()");
+
+        iFireStoreView.showLoading(true);
+        eventArrayList.clear();
+        App.db.collection("events")
+                .whereGreaterThanOrEqualTo("date", DateParser.getDateWithMinusHours(new Date(), 12))
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (QueryDocumentSnapshot documentSnapshot: queryDocumentSnapshots){
+                        //Получаем id документа
+                        String id = documentSnapshot.getId();
+                        Log.d(TAG, "getAllEventsFromFireBase: id эвента = " + id);
+                        Event addedEvent = documentSnapshot.toObject(Event.class);
+                        addedEvent.setId(id);
+                        eventArrayList.add(addedEvent);
+                        Log.d(TAG, "getAllEventsFromFireBase: эвент считан");
+                    }
+                    iFireStoreView.showLoading(false);
+                    iFireStoreView.onGetEvents(eventArrayList);
+                })
+                .addOnFailureListener(error -> {
+                    Log.e(TAG, "getAllEventsFromFireBase: " + error.getLocalizedMessage());
+                    iFireStoreView.showLoading(false);
+                    iFireStoreView.onGetError(error.getLocalizedMessage());
                 });
     }
 

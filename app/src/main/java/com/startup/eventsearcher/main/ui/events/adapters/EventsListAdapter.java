@@ -1,6 +1,5 @@
-package com.startup.eventsearcher.main.ui.events;
+package com.startup.eventsearcher.main.ui.events.adapters;
 
-import android.content.Intent;
 import android.os.Build;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -12,44 +11,46 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.main.ui.events.filter.Filter;
 import com.startup.eventsearcher.main.ui.events.filter.FilterHandler;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
-import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
-import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.DateParser;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecyclerViewAdapter.ViewHolder> {
+public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.ViewHolder> {
 
     private static final String TAG = "myEventAdapter";
 
-    private final List<Event> listEvents;
-    private List<Event> listEventsFilter;
-    private final Fragment context;
-    private final RecyclerView recyclerView;
+    private List<Event> listEvents = new ArrayList<>();
+    private List<Event> listEventsFilter = new ArrayList<>();
     private final TextView eventEventsGone;
 
+    private final EventRecyclerViewListener eventRecyclerViewListener;
 
-    public EventRecyclerViewAdapter(Fragment context, RecyclerView recyclerView, List<Event> items, TextView eventEventsGone) {
-        this.context = context;
-        this.recyclerView = recyclerView;
-        listEvents = items;
-        listEventsFilter = new ArrayList<>();
-        listEventsFilter.addAll(items);
+    public EventsListAdapter(TextView eventEventsGone,
+                             EventRecyclerViewListener eventRecyclerViewListener) {
+        this.eventRecyclerViewListener = eventRecyclerViewListener;
         this.eventEventsGone = eventEventsGone;
+    }
+
+    public void setListEvents(List<Event> listEvents) {
+        this.listEvents = listEvents;
+        listEventsFilter.clear();
+        listEventsFilter.addAll(listEvents);
+    }
+
+    public List<Event> getListEvents() {
+        return listEvents;
     }
 
     @NonNull
@@ -57,14 +58,6 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.event_item_list, parent, false);
-
-        //Вызов подробной информации об эвенте
-        view.setOnClickListener(view1 -> {
-            int itemPosition = recyclerView.getChildLayoutPosition(view1);
-            Intent intent = new Intent(parent.getContext(), EventActivity.class);
-            intent.putExtra("Event", listEventsFilter.get(itemPosition));
-            ((EventFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
-        });
 
         return new ViewHolder(view);
     }
@@ -85,32 +78,14 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
         int resourceId = getResourceIdImage(event);
         holder.eventImage.setImageResource(resourceId);
-//        Glide.with(context).load(resourceId).into(holder.eventImage);
 
         if (currentPersonIsSubscribe(event) != null){
-            holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_favorite));
+            holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(holder.eventView.getContext(), R.drawable.ic_favorite));
         }else {
-            holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_unfavorite));
+            holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(holder.eventView.getContext(), R.drawable.ic_unfavorite));
         }
 
-        //Подписка
-        holder.eventSubscribe.setOnClickListener(view -> {
-            Subscriber subscriber = currentPersonIsSubscribe(event);
-            //Если пользователь не подписан
-            if (subscriber == null){
-                Intent intent = new Intent(context.requireContext(), SubscribeActivity.class);
-                intent.putExtra("Event", event);
-                ((EventFragment)context).myStartActivityForResult(intent, Config.SUBSCRIBE);
-            }else {
-                //Убираем подписчика и обновляем список эвентов
-                //TODO Отправка запроса на сервер об отписке
-                event.getSubscribers().remove(subscriber);
-                notifyDataSetChanged();
-            }
-        });
-
-        //Показ местоположения эвента
-        holder.eventLocationMarker.setOnClickListener(view -> EventFragment.showEventLocation(context, event));
+        holder.onBindSuccess(event, eventRecyclerViewListener);
     }
 
     //Сброс фильтрованного списка
@@ -122,7 +97,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
     //Проверка подписан ли пользователь на эвент
     private Subscriber currentPersonIsSubscribe(Event event){
         for (Subscriber subscriber: event.getSubscribers()){
-            if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
+            if (subscriber.getUser().equals(FirebaseAuthUserGetter.getUserFromFirebaseAuth())){
                 return subscriber;
             }
         }
@@ -170,8 +145,8 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View View;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View eventView;
         public final TextView eventTitle;
         public final TextView eventAddress;
         public final TextView eventCountPeople;
@@ -184,7 +159,7 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
 
         public ViewHolder(View view) {
             super(view);
-            View = view;
+            eventView = view;
             eventTitle = view.findViewById(R.id.list_events_title);
             eventAddress = view.findViewById(R.id.list_events_address);
             eventCountPeople = view.findViewById(R.id.list_events_count_people);
@@ -194,6 +169,27 @@ public class EventRecyclerViewAdapter extends RecyclerView.Adapter<EventRecycler
             eventLocationMarker = view.findViewById(R.id.list_events_layout_location);
             eventDateNumber = view.findViewById(R.id.list_events_date_number);
             eventDateMonth = view.findViewById(R.id.list_events_date_month);
+        }
+
+        public void onBindSuccess(Event event, EventRecyclerViewListener eventRecyclerViewListener) {
+
+            //Вызов подробной информации об эвенте
+            eventView.setOnClickListener(view -> eventRecyclerViewListener.onEventClick(event));
+
+            //Подписка
+            eventSubscribe.setOnClickListener(view -> {
+                Subscriber subscriber = currentPersonIsSubscribe(event);
+                if (subscriber == null) {
+                    eventRecyclerViewListener.onSubscribe(event);
+                }else {
+                    //TODO Отправка запроса на сервер об отписке
+                    event.getSubscribers().remove(subscriber);
+                    notifyDataSetChanged();
+                }
+            });
+
+            //Показ местоположения
+            eventLocationMarker.setOnClickListener(view -> eventRecyclerViewListener.onMarkerClick(event));
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.main.ui.events;
+package com.startup.eventsearcher.main.ui.events.adapters;
 
 import android.animation.ValueAnimator;
 import android.view.LayoutInflater;
@@ -24,12 +24,12 @@ import java.util.List;
 public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerViewAdapter.ViewHolder> {
 
     private final List<String> listTags;
-    private final EventRecyclerViewAdapter eventRecyclerViewAdapter;
+    private TagRecyclerViewListener tagRecyclerViewListener;
     private final ArrayList<String> arrayListActiveCategory;
 
-    public TagRecyclerViewAdapter(List<String> items, EventRecyclerViewAdapter eventRecyclerViewAdapter) {
+    public TagRecyclerViewAdapter(List<String> items, TagRecyclerViewListener tagRecyclerViewListener) {
         this.listTags = items;
-        this.eventRecyclerViewAdapter = eventRecyclerViewAdapter;
+        this.tagRecyclerViewListener = tagRecyclerViewListener;
         arrayListActiveCategory = new ArrayList<>();
     }
 
@@ -76,7 +76,7 @@ public class TagRecyclerViewAdapter extends RecyclerView.Adapter<TagRecyclerView
 
     private void filterEventList() {
         FilterHandler.setArrayListCategory(arrayListActiveCategory);
-        eventRecyclerViewAdapter.filter();
+        tagRecyclerViewListener.onFilter();
     }
 
     @Override

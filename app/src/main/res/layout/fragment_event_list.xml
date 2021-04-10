@@ -60,7 +60,7 @@
                     android:orientation="horizontal"
                     android:scrollbars="none"
                     app:layoutManager="LinearLayoutManager"
-                    tools:context=".main.ui.events.EventFragment"
+                    tools:context=".main.ui.events.EventsListFragment"
                     tools:listitem="@layout/tag_item_list" />
 
                 <androidx.constraintlayout.widget.ConstraintLayout
@@ -121,10 +121,15 @@
         </com.google.android.material.appbar.CollapsingToolbarLayout>
     </com.google.android.material.appbar.AppBarLayout>
 
-    <androidx.core.widget.NestedScrollView
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        android:id="@+id/event_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         app:layout_behavior="com.google.android.material.appbar.AppBarLayout$ScrollingViewBehavior">
+
+        <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -136,11 +141,12 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 app:layoutManager="LinearLayoutManager"
-                tools:context=".main.ui.events.EventFragment"
+                tools:context=".main.ui.events.EventsListFragment"
                 tools:listitem="@layout/event_item_list" />
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
@@ -155,6 +161,5 @@
             android:visibility="invisible"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
-
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

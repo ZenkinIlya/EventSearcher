@@ -12,6 +12,10 @@
                 android:id="@+id/add_event"
                 android:icon="@drawable/ic_add_location_black"
                 android:title="@string/addEvent"/>
+            <item
+                android:id="@+id/filter"
+                android:icon="@drawable/ic_filter"
+                android:title="@string/Filter"/>
         </menu>
     </item>
 </menu>

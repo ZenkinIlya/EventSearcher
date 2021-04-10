@@ -21,11 +21,11 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.ActivityEventBinding;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 import com.startup.eventsearcher.main.ui.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.DateParser;
@@ -136,7 +136,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         bind.eventDateNumber.setText(DateParser.getDateFormatDay(event.getDate()));
         bind.eventDateMonth.setText(DateParser.getDateFormatMonth(event.getDate()));
 
-        bind.eventTextViewCreator.setText(event.getPersonCreator().getLogin());
+        bind.eventTextViewCreator.setText(event.getUser().getLogin());
 
         bind.eventAddress.setText(event.getEventAddress().getAddress());
         bind.eventCountPeople.setText(String.valueOf(event.getSubscribers().size()));
@@ -164,7 +164,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
     //Проверка подписан ли пользователь на эвент
     private Subscriber currentPersonIsSubscribe(Event event){
         for (Subscriber subscriber: event.getSubscribers()){
-            if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
+            if (subscriber.getUser().equals(FirebaseAuthUserGetter.getUserFromFirebaseAuth())){
                 return subscriber;
             }
         }

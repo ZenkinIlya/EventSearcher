@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_maps"/>
     <fragment
         android:id="@+id/eventFragment"
-        android:name="com.startup.eventsearcher.main.ui.events.EventFragment"
+        android:name="com.startup.eventsearcher.main.ui.events.EventsListFragment"
         android:label="fragment_event_list"
         tools:layout="@layout/fragment_event_list" />
     <fragment

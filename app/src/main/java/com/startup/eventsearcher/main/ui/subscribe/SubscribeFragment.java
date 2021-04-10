@@ -1,6 +1,5 @@
 package com.startup.eventsearcher.main.ui.subscribe;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -12,13 +11,17 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.FragmentSubscribeBinding;
+import com.startup.eventsearcher.main.ui.events.adapters.EventRecyclerViewListener;
+import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.main.ui.events.event.LocationEventFragment;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
+import com.startup.eventsearcher.main.ui.map.presenters.EventFireStorePresenter;
+import com.startup.eventsearcher.main.ui.map.views.IFireStoreView;
 import com.startup.eventsearcher.utils.Config;
 
 import java.util.ArrayList;
@@ -26,7 +29,7 @@ import java.util.ArrayList;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class SubscribeFragment extends Fragment {
+public class SubscribeFragment extends Fragment implements EventRecyclerViewListener, IFireStoreView {
 
     private static final String TAG = "mySubscribeList";
 
@@ -34,7 +37,8 @@ public class SubscribeFragment extends Fragment {
 
     private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
     private final ArrayList<Event> subscribeEvents = new ArrayList<>();
-    private ArrayList<Event> eventArrayList = new ArrayList<>();
+    private static FragmentManager fragmentManager;
+    private EventFireStorePresenter eventFireStorePresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,96 +50,56 @@ public class SubscribeFragment extends Fragment {
                              Bundle savedInstanceState) {
         bind = FragmentSubscribeBinding.inflate(inflater, container, false);
 
-        getSubscribeEvents(eventArrayList);
+        fragmentManager = getActivity().getSupportFragmentManager();
+        eventFireStorePresenter = new EventFireStorePresenter(this);
+        bind.subscribeEventListSwipeRefresh.setOnRefreshListener(() -> eventFireStorePresenter.getAllEventsFromFireBase());
 
-        subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
-                this,
-                bind.subscribeEventList,
-                subscribeEvents,
-                bind.subscribeEventListGone);
-        bind.subscribeEventList.setAdapter(subscribeEventsRecyclerViewAdapter);
+        initSubscribeEventListAdapter();
+
+        eventFireStorePresenter.getAllEventsFromFireBase();
 
         return bind.getRoot();
     }
 
-    @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Log.d(TAG, "onViewCreated():");
+    private void initSubscribeEventListAdapter() {
+        subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
+                bind.subscribeEventListGone,
+                this);
+        bind.subscribeEventList.setAdapter(subscribeEventsRecyclerViewAdapter);
     }
 
     @Override
-    public void onAttach(@NonNull Context context) {
-        super.onAttach(context);
-        Log.d(TAG, "onAttach()");
+    public void onGetEvents(ArrayList<Event> eventArrayList) {
+        getSubscribeEvents(eventArrayList);
     }
 
     @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        Log.d(TAG, "onActivityCreated()");
+    public void onGetError(String message) {
+        Toast.makeText(getContext(), message, Toast.LENGTH_LONG).show();
     }
 
     @Override
-    public void onSaveInstanceState(@NonNull Bundle outState) {
-        super.onSaveInstanceState(outState);
-        Log.d(TAG, "onSaveInstanceState():");
+    public void showLoading(boolean show) {
+        bind.subscribeEventListSwipeRefresh.setRefreshing(show);
     }
 
     @Override
-    public void onStart() {
-        super.onStart();
-        Log.d(TAG, "onStart()");
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-        eventArrayList.clear();
-        db.collection("Events").addSnapshotListener((value, error) -> {
-            if (error != null){
-                Toast.makeText(getContext(), error.getLocalizedMessage(), Toast.LENGTH_SHORT).show();
-            }else if (value != null) {
-                for (QueryDocumentSnapshot documentSnapshot: value){
-                    Event event = documentSnapshot.toObject(Event.class);
-                    eventArrayList.add(event);
-                }
-                subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
-            }
-        });
+    public void onEventClick(Event event) {
+        Intent intent = new Intent(getContext(), EventActivity.class);
+        intent.putExtra("Event", event);
+        startActivityForResult(intent, Config.SHOW_EVENT);
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
-        Log.d(TAG, "onResume()");
+    public void onSubscribe(Event event) {
+        //nothing
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        Log.d(TAG, "onPause()");
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        Log.d(TAG, "onStop()");
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        Log.d(TAG, "onDestroyView()");
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        Log.d(TAG, "onDestroy()");
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        Log.d(TAG, "onDetach()");
+    public void onMarkerClick(Event event) {
+        LocationEventFragment locationEventFragment = LocationEventFragment.newInstance(event);
+        locationEventFragment.setTargetFragment(getParentFragment(), 300);
+        locationEventFragment.show(fragmentManager, "fragment_location_event");
     }
 
     @Override
@@ -148,6 +112,8 @@ public class SubscribeFragment extends Fragment {
             case RESULT_CANCELED:{
                 switch (requestCode){
                     case Config.SHOW_EVENT:{
+                        //Обновляем список в случае если пользователь отписался при просмотре эвента
+                        eventFireStorePresenter.getAllEventsFromFireBase();
                         Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SHOW_EVENT) Пользователь вышел из подробного просмотра эвента");
                         break;
                     }
@@ -161,14 +127,12 @@ public class SubscribeFragment extends Fragment {
         subscribeEvents.clear();
         for (Event event : arrayList){
             for (Subscriber subscriber : event.getSubscribers()){
-                if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
+                if (subscriber.getUser().equals(FirebaseAuthUserGetter.getUserFromFirebaseAuth())){
                     subscribeEvents.add(event);
                 }
             }
         }
-    }
-
-    public void myStartActivityForResult(Intent intent, int showEvent) {
-        startActivityForResult(intent, showEvent);
+        subscribeEventsRecyclerViewAdapter.setSubscribeEventsArrayList(subscribeEvents);
+        subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
     }
 }

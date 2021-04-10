@@ -24,13 +24,13 @@ public class LoadConfidentialUserDataPresenter implements ILoadConfidentialUserD
     }
 
     @Override
-    public void onGetData() {
-        Log.d(TAG, "onGetData: Чтение данных из SharedPreference");
+    public void getData() {
+        Log.d(TAG, "getData: Чтение данных из SharedPreference");
         Disposable disposable = Observable.just(iProviderConfidentialUserData.getConfidentialUserDataFromJSON())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(confidentialUserData -> {
-                    Log.d(TAG, "onGetData: Данные получены: " + confidentialUserData.toString());
+                    Log.d(TAG, "getData: Данные получены: " + confidentialUserData.toString());
                     iSetUserDataView.onSetEmail(confidentialUserData.getEmail());
                     iSetUserDataView.onSetPassword(confidentialUserData.getPassword());;
                 });

@@ -1,6 +1,5 @@
 package com.startup.eventsearcher.main.ui.subscribe;
 
-import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,37 +9,33 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.main.ui.events.EventFragment;
-import com.startup.eventsearcher.main.ui.events.event.EventActivity;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
+import com.startup.eventsearcher.main.ui.events.adapters.EventRecyclerViewListener;
 import com.startup.eventsearcher.main.ui.events.model.Category;
 import com.startup.eventsearcher.main.ui.events.model.Event;
 import com.startup.eventsearcher.main.ui.events.model.Subscriber;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
-import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.DateParser;
 
 import java.util.ArrayList;
 
 public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<SubscribeEventsRecyclerViewAdapter.ViewHolder> {
 
-    private final Fragment context;
-    private final RecyclerView subscribeRecyclerView;
-    private final ArrayList<Event> subscribeEventsArrayList;
+    private ArrayList<Event> subscribeEventsArrayList = new ArrayList<>();
     private final TextView textViewSubscribeEventListGone;
+    private final EventRecyclerViewListener eventRecyclerViewListener;
 
-    public SubscribeEventsRecyclerViewAdapter(SubscribeFragment subscribeFragment,
-                                              RecyclerView subscribeRecyclerView,
-                                              ArrayList<Event> subscribeEventsArrayList,
-                                              TextView textViewSubscribeEventListGone) {
-        this.context = subscribeFragment;
-        this.subscribeRecyclerView = subscribeRecyclerView;
-        this.subscribeEventsArrayList = subscribeEventsArrayList;
+    public SubscribeEventsRecyclerViewAdapter(TextView textViewSubscribeEventListGone,
+                                              EventRecyclerViewListener eventRecyclerViewListener) {
         this.textViewSubscribeEventListGone = textViewSubscribeEventListGone;
+        this.eventRecyclerViewListener = eventRecyclerViewListener;
+    }
+
+    public void setSubscribeEventsArrayList(ArrayList<Event> subscribeEventsArrayList) {
+        this.subscribeEventsArrayList = subscribeEventsArrayList;
     }
 
     @NonNull
@@ -48,14 +43,6 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
     public SubscribeEventsRecyclerViewAdapter.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.event_item_list, parent, false);
-
-        //Вызов подробной информации об эвенте
-        view.setOnClickListener(view1 -> {
-            int itemPosition = subscribeRecyclerView.getChildLayoutPosition(view1);
-            Intent intent = new Intent(parent.getContext(), EventActivity.class);
-            intent.putExtra("Event", subscribeEventsArrayList.get(itemPosition));
-            ((SubscribeFragment)context).myStartActivityForResult(intent, Config.SHOW_EVENT);
-        });
 
         return new ViewHolder(view);
     }
@@ -76,28 +63,17 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
 
         int resourceId = getResourceIdImage(event);
         holder.eventImage.setImageResource(resourceId);
-//        Glide.with(context).load(resourceId).into(holder.eventImage);
 
-        holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(context.requireContext(), R.drawable.ic_favorite));
+        holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(holder.eventView.getContext(), R.drawable.ic_favorite));
 
-        //Отписка, обратно подписаться нельзя, так как эвент исчезает из подписок
-        holder.eventSubscribe.setOnClickListener(view -> {
-            removeCurrentPersonFromSubscribers(event);
-            subscribeEventsArrayList.remove(event);
-            notifyItemRemoved(position);
-            notifyItemRangeChanged(position, getItemCount());
-        });
-
-        //Показ местоположения эвента
-        holder.eventLocationMarker.setOnClickListener(view -> EventFragment.showEventLocation(context, event));
-
+        holder.onBindingSuccess(event, position, eventRecyclerViewListener);
     }
 
     //Удаление текущего пользователя из подписчиков выбранного эвента
     private void removeCurrentPersonFromSubscribers(Event event) {
         ArrayList<Subscriber> subscriberArrayList = event.getSubscribers();
         for (Subscriber subscriber: event.getSubscribers()){
-            if (subscriber.getPerson().equals(CurrentPerson.getPerson())){
+            if (subscriber.getUser().equals(FirebaseAuthUserGetter.getUserFromFirebaseAuth())){
                 subscriberArrayList.remove(subscriber);
                 break;
             }
@@ -119,8 +95,8 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
         return subscribeEventsArrayList.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View View;
+    public class ViewHolder extends RecyclerView.ViewHolder {
+        public final View eventView;
         public final TextView eventTitle;
         public final TextView eventAddress;
         public final TextView eventCountPeople;
@@ -133,7 +109,7 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
 
         public ViewHolder(View view) {
             super(view);
-            View = view;
+            eventView = view;
             eventTitle = view.findViewById(R.id.list_events_title);
             eventAddress = view.findViewById(R.id.list_events_address);
             eventCountPeople = view.findViewById(R.id.list_events_count_people);
@@ -143,6 +119,24 @@ public class SubscribeEventsRecyclerViewAdapter extends RecyclerView.Adapter<Sub
             eventLocationMarker = view.findViewById(R.id.list_events_layout_location);
             eventDateNumber = view.findViewById(R.id.list_events_date_number);
             eventDateMonth = view.findViewById(R.id.list_events_date_month);
+        }
+
+        public void onBindingSuccess(Event event, int position, EventRecyclerViewListener eventRecyclerViewListener) {
+
+            //Вызов подробной информации об эвенте
+            eventView.setOnClickListener(view -> eventRecyclerViewListener.onEventClick(event));
+
+            //Подписка
+            eventSubscribe.setOnClickListener(view -> {
+                removeCurrentPersonFromSubscribers(event);
+                subscribeEventsArrayList.remove(event);
+                notifyItemRemoved(position);
+                notifyItemRangeChanged(position, getItemCount());
+                //TODO Отправка запроса на сервер об отписке
+            });
+
+            //Показ местоположения
+            eventLocationMarker.setOnClickListener(view -> eventRecyclerViewListener.onMarkerClick(event));
         }
     }
 }

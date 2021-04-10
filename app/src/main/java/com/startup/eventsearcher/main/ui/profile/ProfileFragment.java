@@ -9,12 +9,15 @@ import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.startup.eventsearcher.authentication.models.user.User;
+import com.startup.eventsearcher.authentication.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.FragmentProfileBinding;
-import com.startup.eventsearcher.main.ui.profile.model.CurrentPerson;
 
 public class ProfileFragment extends Fragment {
 
     private FragmentProfileBinding bind;
+
+    private FirebaseAuth firebaseAuth;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,21 +29,29 @@ public class ProfileFragment extends Fragment {
                              Bundle savedInstanceState) {
         bind = FragmentProfileBinding.inflate(inflater, container, false);
 
-        fillFields();
-
-        bind.profileSignOut.setOnClickListener(view -> {
-            FirebaseAuth firebaseAuth = FirebaseAuth.getInstance();
-            firebaseAuth.signOut();
-        });
+        firebaseAuth = FirebaseAuth.getInstance();
+        componentListeners();
 
         return bind.getRoot();
     }
 
+    private void componentListeners() {
+        bind.profileSignOut.setOnClickListener(view -> {
+            firebaseAuth.signOut();
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        fillFields();
+    }
+
     private void fillFields() {
-        bind.profileLogin.setText(CurrentPerson.getPerson().getLogin());
-        bind.profilePassword.setText(CurrentPerson.getPerson().getPassword());
-        bind.profileName.setText(CurrentPerson.getPerson().getName());
-        bind.profileSecondName.setText(CurrentPerson.getPerson().getSurname());
-        bind.profileEmail.setText(CurrentPerson.getPerson().getEmail());
+        User user = FirebaseAuthUserGetter.getUserFromFirebaseAuth();
+        String email = FirebaseAuthUserGetter.getUserEmailFromFirebaseAuth();
+        bind.profileLogin.setText(user.getLogin());
+        bind.profileEmail.setText(email);
+//        bind.profilePhoto.setImageURI(user.getUriPhoto());
     }
 }

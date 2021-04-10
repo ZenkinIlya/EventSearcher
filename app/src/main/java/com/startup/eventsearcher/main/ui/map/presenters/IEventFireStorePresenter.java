@@ -5,4 +5,6 @@ public interface IEventFireStorePresenter {
     void startEventAddListener();
 
     void endRegistrationListener();
+
+    void getAllEventsFromFireBase();
 }

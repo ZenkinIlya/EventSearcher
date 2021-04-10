@@ -36,7 +36,7 @@ public class SignInActivity extends AppCompatActivity implements ISignInView, IS
         getConfidentialUserDataPresenter =
                 new LoadConfidentialUserDataPresenter(this, new ProviderConfidentialUserData(this));
         //Получаем email и пароль из SharedPreference и заполняем поля
-        getConfidentialUserDataPresenter.onGetData();
+        getConfidentialUserDataPresenter.getData();
 
         saveConfidentialUserDataPresenter = new SaveConfidentialUserDataPresenter(new ProviderConfidentialUserData(this));
 

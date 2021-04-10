@@ -2,25 +2,25 @@ package com.startup.eventsearcher.main.ui.events.model;
 
 import androidx.annotation.NonNull;
 
-import com.startup.eventsearcher.main.ui.profile.model.Person;
+import com.startup.eventsearcher.authentication.models.user.User;
 
 import java.io.Serializable;
 import java.util.Objects;
 
 public class Subscriber implements Serializable {
 
-    private Person person;
+    private User user;
     private ExtraDate extraDate;
 
     public Subscriber(){}
 
-    public Subscriber(Person person, ExtraDate extraDate) {
-        this.person = person;
+    public Subscriber(User user, ExtraDate extraDate) {
+        this.user = user;
         this.extraDate = extraDate;
     }
 
-    public Person getPerson() {
-        return person;
+    public User getUser() {
+        return user;
     }
 
     public ExtraDate getExtraDate() {
@@ -31,7 +31,7 @@ public class Subscriber implements Serializable {
     @Override
     public String toString() {
         return "Subscriber{" +
-                "person=" + person +
+                "user=" + user +
                 ", extraDate=" + extraDate +
                 '}';
     }
@@ -41,12 +41,12 @@ public class Subscriber implements Serializable {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Subscriber that = (Subscriber) o;
-        return Objects.equals(person, that.person) &&
+        return Objects.equals(user, that.user) &&
                 Objects.equals(extraDate, that.extraDate);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(person, extraDate);
+        return Objects.hash(user, extraDate);
     }
 }

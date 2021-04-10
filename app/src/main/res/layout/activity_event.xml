@@ -299,7 +299,7 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         app:layoutManager="LinearLayoutManager"
-                        tools:context=".main.ui.events.EventFragment"
+                        tools:context=".main.ui.events.EventsListFragment"
                         tools:listitem="@layout/person_item_list" />
 
                 </LinearLayout>
