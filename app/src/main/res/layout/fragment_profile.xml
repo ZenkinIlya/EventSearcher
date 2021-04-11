@@ -13,26 +13,24 @@
         android:layout_width="30dp"
         android:layout_height="30dp"
         android:scaleType="fitXY"
-        android:src="@drawable/ic_settings"
+        android:src="@drawable/ic_exit"
         android:background="@color/primaryColor"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_margin="15dp"
         android:contentDescription="@string/Settings" />
 
-    <ImageView
+    <de.hdodenhof.circleimageview.CircleImageView
         android:id="@+id/profile_photo"
         android:layout_width="80dp"
         android:layout_height="80dp"
-        android:src="@drawable/ic_profile"
-        android:scaleType="fitXY"
-        android:padding="15dp"
-        android:background="@drawable/circle_dark"
+        android:src="@drawable/default_avatar"
+        android:scaleType="centerCrop"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/profile_help_view"
         android:elevation="5dp"
-        android:contentDescription="@string/Avatar" />
+        android:contentDescription="@string/Avatar"/>
 
     <View
         android:id="@+id/profile_help_view"
@@ -125,4 +123,12 @@
 
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/profile_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:name="com.startup.eventsearcher.views.common.LoadingFragment"
+        tools:layout="@layout/fragment_loading"/>
 </androidx.constraintlayout.widget.ConstraintLayout>

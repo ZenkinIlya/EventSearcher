@@ -15,7 +15,7 @@ import com.startup.eventsearcher.views.login.ISetExtraUserDataView;
 
 import java.util.Objects;
 
-public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
+public class UpdateFirebaseUserDataPresenter {
 
     private static final String TAG = "tgUpdateUserDataPres";
 
@@ -25,8 +25,8 @@ public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
     private final FirebaseUser firebaseUser;
     private final StorageReference firebaseStorageRef;
 
-    public UpdateUserDataPresenter(ISetExtraUserDataView iSetExtraUserDataView,
-                                   UserDataVerification userDataVerification) {
+    public UpdateFirebaseUserDataPresenter(ISetExtraUserDataView iSetExtraUserDataView,
+                                           UserDataVerification userDataVerification) {
         this.iSetExtraUserDataView = iSetExtraUserDataView;
         this.iUserDataVerification = userDataVerification;
 
@@ -52,53 +52,23 @@ public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
         }
     }
 
-    @Override
-    public void savePhotoInStorage(Uri uriPhoto){
-        Log.d(TAG, "savePhotoInStorage: Сохранение аватарки пользователя с uri = " + firebaseUser.getUid());
+    public void setLoginInFirebaseAuth(String displayName) {
+        Log.d(TAG, "setLoginInFirebaseAuth: Сохранение логина и аватарки по uri в firebaseUser");
 
-        if (uriPhoto == null){
-            Log.w(TAG, "savePhotoInStorage: uriPhoto = " + uriPhoto);
-            iSetExtraUserDataView.showLoading(false);
-            iSetExtraUserDataView.onSavePhotoInStorage();
-            return;
-        }
-
-        iSetExtraUserDataView.showLoading(true);
-        StorageReference storageReferencePhoto = firebaseStorageRef.child("images/users/" + firebaseUser.getUid() + "/avatar.jpg");
-        storageReferencePhoto.putFile(uriPhoto)
-                .addOnSuccessListener(taskSnapshot -> {
-                    Log.i(TAG, "savePhotoInStorage: success");
-                    iSetExtraUserDataView.showLoading(false);
-                    iSetExtraUserDataView.onSavePhotoInStorage();
-                })
-                .addOnFailureListener(e -> {
-                    String message = FirebaseErrorHandler.errorHandler(e);
-                    Log.e(TAG, "savePhotoInStorage: error = " + message);
-                    iSetExtraUserDataView.showLoading(false);
-                    iSetExtraUserDataView.onError(message);
-                });
-    }
-
-    @Override
-    public void updateDisplayNameAndPhoto(String displayName, Uri uriPhoto) {
-        Log.d(TAG, "updateDisplayNameAndPhoto: Сохранение логина и аватарки по uri в firebaseUser");
         if (verificationLogin(displayName)){
             iSetExtraUserDataView.showLoading(true);
-
             UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
-                    .setPhotoUri(uriPhoto)
                     .setDisplayName(displayName)
                     .build();
 
             Objects.requireNonNull(firebaseUser).updateProfile(profileUpdates)
                     .addOnCompleteListener(task -> {
                         if (task.isSuccessful()) {
-                            Log.i(TAG, "updateDisplayNameAndPhoto: success");
+                            Log.i(TAG, "setLoginInFirebaseAuth: success");
                             FirebaseUser user = firebaseAuth.getCurrentUser();
-                            Log.d(TAG, "updateDisplayNameAndPhoto: firebaseUser DisplayName = " + user.getDisplayName() +
-                                    ", PhotoUrl = " + user.getPhotoUrl());
+                            Log.d(TAG, "setLoginInFirebaseAuth: firebaseUser DisplayName = " + user.getDisplayName());
                             iSetExtraUserDataView.showLoading(false);
-                            iSetExtraUserDataView.onUpdateLoginAndPhoto();
+                            iSetExtraUserDataView.onSetLogin();
                         }
                     })
                     .addOnFailureListener(e -> {
@@ -110,13 +80,29 @@ public class UpdateUserDataPresenter implements IUpdateUserDataPresenter {
         }
     }
 
-    @Override
-    public void updateEmail(String email) {
+    public void setUriPhotoInFirebaseAuth(Uri uriPhoto) {
+        Log.d(TAG, "setUriPhotoInFirebaseAuth: Сохранение аватарки по uri в firebaseUser");
 
-    }
+            iSetExtraUserDataView.showLoading(true);
+            UserProfileChangeRequest profileUpdates = new UserProfileChangeRequest.Builder()
+                    .setPhotoUri(uriPhoto)
+                    .build();
 
-    @Override
-    public void updatePassword(String password) {
-
+            Objects.requireNonNull(firebaseUser).updateProfile(profileUpdates)
+                    .addOnCompleteListener(task -> {
+                        if (task.isSuccessful()) {
+                            Log.i(TAG, "setUriPhotoInFirebaseAuth: success");
+                            FirebaseUser user = firebaseAuth.getCurrentUser();
+                            Log.d(TAG, "setUriPhotoInFirebaseAuth: firebaseUser: photoUrl = " + user.getPhotoUrl());
+                            iSetExtraUserDataView.showLoading(false);
+                            iSetExtraUserDataView.onSetUriPhoto();
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        String message = FirebaseErrorHandler.errorHandler(e);
+                        Log.e(TAG, "setUriPhotoInFirebaseAuth: error = " + message);
+                        iSetExtraUserDataView.showLoading(false);
+                        iSetExtraUserDataView.onError(message);
+                    });
     }
 }

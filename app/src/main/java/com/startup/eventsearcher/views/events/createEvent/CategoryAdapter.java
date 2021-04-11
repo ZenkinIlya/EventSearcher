@@ -12,6 +12,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.viewpager.widget.PagerAdapter;
 
+import com.squareup.picasso.Picasso;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.models.event.Category;
 
@@ -46,7 +47,9 @@ public class CategoryAdapter extends PagerAdapter {
 
         ImageView imageView = new ImageView(context);
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setImageResource(categoryArrayList.get(position).getCategoryImage());
+        Picasso.get()
+                .load(categoryArrayList.get(position).getCategoryImage())
+                .into(imageView);
         relativeLayout.addView(imageView);
 
         TextView textView = new TextView(context);

@@ -1,11 +1,12 @@
 package com.startup.eventsearcher.views.events.event;
 
-import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
@@ -13,22 +14,24 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.models.event.Subscriber;
+import com.startup.eventsearcher.presenters.userData.StoragePhotoPresenter;
 import com.startup.eventsearcher.utils.DateParser;
+import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
+import com.startup.eventsearcher.views.profile.IStoragePhotoView;
 
 import java.util.ArrayList;
 
 public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecyclerViewAdapter.ViewHolder> {
 
-    private final ArrayList<Subscriber> subscribers;
-    private final Context context;
-    private final RecyclerView recyclerView;
+    private ArrayList<Subscriber> subscribers = new ArrayList<>();
 
-    public PersonRecyclerViewAdapter(ArrayList<Subscriber> subscribers, Context context, RecyclerView recyclerView) {
+    public PersonRecyclerViewAdapter() {
+    }
+
+    public void setSubscribers(ArrayList<Subscriber> subscribers) {
         this.subscribers = subscribers;
-        this.context = context;
-        this.recyclerView = recyclerView;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -37,18 +40,14 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.person_item_list, parent, false);
 
-        view.setOnClickListener(view1 -> {
-            int itemPosition = recyclerView.getChildLayoutPosition(view1);
-            Toast.makeText(context, "itemPosition = " + itemPosition, Toast.LENGTH_SHORT).show();
-        });
-
         return new PersonRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        holder.loadPhotoFromStorage(subscribers.get(position).getUser().getUid());
         if (FirebaseAuthUserGetter.getUserFromFirebaseAuth().equals(subscribers.get(position).getUser())){
-            holder.personCardView.setCardBackgroundColor(ContextCompat.getColor(context, R.color.backgroundCurrentUser));
+            holder.personCardView.setCardBackgroundColor(ContextCompat.getColor(holder.personView.getContext(), R.color.backgroundCurrentUser));
         }
         holder.personLogin.setText(subscribers.get(position).getUser().getLogin());
         holder.personArrivalTime.setText(DateParser.getDateFormatTime(subscribers.get(position).getExtraDate().getArrivalTime()));
@@ -60,20 +59,55 @@ public class PersonRecyclerViewAdapter extends RecyclerView.Adapter<PersonRecycl
         return subscribers.size();
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
-        public final View View;
+    public void unSubscribe(Subscriber subscriber) {
+        subscribers.remove(subscriber);
+        notifyDataSetChanged();
+    }
+
+    public static class ViewHolder extends RecyclerView.ViewHolder implements IStoragePhotoView {
+        public final View personView;
         public final TextView personLogin;
         public final TextView personArrivalTime;
         public final TextView personComment;
         public final CardView personCardView;
+        public final ImageView personAvatar;
 
         public ViewHolder(View view) {
             super(view);
-            View = view;
+            personView = view;
             personLogin = view.findViewById(R.id.person_login);
             personArrivalTime = view.findViewById(R.id.person_arrival_time);
             personComment = view.findViewById(R.id.person_comment);
             personCardView = view.findViewById(R.id.person_card);
+            personAvatar = view.findViewById(R.id.person_avatar);
+        }
+
+        private final StoragePhotoPresenter storagePhotoPresenter = new StoragePhotoPresenter(this);
+
+        @Override
+        public void onSavePhotoInStorage() {
+            //
+        }
+
+        @Override
+        public void onLoadPhotoFromStorage(Bitmap bitmap) {
+            personAvatar.setImageBitmap(bitmap);
+        }
+
+        @Override
+        public void onError(String message) {
+            //
+        }
+
+        @Override
+        public void showLoading(boolean show) {
+            //
+        }
+
+        public void loadPhotoFromStorage(String uid) {
+            storagePhotoPresenter.loadPhotoFromStorage(
+                    uid,
+                    BitmapFactory.decodeResource(itemView.getResources(), R.drawable.default_avatar));
         }
     }
 }

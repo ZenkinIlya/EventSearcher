@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.squareup.picasso.Picasso;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
@@ -33,12 +34,14 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
 
     private List<Event> listEvents = new ArrayList<>();
     private List<Event> listEventsFilter = new ArrayList<>();
+    private TypeEventList typeEventList;
     private final TextView eventEventsGone;
 
     private final EventRecyclerViewListener eventRecyclerViewListener;
 
-    public EventsListAdapter(TextView eventEventsGone,
+    public EventsListAdapter(TypeEventList typeEventList, TextView eventEventsGone,
                              EventRecyclerViewListener eventRecyclerViewListener) {
+        this.typeEventList = typeEventList;
         this.eventRecyclerViewListener = eventRecyclerViewListener;
         this.eventEventsGone = eventEventsGone;
     }
@@ -47,10 +50,7 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
         this.listEvents = listEvents;
         listEventsFilter.clear();
         listEventsFilter.addAll(listEvents);
-    }
-
-    public List<Event> getListEvents() {
-        return listEvents;
+        eventEventsGone.setVisibility(this.listEvents.isEmpty() ? View.VISIBLE : View.INVISIBLE);
     }
 
     @NonNull
@@ -76,8 +76,9 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
         holder.eventCountPeople.setText(String.valueOf(countPeople));
         holder.eventTime.setText(DateParser.getDateFormatTime(event.getDate()));
 
-        int resourceId = getResourceIdImage(event);
-        holder.eventImage.setImageResource(resourceId);
+        Picasso.get()
+                .load(getResourceIdImage(event))
+                .into(holder.eventImage);
 
         if (currentPersonIsSubscribe(event) != null){
             holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(holder.eventView.getContext(), R.drawable.ic_favorite));
@@ -85,13 +86,7 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
             holder.eventSubscribe.setImageDrawable(ContextCompat.getDrawable(holder.eventView.getContext(), R.drawable.ic_unfavorite));
         }
 
-        holder.onBindSuccess(event, eventRecyclerViewListener);
-    }
-
-    //Сброс фильтрованного списка
-    public void resetFilterList(){
-        listEventsFilter.clear();
-        listEventsFilter.addAll(listEvents);
+        holder.onBindSuccess(event, position, eventRecyclerViewListener);
     }
 
     //Проверка подписан ли пользователь на эвент
@@ -115,7 +110,6 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
 
     @Override
     public int getItemCount() {
-        eventEventsGone.setVisibility(listEvents.isEmpty() ? View.VISIBLE : View.INVISIBLE);
         return listEventsFilter.size();
     }
 
@@ -171,10 +165,10 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
             eventDateMonth = view.findViewById(R.id.list_events_date_month);
         }
 
-        public void onBindSuccess(Event event, EventRecyclerViewListener eventRecyclerViewListener) {
+        public void onBindSuccess(Event event, int position, EventRecyclerViewListener eventRecyclerViewListener) {
 
             //Вызов подробной информации об эвенте
-            eventView.setOnClickListener(view -> eventRecyclerViewListener.onEventClick(event));
+            eventView.setOnClickListener(view -> eventRecyclerViewListener.onEventClick(event.getId()));
 
             //Подписка
             eventSubscribe.setOnClickListener(view -> {
@@ -182,9 +176,16 @@ public class EventsListAdapter extends RecyclerView.Adapter<EventsListAdapter.Vi
                 if (subscriber == null) {
                     eventRecyclerViewListener.onSubscribe(event);
                 }else {
-                    //TODO Отправка запроса на сервер об отписке
-                    event.getSubscribers().remove(subscriber);
-                    notifyDataSetChanged();
+                    eventRecyclerViewListener.onUnSubscribe(event, subscriber);
+                    if (typeEventList == TypeEventList.SUBSCRIBES){
+                        listEventsFilter.remove(event);
+                        listEvents.remove(event);
+                        notifyItemRemoved(position);
+                        notifyItemRangeChanged(position, getItemCount());
+                    }else {
+                        notifyDataSetChanged();
+                        event.getSubscribers().remove(subscriber);
+                    }
                 }
             });
 

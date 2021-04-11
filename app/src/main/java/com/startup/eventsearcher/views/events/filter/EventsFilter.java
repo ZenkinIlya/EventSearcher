@@ -1,4 +1,4 @@
-package com.startup.eventsearcher.utils.filter;
+package com.startup.eventsearcher.views.events.filter;
 
 import com.startup.eventsearcher.models.event.Event;
 import com.startup.eventsearcher.utils.DateParser;

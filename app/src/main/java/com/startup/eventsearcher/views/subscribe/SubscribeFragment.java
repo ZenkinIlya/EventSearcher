@@ -13,15 +13,18 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 
+import com.startup.eventsearcher.presenters.firestore.EventSubscribeFireStorePresenter;
 import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.FragmentSubscribeBinding;
 import com.startup.eventsearcher.views.events.adapters.EventRecyclerViewListener;
+import com.startup.eventsearcher.views.events.adapters.EventsListAdapter;
+import com.startup.eventsearcher.views.events.adapters.TypeEventList;
 import com.startup.eventsearcher.views.events.event.EventActivity;
 import com.startup.eventsearcher.views.events.event.LocationEventFragment;
 import com.startup.eventsearcher.models.event.Event;
 import com.startup.eventsearcher.models.event.Subscriber;
-import com.startup.eventsearcher.presenters.firestore.EventFireStorePresenter;
-import com.startup.eventsearcher.views.map.IFireStoreView;
+import com.startup.eventsearcher.presenters.firestore.EventGetterFireStorePresenter;
+import com.startup.eventsearcher.views.map.IEventGetterFireStoreView;
 import com.startup.eventsearcher.utils.Config;
 
 import java.util.ArrayList;
@@ -29,16 +32,18 @@ import java.util.ArrayList;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class SubscribeFragment extends Fragment implements EventRecyclerViewListener, IFireStoreView {
+public class SubscribeFragment extends Fragment implements EventRecyclerViewListener,
+        IEventGetterFireStoreView, ISubscribeFireStoreView {
 
     private static final String TAG = "mySubscribeList";
 
     private FragmentSubscribeBinding bind;
 
-    private SubscribeEventsRecyclerViewAdapter subscribeEventsRecyclerViewAdapter;
+    private EventsListAdapter eventsListAdapter;
     private final ArrayList<Event> subscribeEvents = new ArrayList<>();
     private static FragmentManager fragmentManager;
-    private EventFireStorePresenter eventFireStorePresenter;
+    private EventGetterFireStorePresenter eventGetterFireStorePresenter;
+    private EventSubscribeFireStorePresenter eventSubscribeFireStorePresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -51,26 +56,33 @@ public class SubscribeFragment extends Fragment implements EventRecyclerViewList
         bind = FragmentSubscribeBinding.inflate(inflater, container, false);
 
         fragmentManager = getActivity().getSupportFragmentManager();
-        eventFireStorePresenter = new EventFireStorePresenter(this);
-        bind.subscribeEventListSwipeRefresh.setOnRefreshListener(() -> eventFireStorePresenter.getAllEventsFromFireBase());
+        bind.subscribeEventListSwipeRefresh.setOnRefreshListener(() -> eventGetterFireStorePresenter.getAllEventsFromFireBase());
 
-        initSubscribeEventListAdapter();
+        initEventsListAdapter();
 
-        eventFireStorePresenter.getAllEventsFromFireBase();
+        eventSubscribeFireStorePresenter = new EventSubscribeFireStorePresenter(this);
+        eventGetterFireStorePresenter = new EventGetterFireStorePresenter(this);
+        eventGetterFireStorePresenter.getAllEventsFromFireBase();
 
         return bind.getRoot();
     }
 
-    private void initSubscribeEventListAdapter() {
-        subscribeEventsRecyclerViewAdapter = new SubscribeEventsRecyclerViewAdapter(
+    private void initEventsListAdapter() {
+        eventsListAdapter = new EventsListAdapter(
+                TypeEventList.SUBSCRIBES,
                 bind.subscribeEventListGone,
                 this);
-        bind.subscribeEventList.setAdapter(subscribeEventsRecyclerViewAdapter);
+        bind.subscribeEventList.setAdapter(eventsListAdapter);
     }
 
     @Override
     public void onGetEvents(ArrayList<Event> eventArrayList) {
         getSubscribeEvents(eventArrayList);
+    }
+
+    @Override
+    public void onSuccess() {
+        //Вызывается только при удачной отписке
     }
 
     @Override
@@ -84,15 +96,15 @@ public class SubscribeFragment extends Fragment implements EventRecyclerViewList
     }
 
     @Override
-    public void onEventClick(Event event) {
+    public void onEventClick(String eventId) {
         Intent intent = new Intent(getContext(), EventActivity.class);
-        intent.putExtra("Event", event);
+        intent.putExtra("eventId", eventId);
         startActivityForResult(intent, Config.SHOW_EVENT);
     }
 
     @Override
     public void onSubscribe(Event event) {
-        //nothing
+        //Подписаться не возможно, так как отображаются только эвенты на которые пользователь уже подписан
     }
 
     @Override
@@ -103,17 +115,24 @@ public class SubscribeFragment extends Fragment implements EventRecyclerViewList
     }
 
     @Override
+    public void onUnSubscribe(Event event, Subscriber subscriber) {
+        eventSubscribeFireStorePresenter.unSubscribeFormEventInFirebase(event.getId(), subscriber);
+    }
+
+    @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (resultCode){
             case RESULT_OK:{
+                switch (requestCode) {
+                }
                 break;
             }
             case RESULT_CANCELED:{
                 switch (requestCode){
                     case Config.SHOW_EVENT:{
                         //Обновляем список в случае если пользователь отписался при просмотре эвента
-                        eventFireStorePresenter.getAllEventsFromFireBase();
+                        eventGetterFireStorePresenter.getAllEventsFromFireBase();
                         Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SHOW_EVENT) Пользователь вышел из подробного просмотра эвента");
                         break;
                     }
@@ -132,7 +151,7 @@ public class SubscribeFragment extends Fragment implements EventRecyclerViewList
                 }
             }
         }
-        subscribeEventsRecyclerViewAdapter.setSubscribeEventsArrayList(subscribeEvents);
-        subscribeEventsRecyclerViewAdapter.notifyDataSetChanged();
+        eventsListAdapter.setListEvents(subscribeEvents);
+        eventsListAdapter.notifyDataSetChanged();
     }
 }

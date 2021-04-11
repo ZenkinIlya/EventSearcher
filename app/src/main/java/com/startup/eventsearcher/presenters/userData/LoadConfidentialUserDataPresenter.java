@@ -10,7 +10,7 @@ import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
 
-public class LoadConfidentialUserDataPresenter implements ILoadConfidentialUserDataPresenter {
+public class LoadConfidentialUserDataPresenter {
 
     private static final String TAG = "tgLoadConfUserDataPres";
 
@@ -23,7 +23,6 @@ public class LoadConfidentialUserDataPresenter implements ILoadConfidentialUserD
         this.iProviderConfidentialUserData = iProviderConfidentialUserData;
     }
 
-    @Override
     public void getData() {
         Log.d(TAG, "getData: Чтение данных из SharedPreference");
         Disposable disposable = Observable.just(iProviderConfidentialUserData.getConfidentialUserDataFromJSON())

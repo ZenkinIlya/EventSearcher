@@ -7,24 +7,24 @@ import com.google.firebase.firestore.ListenerRegistration;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.models.event.Event;
-import com.startup.eventsearcher.views.map.IFireStoreView;
 import com.startup.eventsearcher.utils.DateParser;
+import com.startup.eventsearcher.utils.firebase.FirebaseErrorHandler;
+import com.startup.eventsearcher.views.map.IEventGetterFireStoreView;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-public class EventFireStorePresenter implements IEventFireStorePresenter{
+public class EventGetterFireStorePresenter {
 
     private static final String TAG = "tgEventFireStorePres";
     private final ArrayList<Event> eventArrayList = new ArrayList<>();
-    private final IFireStoreView iFireStoreView;
+    private final IEventGetterFireStoreView iEventGetterFireStoreView;
     private ListenerRegistration listenerRegistration;
 
-    public EventFireStorePresenter(IFireStoreView iFireStoreView) {
-        this.iFireStoreView = iFireStoreView;
+    public EventGetterFireStorePresenter(IEventGetterFireStoreView iEventGetterFireStoreView) {
+        this.iEventGetterFireStoreView = iEventGetterFireStoreView;
     }
 
-    @Override
     public void startAllEventChangesListener() {
         //Необходимо при инициализации слушателя очищать список
         eventArrayList.clear();
@@ -35,7 +35,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
 
                     if (error != null){
                         Log.e(TAG, "startAllEventChangesListener: " + error.getLocalizedMessage());
-                        iFireStoreView.onGetError(error.getLocalizedMessage());
+                        iEventGetterFireStoreView.onGetError(error.getLocalizedMessage());
                     }else if (value != null) {
                         //Перебираю все изменения во всей коллекции
                         for (DocumentChange documentChange: value.getDocumentChanges()){
@@ -81,12 +81,11 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                             idStringArrayList.add(event.getId());
                         }
                         Log.i(TAG, "startAllEventChangesListener: id eventArrayList = " + idStringArrayList.toString());
-                        iFireStoreView.onGetEvents(eventArrayList);
+                        iEventGetterFireStoreView.onGetEvents(eventArrayList);
                     }
         });
     }
 
-    @Override
     public void startEventAddListener() {
         Log.d(TAG, "startEventAddListener()");
 
@@ -99,8 +98,9 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                 .addSnapshotListener((value, error) -> {
 
                     if (error != null) {
-                        Log.e(TAG, "startEventAddListener: " + error.getLocalizedMessage());
-                        iFireStoreView.onGetError(error.getLocalizedMessage());
+                        String stringError = FirebaseErrorHandler.errorHandler(error);
+                        Log.e(TAG, "startEventAddListener: " + stringError);
+                        iEventGetterFireStoreView.onGetError(stringError);
                     } else if (value != null) {
                         //Перебираю все изменения во всей коллекции
                         for (DocumentChange documentChange : value.getDocumentChanges()) {
@@ -113,7 +113,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                                     Event addedEvent = documentChange.getDocument().toObject(Event.class);
                                     addedEvent.setId(id);
                                     eventArrayList.add(addedEvent);
-                                    Log.d(TAG, "startAllEventChangesListener: эвент добавлен");
+                                    Log.i(TAG, "startAllEventChangesListener: эвент добавлен");
                                     break;
                                 case REMOVED:
                                     for (Event event: eventArrayList){
@@ -122,7 +122,7 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                                             break;
                                         }
                                     }
-                                    Log.d(TAG, "startAllEventChangesListener: эвент изъят");
+                                    Log.i(TAG, "startAllEventChangesListener: эвент изъят");
                                     break;
                             }
                         }
@@ -131,17 +131,16 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                         for (Event event: eventArrayList){
                             idStringArrayList.add(event.getId());
                         }
-                        Log.i(TAG, "startEventAddListener: id eventArrayList = " + idStringArrayList.toString());
-                        iFireStoreView.onGetEvents(eventArrayList);
+                        Log.d(TAG, "startEventAddListener: id eventArrayList = " + idStringArrayList.toString());
+                        iEventGetterFireStoreView.onGetEvents(eventArrayList);
                     }
                 });
     }
 
-    @Override
     public void getAllEventsFromFireBase() {
         Log.d(TAG, "getAllEventsFromFireBase()");
 
-        iFireStoreView.showLoading(true);
+        iEventGetterFireStoreView.showLoading(true);
         eventArrayList.clear();
         App.db.collection("events")
                 .whereGreaterThanOrEqualTo("date", DateParser.getDateWithMinusHours(new Date(), 12))
@@ -154,19 +153,45 @@ public class EventFireStorePresenter implements IEventFireStorePresenter{
                         Event addedEvent = documentSnapshot.toObject(Event.class);
                         addedEvent.setId(id);
                         eventArrayList.add(addedEvent);
-                        Log.d(TAG, "getAllEventsFromFireBase: эвент считан");
+                        Log.i(TAG, "getAllEventsFromFireBase: эвент считан");
                     }
-                    iFireStoreView.showLoading(false);
-                    iFireStoreView.onGetEvents(eventArrayList);
+                    iEventGetterFireStoreView.onGetEvents(eventArrayList);
                 })
                 .addOnFailureListener(error -> {
-                    Log.e(TAG, "getAllEventsFromFireBase: " + error.getLocalizedMessage());
-                    iFireStoreView.showLoading(false);
-                    iFireStoreView.onGetError(error.getLocalizedMessage());
+                    String stringError = FirebaseErrorHandler.errorHandler(error);
+                    Log.e(TAG, "getAllEventsFromFireBase: " + stringError);
+                    iEventGetterFireStoreView.onGetError(stringError);
+                })
+                .addOnCompleteListener(task -> {
+                    iEventGetterFireStoreView.showLoading(false);
                 });
     }
 
-    @Override
+    public void getEventById(String id){
+        Log.d(TAG, "getEventById()");
+
+        iEventGetterFireStoreView.showLoading(true);
+        eventArrayList.clear();
+        App.db.collection("events")
+                .document(id)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    Log.i(TAG, "getEventById: Получен эвент по id");
+                    Event gottenEvent = documentSnapshot.toObject(Event.class);
+                    gottenEvent.setId(id);
+                    eventArrayList.add(gottenEvent);
+                    iEventGetterFireStoreView.onGetEvents(eventArrayList);
+                })
+                .addOnFailureListener(error -> {
+                    String stringError = FirebaseErrorHandler.errorHandler(error);
+                    Log.e(TAG, "getEventById: " + stringError);
+                    iEventGetterFireStoreView.onGetError(stringError);
+                })
+                .addOnCompleteListener(task -> {
+                    iEventGetterFireStoreView.showLoading(false);
+                });
+    }
+
     public void endRegistrationListener() {
         listenerRegistration.remove();
     }

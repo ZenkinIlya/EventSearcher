@@ -19,9 +19,12 @@ import androidx.fragment.app.FragmentManager;
 
 import com.jakewharton.rxbinding4.appcompat.RxSearchView;
 import com.startup.eventsearcher.R;
+import com.startup.eventsearcher.models.event.Subscriber;
+import com.startup.eventsearcher.presenters.firestore.EventSubscribeFireStorePresenter;
 import com.startup.eventsearcher.views.events.adapters.EventRecyclerViewListener;
 import com.startup.eventsearcher.views.events.adapters.EventsListAdapter;
 import com.startup.eventsearcher.views.events.adapters.TagRecyclerViewListener;
+import com.startup.eventsearcher.views.events.adapters.TypeEventList;
 import com.startup.eventsearcher.views.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.views.events.event.EventActivity;
 import com.startup.eventsearcher.views.events.event.LocationEventFragment;
@@ -30,8 +33,9 @@ import com.startup.eventsearcher.views.events.filter.FilterHandler;
 import com.startup.eventsearcher.databinding.FragmentEventListBinding;
 import com.startup.eventsearcher.views.events.adapters.TagRecyclerViewAdapter;
 import com.startup.eventsearcher.models.event.Event;
-import com.startup.eventsearcher.presenters.firestore.EventFireStorePresenter;
-import com.startup.eventsearcher.views.map.IFireStoreView;
+import com.startup.eventsearcher.presenters.firestore.EventGetterFireStorePresenter;
+import com.startup.eventsearcher.views.map.IEventGetterFireStoreView;
+import com.startup.eventsearcher.views.subscribe.ISubscribeFireStoreView;
 import com.startup.eventsearcher.views.subscribe.SubscribeActivity;
 import com.startup.eventsearcher.utils.Config;
 
@@ -52,14 +56,16 @@ import static android.app.Activity.RESULT_OK;
  * он прошел упешно, то из окна подписки возвращаются параметры: index, startTime, comment. Затем
  * идет обновление глобального списка эвентов и обновление адаптера*/
 
-public class EventsListFragment extends Fragment implements EventRecyclerViewListener, IFireStoreView, TagRecyclerViewListener {
+public class EventsListFragment extends Fragment implements EventRecyclerViewListener,
+        IEventGetterFireStoreView, ISubscribeFireStoreView, TagRecyclerViewListener {
 
     private static final String TAG = "tgEventFrag";
 
     private FragmentEventListBinding bind;
 
     private EventsListAdapter eventsListAdapter;
-    private EventFireStorePresenter eventFireStorePresenter;
+    private EventGetterFireStorePresenter eventGetterFireStorePresenter;
+    private EventSubscribeFireStorePresenter eventSubscribeFireStorePresenter;
     private static FragmentManager fragmentManager;
 
     @Override
@@ -76,13 +82,14 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
         ((AppCompatActivity) requireActivity()).setSupportActionBar(bind.eventListToolbar);
         setHasOptionsMenu(true);
 
-        eventFireStorePresenter = new EventFireStorePresenter(this);
+        eventGetterFireStorePresenter = new EventGetterFireStorePresenter(this);
+        eventSubscribeFireStorePresenter = new EventSubscribeFireStorePresenter(this);
 
         initEventListAdapter();
         initTagListAdapter();
         componentListener();
 
-        eventFireStorePresenter.getAllEventsFromFireBase();
+        eventGetterFireStorePresenter.getAllEventsFromFireBase();
 
         return bind.getRoot();
     }
@@ -96,6 +103,7 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
 
     private void initEventListAdapter() {
         eventsListAdapter = new EventsListAdapter(
+                TypeEventList.DEFAULT,
                 bind.eventListGone,
                 this);
         bind.eventList.setAdapter(eventsListAdapter);
@@ -103,9 +111,9 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
 
 
     @Override
-    public void onEventClick(Event event) {
+    public void onEventClick(String eventId) {
         Intent intent = new Intent(getContext(), EventActivity.class);
-        intent.putExtra("Event", event);
+        intent.putExtra("eventId", eventId);
         startActivityForResult(intent, Config.SHOW_EVENT);
     }
 
@@ -124,11 +132,21 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
     }
 
     @Override
+    public void onUnSubscribe(Event event, Subscriber subscriber) {
+        eventSubscribeFireStorePresenter.unSubscribeFormEventInFirebase(event.getId(), subscriber);
+    }
+
+    @Override
     public void onGetEvents(ArrayList<Event> eventArrayList) {
         //Получаем эвенты с сервера и фильтруем их
         eventsListAdapter.setListEvents(eventArrayList);
         eventsListAdapter.filter();
         eventsListAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onSuccess() {
+        //Вызывается при отписке
     }
 
     @Override
@@ -154,12 +172,12 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
             case RESULT_OK:{
                 switch (requestCode) {
                     case Config.SUBSCRIBE:{
-                        eventFireStorePresenter.getAllEventsFromFireBase();
+                        eventGetterFireStorePresenter.getAllEventsFromFireBase();
                         Log.d(TAG, "onActivityResult: (RESULT_OK, SUBSCRIBE) Пользователь подписался");
                         break;
                     }
                     case Config.CREATE_EVENT:{
-                        eventFireStorePresenter.getAllEventsFromFireBase();
+                        eventGetterFireStorePresenter.getAllEventsFromFireBase();
                         Log.d(TAG, "onActivityResult: (RESULT_OK, CREATE_EVENT) Пользователь создал эвент из меню");
                         break;
                     }
@@ -175,15 +193,17 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
             case RESULT_CANCELED:{
                 switch (requestCode){
                     case Config.SUBSCRIBE:{
-                        Log.d(TAG, "onActivityResult: Пользователь отменил этап подписки");
+                        Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SUBSCRIBE) Пользователь вышел из подробного просмотра эвента");
                         break;
                     }
                     case Config.SHOW_EVENT:{
-                        Log.d(TAG, "onActivityResult: Пользователь вышел из подробного просмотра эвента");
+                        //Обновляем список в случае если пользователь отписался/подписался при просмотре эвента
+                        eventGetterFireStorePresenter.getAllEventsFromFireBase();
+                        Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SHOW_EVENT) Пользователь вышел из подробного просмотра эвента");
                         break;
                     }
                     case Config.SHOW_FILTER:{
-                        Log.d(TAG, "onActivityResult: Пользователь вышел из фильтра");
+                        Log.d(TAG, "onActivityResult: (RESULT_CANCELED, SHOW_FILTER) Пользователь вышел из фильтра");
                         break;
                     }
                 }
@@ -247,6 +267,6 @@ public class EventsListFragment extends Fragment implements EventRecyclerViewLis
             startActivityForResult(intent, Config.SHOW_FILTER);
         });
 
-        bind.eventSwipeRefresh.setOnRefreshListener(() -> eventFireStorePresenter.getAllEventsFromFireBase());
+        bind.eventSwipeRefresh.setOnRefreshListener(() -> eventGetterFireStorePresenter.getAllEventsFromFireBase());
     }
 }

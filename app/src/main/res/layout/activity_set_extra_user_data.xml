@@ -30,9 +30,8 @@
                 android:layout_height="150dp"
                 android:layout_marginBottom="10dp"
                 android:layout_gravity="center"
-                android:src="@drawable/ic_profile"
-                android:scaleType="centerCrop"
-                app:civ_circle_background_color="@color/primaryDarkColor"/>
+                android:src="@drawable/default_avatar"
+                android:scaleType="centerCrop"/>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/set_data_user_login"

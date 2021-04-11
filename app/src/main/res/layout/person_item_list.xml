@@ -22,12 +22,11 @@
             android:padding="5dp">
 
             <de.hdodenhof.circleimageview.CircleImageView
-                android:id="@+id/person_ava"
+                android:id="@+id/person_avatar"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:src="@drawable/ic_profile"
+                android:src="@drawable/default_avatar"
                 android:scaleType="centerCrop"
-                app:civ_circle_background_color="@color/primaryDarkColor"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -41,7 +40,7 @@
                 android:paddingEnd="15dp"
                 android:text="Lionel Messi"
                 app:layout_constraintEnd_toStartOf="@id/person_arrival_time"
-                app:layout_constraintStart_toEndOf="@id/person_ava"
+                app:layout_constraintStart_toEndOf="@id/person_avatar"
                 app:layout_constraintTop_toTopOf="parent"/>
 
             <TextView

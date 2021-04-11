@@ -306,4 +306,13 @@
             </androidx.core.widget.NestedScrollView>
         </LinearLayout>
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.fragment.app.FragmentContainerView
+        android:id="@+id/event_loading"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="invisible"
+        android:name="com.startup.eventsearcher.views.common.LoadingFragment"
+        tools:layout="@layout/fragment_loading"/>
+
 </LinearLayout>

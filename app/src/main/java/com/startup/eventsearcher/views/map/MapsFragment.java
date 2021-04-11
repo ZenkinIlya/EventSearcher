@@ -26,9 +26,9 @@ import com.startup.eventsearcher.R;
 import com.startup.eventsearcher.databinding.FragmentMapsBinding;
 import com.startup.eventsearcher.views.events.createEvent.EventCreatorActivity;
 import com.startup.eventsearcher.views.events.event.EventActivity;
-import com.startup.eventsearcher.utils.filter.EventsFilter;
+import com.startup.eventsearcher.views.events.filter.EventsFilter;
 import com.startup.eventsearcher.models.event.Event;
-import com.startup.eventsearcher.presenters.firestore.EventFireStorePresenter;
+import com.startup.eventsearcher.presenters.firestore.EventGetterFireStorePresenter;
 import com.startup.eventsearcher.utils.map.IMapHandler;
 import com.startup.eventsearcher.utils.map.IPermissionMapProvider;
 import com.startup.eventsearcher.utils.map.MapHandler;
@@ -44,7 +44,7 @@ import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class MapsFragment extends Fragment implements IMapHandler, IPermissionMapProvider,
-        IFireStoreView {
+        IEventGetterFireStoreView {
 
     private static final String TAG = "tgMapsFragment";
 
@@ -52,7 +52,7 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
 
     private MapHandler mapHandler;
     private PermissionMapProvider permissionMapProvider;
-    private EventFireStorePresenter eventFireStorePresenter;
+    private EventGetterFireStorePresenter eventGetterFireStorePresenter;
 
     private GoogleMap map;
     private boolean flgFirstEnterToMapFragment = true;
@@ -71,7 +71,7 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         mapHandler = new MapHandler(this);
         permissionMapProvider = new PermissionMapProvider(this, getContext());
 
-        eventFireStorePresenter = new EventFireStorePresenter(this);
+        eventGetterFireStorePresenter = new EventGetterFireStorePresenter(this);
 
         return bind.getRoot();
     }
@@ -82,14 +82,14 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         Log.d(TAG, "onStart()");
 
         permissionMapProvider.getPermissions();
-        eventFireStorePresenter.startEventAddListener();
+        eventGetterFireStorePresenter.startEventAddListener();
     }
 
     @Override
     public void onStop() {
         super.onStop();
         Log.d(TAG, "onStop()");
-        eventFireStorePresenter.endRegistrationListener();
+        eventGetterFireStorePresenter.endRegistrationListener();
     }
 
     @Override
@@ -340,7 +340,7 @@ public class MapsFragment extends Fragment implements IMapHandler, IPermissionMa
         Log.d(TAG, "onMarkerClick: event = " + Objects.requireNonNull(event).toString());
 
         Intent intent = new Intent(getContext(), EventActivity.class);
-        intent.putExtra("Event", event);
+        intent.putExtra("eventId", event.getId());
         startActivityForResult(intent, Config.SHOW_EVENT);
 
         // Return false to indicate that we have not consumed the event and that we wish

@@ -10,8 +10,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.databinding.ActivityFilterBinding;
 import com.startup.eventsearcher.models.event.Event;
-import com.startup.eventsearcher.presenters.firestore.EventFireStorePresenter;
-import com.startup.eventsearcher.views.map.IFireStoreView;
+import com.startup.eventsearcher.presenters.firestore.EventGetterFireStorePresenter;
+import com.startup.eventsearcher.views.map.IEventGetterFireStoreView;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.DateTimeMaterialPicker;
 import com.startup.eventsearcher.utils.dateTimeMaterialPicker.IDateTimeMaterialPicker;
 
@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class FilterActivity extends AppCompatActivity implements IDateTimeMaterialPicker, IFireStoreView {
+public class FilterActivity extends AppCompatActivity implements IDateTimeMaterialPicker, IEventGetterFireStoreView {
 
     private static final String TAG = "myFilter";
 
@@ -33,7 +33,7 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
     private Filter filter;
     private DateTimeMaterialPicker dateTimeMaterialPicker;
 
-    private EventFireStorePresenter eventFireStorePresenter;
+    private EventGetterFireStorePresenter eventGetterFireStorePresenter;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,7 +44,7 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
         filter = FilterHandler.getFilterFromJSON(this);
         Log.d(TAG, "onCreate: filter = " + filter.toString());
 
-        eventFireStorePresenter = new EventFireStorePresenter(this);
+        eventGetterFireStorePresenter = new EventGetterFireStorePresenter(this);
 
         dateTimeMaterialPicker = new DateTimeMaterialPicker(this, getSupportFragmentManager());
 
@@ -58,7 +58,7 @@ public class FilterActivity extends AppCompatActivity implements IDateTimeMateri
     @Override
     protected void onStart() {
         super.onStart();
-        eventFireStorePresenter.getAllEventsFromFireBase();
+        eventGetterFireStorePresenter.getAllEventsFromFireBase();
     }
 
     @Override

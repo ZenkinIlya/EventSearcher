@@ -1,6 +1,7 @@
 package com.startup.eventsearcher.views.login;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
@@ -10,19 +11,23 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.startup.eventsearcher.databinding.ActivitySetExtraUserDataBinding;
-import com.startup.eventsearcher.presenters.userData.UpdateUserDataPresenter;
+import com.startup.eventsearcher.presenters.userData.StoragePhotoPresenter;
+import com.startup.eventsearcher.presenters.userData.UpdateFirebaseUserDataPresenter;
 import com.startup.eventsearcher.utils.Config;
+import com.startup.eventsearcher.utils.converters.ImageConverter;
 import com.startup.eventsearcher.utils.user.UserDataVerification;
 import com.startup.eventsearcher.views.main.MainActivity;
+import com.startup.eventsearcher.views.profile.IStoragePhotoView;
 
 import java.util.Objects;
 
-public class SetExtraUserDataActivity extends AppCompatActivity implements ISetExtraUserDataView {
+public class SetExtraUserDataActivity extends AppCompatActivity implements ISetExtraUserDataView, IStoragePhotoView {
 
     private static final String TAG = "tgSetExtraUserDataAct";
     private ActivitySetExtraUserDataBinding bind;
 
-    private UpdateUserDataPresenter updateUserDataPresenter;
+    private UpdateFirebaseUserDataPresenter updateFirebaseUserDataPresenter;
+    private StoragePhotoPresenter storagePhotoPresenter;
     private Uri imageUri;
 
     @Override
@@ -31,8 +36,9 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
         bind = ActivitySetExtraUserDataBinding.inflate(getLayoutInflater());
         setContentView(bind.getRoot());
 
-        updateUserDataPresenter = new UpdateUserDataPresenter(this,
+        updateFirebaseUserDataPresenter = new UpdateFirebaseUserDataPresenter(this,
                 new UserDataVerification(this));
+        storagePhotoPresenter = new StoragePhotoPresenter(this);
 
         componentListener();
     }
@@ -49,7 +55,8 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
 
         //Применить изменения
         bind.setDataUserAccept.setOnClickListener(view -> {
-            updateUserDataPresenter.savePhotoInStorage(imageUri);
+            byte[] bytes = ImageConverter.compressImage(this, imageUri);
+            storagePhotoPresenter.savePhotoInStorage(bytes);
         });
     }
 
@@ -63,26 +70,26 @@ public class SetExtraUserDataActivity extends AppCompatActivity implements ISetE
     }
 
     @Override
-    public void onUpdateLoginAndPhoto() {
+    public void onSavePhotoInStorage() {
+        updateFirebaseUserDataPresenter.setUriPhotoInFirebaseAuth(imageUri);
+    }
+
+    @Override
+    public void onLoadPhotoFromStorage(Bitmap bitmap) {
+        //Загрузка аватрки не выполняется в данном Activity
+    }
+
+    @Override
+    public void onSetLogin() {
         Intent intent = new Intent(this, MainActivity.class);
         startActivity(intent);
         finish();
     }
 
     @Override
-    public void onSavePhotoInStorage() {
+    public void onSetUriPhoto() {
         String displayName = Objects.requireNonNull(bind.setDataUserLogin.getEditText()).getText().toString();
-        updateUserDataPresenter.updateDisplayNameAndPhoto(displayName, imageUri);
-    }
-
-    @Override
-    public void onErrorEmail(String message) {
-        //При обновлении email
-    }
-
-    @Override
-    public void onErrorPassword(String message) {
-        //При обновлении пароля
+        updateFirebaseUserDataPresenter.setLoginInFirebaseAuth(displayName);
     }
 
     @Override

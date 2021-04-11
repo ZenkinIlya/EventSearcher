@@ -4,13 +4,14 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.content.ContextCompat;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -21,15 +22,20 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 import com.startup.eventsearcher.App;
 import com.startup.eventsearcher.R;
-import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
 import com.startup.eventsearcher.databinding.ActivityEventBinding;
 import com.startup.eventsearcher.models.event.Category;
 import com.startup.eventsearcher.models.event.Event;
 import com.startup.eventsearcher.models.event.Subscriber;
-import com.startup.eventsearcher.views.subscribe.SubscribeActivity;
+import com.startup.eventsearcher.presenters.firestore.EventGetterFireStorePresenter;
+import com.startup.eventsearcher.presenters.firestore.EventSubscribeFireStorePresenter;
 import com.startup.eventsearcher.utils.Config;
 import com.startup.eventsearcher.utils.DateParser;
+import com.startup.eventsearcher.utils.user.FirebaseAuthUserGetter;
+import com.startup.eventsearcher.views.map.IEventGetterFireStoreView;
+import com.startup.eventsearcher.views.subscribe.ISubscribeFireStoreView;
+import com.startup.eventsearcher.views.subscribe.SubscribeActivity;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 /*Активити отображения эвента
@@ -37,14 +43,18 @@ import java.util.Objects;
 * При нажатии на "подписаться" появляется окно подписки. После успешного завершение подписки
 * файл json перезаписывается в onActivityResult. При снятии подписки json тут же обновляется*/
 
-public class EventActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class EventActivity extends AppCompatActivity implements
+        ISubscribeFireStoreView, IEventGetterFireStoreView {
 
     private static final String TAG = "myEvent";
 
     private ActivityEventBinding bind;
 
+    private String eventId;
     private Event event;
     private PersonRecyclerViewAdapter personRecyclerViewAdapter;
+    private EventSubscribeFireStorePresenter eventSubscribeFireStorePresenter;
+    private EventGetterFireStorePresenter eventGetterFireStorePresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,22 +68,44 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setElevation(0);  //удаление тени
 
-        //Принимаем эвент для подробного просмотра
-        event = (Event) getIntent().getSerializableExtra("Event");
-        if (event != null) {
-            fillFields();
-            RecyclerView recyclerView = findViewById(R.id.event_members);
-            personRecyclerViewAdapter = new PersonRecyclerViewAdapter(event.getSubscribers(), this, recyclerView);
-            recyclerView.setAdapter(personRecyclerViewAdapter);
+        personRecyclerViewAdapter = new PersonRecyclerViewAdapter();
+        bind.eventMembers.setAdapter(personRecyclerViewAdapter);
 
-            SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
-                    .findFragmentById(R.id.event_location_event_map);
-            if (supportMapFragment != null) {
-                supportMapFragment.getMapAsync(this);
-            }
-        }
+        eventId = getIntent().getStringExtra("eventId");
+
+        eventSubscribeFireStorePresenter = new EventSubscribeFireStorePresenter(this);
+        eventGetterFireStorePresenter = new EventGetterFireStorePresenter(this);
+        eventGetterFireStorePresenter.getEventById(eventId);
 
         componentListener();
+    }
+
+    @Override
+    public void onSuccess() {
+        //Вызывается при удачной отписке
+        eventGetterFireStorePresenter.getEventById(eventId);
+    }
+
+    @Override
+    public void onGetEvents(ArrayList<Event> eventArrayList) {
+        event = eventArrayList.get(0);
+        personRecyclerViewAdapter.setSubscribers(event.getSubscribers());
+        fillFields();
+        initMap();
+    }
+
+    @Override
+    public void onGetError(String message) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void showLoading(boolean show) {
+        if (show){
+            bind.eventLoading.setVisibility(View.VISIBLE);
+        }else {
+            bind.eventLoading.setVisibility(View.INVISIBLE);
+        }
     }
 
     @Override
@@ -83,6 +115,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
             case RESULT_OK:{
                 switch (requestCode) {
                     case Config.SUBSCRIBE: {
+                        eventGetterFireStorePresenter.getEventById(eventId);
                         Log.d(TAG, "onActivityResult: (RESULT_OK, SUBSCRIBE) Пользователь подписался/отписался");
                         break;
                     }
@@ -124,7 +157,7 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
                 intent.putExtra("Event", event);
                 startActivityForResult(intent, Config.SUBSCRIBE);
             }else {
-                //TODO Убрать сабскрайбера в эвенте глобального списка
+                eventSubscribeFireStorePresenter.unSubscribeFormEventInFirebase(eventId, subscriber);
             }
         });
     }
@@ -143,12 +176,10 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         bind.eventTime.setText(DateParser.getDateFormatTime(event.getDate()));
 
         setImageSubscribe();
-
-        int resourceId = getResourceIdImage(event);
-        bind.eventImageCategory.setImageResource(resourceId);
         Picasso.get()
-                .load(resourceId)
+                .load(getResourceIdImage(event))
                 .into(bind.eventImageCategory);
+
         bind.eventComment.setText(event.getComment());
     }
 
@@ -181,16 +212,25 @@ public class EventActivity extends AppCompatActivity implements OnMapReadyCallba
         return 0;
     }
 
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
-                event.getEventAddress().getLongitude());
-        MarkerOptions markerOptions = new MarkerOptions();
-        markerOptions.position(latLng);
-        googleMap.addMarker(markerOptions);
-        googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
-        //Запрет на перемещение по карте
-        googleMap.getUiSettings().setAllGesturesEnabled(false);
-
+    private void initMap() {
+        SupportMapFragment supportMapFragment = (SupportMapFragment) getSupportFragmentManager()
+                .findFragmentById(R.id.event_location_event_map);
+        if (supportMapFragment != null) {
+            supportMapFragment.getMapAsync(callback);
+        }
     }
+
+    private final OnMapReadyCallback callback = new OnMapReadyCallback() {
+        @Override
+        public void onMapReady(GoogleMap googleMap) {
+            LatLng latLng = new LatLng(event.getEventAddress().getLatitude(),
+                    event.getEventAddress().getLongitude());
+            MarkerOptions markerOptions = new MarkerOptions();
+            markerOptions.position(latLng);
+            googleMap.addMarker(markerOptions);
+            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, Config.DEFAULT_ZOOM));
+            //Запрет на перемещение по карте
+            googleMap.getUiSettings().setAllGesturesEnabled(false);
+        }
+    };
 }
