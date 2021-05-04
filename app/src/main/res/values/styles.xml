@@ -115,5 +115,7 @@
         <item name="android:textColor">@color/chip_text_color</item>
         <item name="checkedIconTint">@color/white</item>
         <item name="rippleColor">@color/primaryLightColor</item>
+        <item name="cardElevation">4dp</item>
+        <item name="android:translationZ">4dp</item>
     </style>
 </resources>

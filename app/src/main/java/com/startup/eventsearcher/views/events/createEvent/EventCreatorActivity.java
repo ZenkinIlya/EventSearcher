@@ -116,7 +116,7 @@ public class EventCreatorActivity extends AppCompatActivity implements SetLocati
         App.db.collection("events")
                 .add(event)
                 .addOnSuccessListener(documentReference -> {
-                    Toast.makeText(EventCreatorActivity.this, "Event saved in FireStore", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(EventCreatorActivity.this, "Эвент создан", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "DocumentSnapshot added with ID: " + documentReference.getId());
                 })
                 .addOnFailureListener(e -> {

@@ -34,7 +34,7 @@
     <string name="event">эвент</string>
     <string name="startTime">Время начала</string>
     <string name="Subscribe">Подписаться</string>
-    <string name="EventsGone">Эвенты отсутствуют</string>
+    <string name="EventsGone">На данный момент событий нет</string>
     <string name="Filter">Фильтер</string>
     <string name="TheDateOfTheEvent">Дата проведения эвента</string>
     <string name="subscribersGone">У вас нет подписок</string>

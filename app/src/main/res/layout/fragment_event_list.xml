@@ -43,15 +43,6 @@
                     android:textSize="25sp"
                     android:textStyle="bold"/>
 
-                <TextView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="5dp"
-                    android:paddingHorizontal="20dp"
-                    android:text="480 событий вокруг вас"
-                    android:textColor="@color/white"
-                    android:textSize="18sp"/>
-
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/event_list_tag"
                     android:layout_width="wrap_content"
@@ -154,11 +145,11 @@
 
         <TextView
             android:id="@+id/event_list_gone"
-            style="@style/TextAppearance.MaterialComponents.Caption"
+            style="@style/TextAppearance.MaterialComponents.Body1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/EventsGone"
-            android:visibility="visible"
+            android:visibility="invisible"
             android:layout_centerInParent="true"/>
     </RelativeLayout>
 
