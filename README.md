@@ -1,4 +1,4 @@
-# Github App
+# EventSearcher
 <p align="center">
     <img src="https://raw.githubusercontent.com/ZenkinIlya/EventSearcher/main/forReadme/auth.png" width="250">
     <img src="https://raw.githubusercontent.com/ZenkinIlya/EventSearcher/main/forReadme/chooseLoginAndPhoto.png" width="250">
